@@ -23,5 +23,20 @@ dist-ssr
 *.sln
 *.sw?
 
+# Hardhat files
+cache
+artifacts
+
+
+node_modules
 .env
-.todo
+coverage
+coverage.json
+typechain
+typechain-types
+
+# Hardhat files
+cache
+artifacts
+
+*.todo
