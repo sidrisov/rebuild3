@@ -1,56 +1,51 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { blue, yellow } from '@mui/material/colors';
+import '../styles/App.css';
+
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import GlobalStyles from '@mui/material/GlobalStyles';
 
-import { AppBar, IconButton, Toolbar } from '@mui/material';
+import { AppBar, Button, IconButton, Toolbar, Typography } from '@mui/material';
 
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 
-import reactLogo from './assets/react.svg';
-import './App.css';
+import reactLogo from '../assets/react.svg';
+import HomeLogo from '../common/HomeLogo';
+import muiTheme from '../common/themeUtils';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [count, setCount] = useState(0);
 
-  const theme = useMemo(
-    () =>
-      createTheme({
-        palette: {
-          //primary: blue,
-          //secondary: yellow,
-          mode: darkMode ? 'dark' : 'light',
-        },
-      }),
-    [darkMode]
-  );
+  const theme = useMemo(() => muiTheme(darkMode), [darkMode]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <GlobalStyles
         styles={{
-          body: { backgroundColor: darkMode ? '#121212' : '#f8fafc' },
+          body: { backgroundColor: darkMode ? '#242424' : '#f8fafc' },
         }}
       />
-      <AppBar position="fixed" color="primary">
+      <AppBar position="fixed">
         <Toolbar variant="dense">
-          <IconButton
-            onClick={() => setDarkMode((darkMode) => !darkMode)}
-            color="inherit">
+          <HomeLogo flexGrow={1} />
+          <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
             {darkMode ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
           </IconButton>
+          <Button variant="contained">Connect Wallet</Button>
         </Toolbar>
       </AppBar>
       <div className="App">
         <div>
           <a href="https://vitejs.dev" target="_blank">
             <img src="/vite.svg" className="logo" alt="Vite logo" />
+          </a>
+          <a href="https://vitejs.dev" target="_blank">
+            <img src="/cubes.svg" className="logo" alt="ReBuild3 logo" />
           </a>
           <a href="https://reactjs.org" target="_blank">
             <img src={reactLogo} className="logo react" alt="React logo" />
