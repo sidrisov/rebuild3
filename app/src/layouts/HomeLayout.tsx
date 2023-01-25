@@ -1,9 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import GlobalStyles from '@mui/material/GlobalStyles';
 
 import {
   AppBar,
@@ -14,33 +10,24 @@ import {
   Toolbar,
   Typography,
   Box,
-  Stack,
+  Stack
 } from '@mui/material';
 
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 
-import HomeLogo from '../common/HomeLogo';
-import muiTheme from '../common/themeUtils';
+import HomeLogo from '../components/Logo';
 
 import { ReactComponent as Love } from '../assets/loving.svg';
 import { ReactComponent as LoveInverted } from '../assets/loving_inverted.svg';
 import { blue, green, red } from '@mui/material/colors';
+import CustomThemeProvider from '../theme/CustomThemeProvider';
 
-export default function Home() {
+export default function HomeLayout() {
   const [darkMode, setDarkMode] = useState(false);
 
-  const theme = useMemo(() => muiTheme(darkMode), [darkMode]);
-
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <GlobalStyles
-        styles={{
-          body: { backgroundColor: darkMode ? '#242424' : '#f8fafc' },
-        }}
-      />
-
+    <CustomThemeProvider darkMode={darkMode}>
       <AppBar position="fixed">
         <Toolbar variant="dense">
           <HomeLogo flexGrow={1} />
@@ -61,7 +48,7 @@ export default function Home() {
               display: 'flex',
               flexDirection: 'row',
               flexWrap: 'wrap',
-              alignItems: 'center',
+              alignItems: 'center'
             }}>
             <Stack sx={{ spacing: 2, flex: 1 }}>
               <Typography color="grey" variant="h5">
@@ -71,9 +58,8 @@ export default function Home() {
                 ReBuild3 helps global community to bring back what was destroyed
               </Typography>
               <Typography m="10" color="grey" variant="h6">
-                enforced by smart contracts to bring transperancy into the
-                fundraising process, safeguard donations, and validate the
-                expenditure.
+                enforced by smart contracts to bring transperancy into the fundraising process,
+                safeguard donations, and validate the expenditure.
               </Typography>
             </Stack>
             {darkMode ? <LoveInverted width={350} /> : <Love width={350} />}
@@ -86,7 +72,7 @@ export default function Home() {
             flexDirection: 'row',
             //flexWrap: 'wrap',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'space-between'
           }}>
           <Box sx={{ m: 2, spacing: 2, flexWrap: 'wrap' }}>
             <Typography color={red[400]} variant="h4">
@@ -114,6 +100,6 @@ export default function Home() {
           </Box>
         </Box>
       </Container>
-    </ThemeProvider>
+    </CustomThemeProvider>
   );
 }
