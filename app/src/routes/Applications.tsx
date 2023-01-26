@@ -1,10 +1,19 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Container, Stack, Typography } from '@mui/material';
+
+import AddIcon from '@mui/icons-material/Add';
 
 function Applications() {
   return (
-    <Box>
-      <Typography variant="h2">I'm Applications Page</Typography>
-    </Box>
+    <Container>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+        <Typography variant="h4" gutterBottom>
+          Applications
+        </Typography>
+        <Button variant="outlined" startIcon={<AddIcon />}>
+          New
+        </Button>
+      </Stack>
+    </Container>
   );
 }
 
