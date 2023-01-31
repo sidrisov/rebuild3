@@ -1,42 +1,92 @@
-import { Container, Typography } from '@mui/material';
+import { useContext, useMemo, useState } from 'react';
+import { ethers } from 'ethers';
 
-function Dashboard() {
+import { Box, Card, CardProps, Container, Typography } from '@mui/material';
+
+import { UserContext } from '../layouts/App';
+
+interface DashboardStatsType {
+  activeRegions: number | undefined;
+  organizations: number | undefined;
+  campaigns: number | undefined;
+  threshold: string | undefined;
+}
+
+function StatsCard(props: CardProps) {
   return (
-    <Container maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: 5 }}>
-        Hi, Welcome back
-      </Typography>
-      <Typography variant="h2">I'm Dashboard Page</Typography>
-      <Typography>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Similique unde fugit veniam eius,
-        perspiciatis sunt? Corporis qui ducimus quibusdam, aliquam dolore excepturi quae. Distinctio
-        enim at eligendi perferendis in cum quibusdam sed quae, accusantium et aperiam? Quod itaque
-        exercitationem, at ab sequi qui modi delectus quia corrupti alias distinctio nostrum. Minima
-        ex dolor modi inventore sapiente necessitatibus aliquam fuga et. Sed numquam quibusdam at
-        officia sapiente porro maxime corrupti perspiciatis asperiores, exercitationem eius nostrum
-        consequuntur iure aliquam itaque, assumenda et! Quibusdam temporibus beatae doloremque
-        voluptatum doloribus soluta accusamus porro reprehenderit eos inventore facere, fugit,
-        molestiae ab officiis illo voluptates recusandae. Vel dolor nobis eius, ratione atque
-        soluta, aliquam fugit qui iste architecto perspiciatis. Nobis, voluptatem! Cumque, eligendi
-        unde aliquid minus quis sit debitis obcaecati error, delectus quo eius exercitationem
-        tempore. Delectus sapiente, provident corporis dolorum quibusdam aut beatae repellendus est
-        labore quisquam praesentium repudiandae non vel laboriosam quo ab perferendis velit ipsa
-        deleniti modi! Ipsam, illo quod. Nesciunt commodi nihil corrupti cum non fugiat praesentium
-        doloremque architecto laborum aliquid. Quae, maxime recusandae? Eveniet dolore molestiae
-        dicta blanditiis est expedita eius debitis cupiditate porro sed aspernatur quidem, repellat
-        nihil quasi praesentium quia eos, quibusdam provident. Incidunt tempore vel placeat
-        voluptate iure labore, repellendus beatae quia unde est aliquid dolor molestias libero.
-        Reiciendis similique exercitationem consequatur, nobis placeat illo laudantium! Enim
-        perferendis nulla soluta magni error, provident repellat similique cupiditate ipsam, et
-        tempore cumque quod! Qui, iure suscipit tempora unde rerum autem saepe nisi vel cupiditate
-        iusto. Illum, corrupti? Fugiat quidem accusantium nulla. Aliquid inventore commodi
-        reprehenderit rerum reiciendis! Quidem alias repudiandae eaque eveniet cumque nihil aliquam
-        in expedita, impedit quas ipsum nesciunt ipsa ullam consequuntur dignissimos numquam at nisi
-        porro a, quaerat rem repellendus. Voluptates perspiciatis, in pariatur impedit, nam facilis
-        libero dolorem dolores sunt inventore perferendis, aut sapiente modi nesciunt.
-      </Typography>
-    </Container>
+    <Card
+      {...props}
+      sx={{
+        maxWidth: '0.8',
+        minWidth: '0.2',
+        flexGrow: 1,
+        m: 2,
+        p: 2,
+        border: 1,
+        borderColor: 'gray',
+        borderRadius: 1
+      }}
+    />
   );
 }
 
-export default Dashboard;
+export default function Dashboard() {
+  const { isWalletConnected, regions, organizations, contract } = useContext(UserContext);
+
+  const [stats, setStats] = useState<DashboardStatsType>({} as DashboardStatsType);
+
+  useMemo(async () => {
+    if (isWalletConnected) {
+      const thresholdWei = await contract?.goalThreshold();
+
+      let threshold;
+      if (thresholdWei) {
+        threshold = ethers.utils.formatEther(thresholdWei);
+      }
+      setStats({
+        activeRegions: (await contract?.getActiveRegions())?.length,
+        organizations: (await contract?.getAllOrganizations())?.length,
+        campaigns: (await contract?.getAllCampaigns())?.length,
+        threshold
+      });
+    }
+  }, [isWalletConnected, contract]);
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        overflowWrap: 'break-word',
+        alignContent: 'center',
+        justifyContent: 'space-evenly',
+        p: 1,
+        m: 1
+      }}>
+      <StatsCard>
+        <Typography variant="overline" color="grey">
+          Active Regions:
+        </Typography>
+        <Typography variant="h6">{stats.activeRegions}</Typography>
+      </StatsCard>
+      <StatsCard>
+        <Typography variant="overline" color="grey">
+          Organizations:
+        </Typography>
+        <Typography variant="h6">{stats.organizations}</Typography>
+      </StatsCard>
+      <StatsCard>
+        <Typography variant="overline" color="grey">
+          Campaigns:
+        </Typography>
+        <Typography variant="h6">{stats.campaigns}</Typography>
+      </StatsCard>
+      <StatsCard>
+        <Typography variant="overline" color="grey">
+          Goal Threashold:
+        </Typography>
+        <Typography variant="h6">{stats.threshold} ETH</Typography>
+      </StatsCard>
+    </Box>
+  );
+}

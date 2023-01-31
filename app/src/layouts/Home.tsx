@@ -10,11 +10,11 @@ import {
   Toolbar,
   Typography,
   Box,
-  Stack
+  Stack,
+  useMediaQuery
 } from '@mui/material';
 
-import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
-import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import { ExitToApp, DarkModeOutlined, LightModeOutlined } from '@mui/icons-material';
 
 import HomeLogo from '../components/Logo';
 
@@ -24,24 +24,34 @@ import { blue, green, red } from '@mui/material/colors';
 import CustomThemeProvider from '../theme/CustomThemeProvider';
 
 export default function HomeLayout() {
-  const [darkMode, setDarkMode] = useState(false);
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [darkMode, setDarkMode] = useState(prefersDarkMode);
 
   return (
     <CustomThemeProvider darkMode={darkMode}>
-      <AppBar position="fixed">
-        <Toolbar variant="dense">
+      <AppBar
+        position="sticky"
+        color="transparent"
+        elevation={0}
+        sx={{ backdropFilter: 'blur(5px)' }}>
+        <Toolbar>
           <HomeLogo flexGrow={1} />
           <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
-            {darkMode ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
+            {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
           </IconButton>
-          <Button variant="contained" component={Link} to={'/app'}>
+          <Button
+            variant="contained"
+            component={Link}
+            to={'/app'}
+            endIcon={<ExitToApp />}
+            sx={{ width: 150 }}>
             Go To App
           </Button>
         </Toolbar>
       </AppBar>
 
       <Container>
-        <Card sx={{ my: 10, border: 2, borderRadius: 16 }} variant="elevation">
+        <Card sx={{ my: 5, border: 2, borderRadius: 16 }} variant="elevation">
           <Box
             sx={{
               m: 5,
@@ -52,7 +62,7 @@ export default function HomeLayout() {
             }}>
             <Stack sx={{ spacing: 2, flex: 1 }}>
               <Typography color="grey" variant="h5">
-                DECENTRALIZED CROWDFUNDING SOLUTION
+                DECENTRALIZED FUNDRAISING SOLUTION
               </Typography>
               <Typography variant="h3">
                 ReBuild3 helps global community to bring back what was destroyed

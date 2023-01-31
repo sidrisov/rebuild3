@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import HomeLayout from './layouts/HomeLayout';
-import AppLayout from './layouts/AppLayout';
+import HomeLayout from './layouts/Home';
+import AppLayout from './layouts/App';
 import Page404 from './routes/Page404';
 import Dashboard from './routes/Dashboard';
 import Applications from './routes/Applications';
