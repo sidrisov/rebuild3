@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import HomeLogo from './Logo';
 
-const paths = ['/app/dashboard', '/app/applications', '/app/validators'];
+const paths = ['/app/dashboard', '/app/fundraisers', '/app/validators'];
 
 import { QueryStats, VolunteerActivism, VerifiedUser } from '@mui/icons-material';
 
@@ -53,13 +53,13 @@ export default function Navigation() {
           icon={<QueryStats />}
         />
         <AlignedLinkTab
-          label="Fundraising"
+          label="Fundraisers"
           tabIndex={1}
           to={paths[1]}
           icon={<VolunteerActivism />}
         />
         <AlignedLinkTab
-          label="Organisations"
+          label="Validators"
           tabIndex={2}
           component={Link}
           to={paths[2]}

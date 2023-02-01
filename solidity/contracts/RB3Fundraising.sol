@@ -13,10 +13,32 @@ contract RB3Fundraising is Ownable {
 
   struct Organization {
     bool active;
-    address payable account;
+    address account;
     string name;
     string description;
     string region;
+  }
+
+  // Fundraising request information
+  struct Campaign {
+    bool active;
+    address owner;
+    string title;
+    string description;
+    uint256 goal;
+    uint256 fundsRaised;
+    bool released;
+    string region;
+    address organization;
+  }
+
+  struct Donation {
+    uint campaignId;
+    address donor;
+    uint256 timestamp;
+    uint256 amount;
+    bool released;
+    bool returned;
   }
 
   uint256 public goalThreshold = 0;
@@ -28,21 +50,12 @@ contract RB3Fundraising is Ownable {
   Organization[] organizations;
   mapping(address => uint) organizationIds;
 
-  // Fundraising request information
-  struct Campaign {
-    bool active;
-    address payable recipient;
-    string title;
-    string description;
-    uint256 goal;
-    uint256 fundsRaised;
-    bool released;
-    string region;
-    address organization;
-  }
-
   Campaign[] public campaigns;
   uint public activeCampaigns;
+
+  Donation[] donations;
+  mapping(uint => uint[]) donatedTo;
+  mapping(address => uint[]) donatedBy;
 
   // Organization events
   event OrganizationRegistered(address indexed organization);
@@ -53,7 +66,10 @@ contract RB3Fundraising is Ownable {
   event RegionDeactivated(string indexed name);
 
   // Campaign events
-  event CampaignCreated(uint indexed campaignId, address indexed creator);
+  event CampaignCreated(uint indexed campaignId, address indexed owner);
+  event CampaignActive(uint indexed campaignId);
+  event DonationMade(uint indexed campaignId, address indexed donor, uint256 indexed amount);
+  event CampaignSuccess(uint indexed campaignId, address indexed receiver, uint256 amount);
 
   // Activate region
   function activateRegion(string memory _name) public onlyOwner {
@@ -83,7 +99,7 @@ contract RB3Fundraising is Ownable {
   ) public onlyOwner {
     require(!isOrganization(_organization), 'Organization already exists!');
     require(isRegionActive(_region), 'Region is not active!');
-    organizations.push(Organization(true, payable(_organization), _name, _description, _region));
+    organizations.push(Organization(true, _organization, _name, _description, _region));
     organizationIds[_organization] = organizations.length;
     emit OrganizationRegistered(_organization);
   }
@@ -163,22 +179,75 @@ contract RB3Fundraising is Ownable {
     require(isRegionActive(_region), 'Region is not active!');
     require(isOrganizationActive(_organization), 'Organization is not active!');
     require(_goal <= goalThreshold, "You can't raise more than allowed threshold!");
+    require(msg.sender != _organization, "Campaign creator and organization can't be same!");
 
     campaigns.push(
-      Campaign(
-        false,
-        payable(msg.sender),
-        _title,
-        _description,
-        _goal,
-        0,
-        false,
-        _region,
-        _organization
-      )
+      Campaign(false, msg.sender, _title, _description, _goal, 0, false, _region, _organization)
     );
 
     emit CampaignCreated(campaigns.length - 1, msg.sender);
+  }
+
+  function approveCampaign(uint _campaignId) external {
+    require(_campaignId < campaigns.length, "Campaign doesn't exist!");
+
+    require(!campaigns[_campaignId].active, 'Campaign is approved already!');
+    require(campaigns[_campaignId].organization == msg.sender, 'Not allowed to approve!');
+
+    campaigns[_campaignId].active = true;
+    emit CampaignActive(_campaignId);
+  }
+
+  function donate(uint _campaignId) external payable {
+    require(_campaignId < campaigns.length, "Campaign doesn't exist!");
+    require(
+      campaigns[_campaignId].active && !campaigns[_campaignId].released,
+      'Campaign is not open for donation!'
+    );
+
+    address donor = msg.sender;
+    uint256 amount = msg.value;
+
+    donations.push(Donation(_campaignId, donor, block.timestamp, amount, false, false));
+
+    uint donationId = donations.length - 1;
+
+    donatedTo[_campaignId].push(donationId);
+    donatedBy[donor].push(donationId);
+    campaigns[_campaignId].fundsRaised += amount;
+
+    emit DonationMade(_campaignId, msg.sender, amount);
+  }
+
+  function release(uint _campaignId) external {
+    require(_campaignId < campaigns.length, "Campaign doesn't exist!");
+    require(
+      campaigns[_campaignId].active && !campaigns[_campaignId].released,
+      'Campaign is not open for donation!'
+    );
+
+    require(
+      campaigns[_campaignId].fundsRaised >= campaigns[_campaignId].goal,
+      'The goal amount is not raised!'
+    );
+
+    campaigns[_campaignId].released = true;
+
+    for (uint i = 0; i < donatedTo[_campaignId].length; i++) {
+      uint donationId = donatedTo[_campaignId][i];
+      donations[donationId].released = true;
+    }
+
+    (bool sent, ) = payable(campaigns[_campaignId].owner).call{
+      value: campaigns[_campaignId].fundsRaised
+    }('');
+    require(sent, 'Failed to release funds!');
+
+    emit CampaignSuccess(
+      _campaignId,
+      campaigns[_campaignId].owner,
+      campaigns[_campaignId].fundsRaised
+    );
   }
 
   function setGoalThreshold(uint256 _threshold) external onlyOwner {

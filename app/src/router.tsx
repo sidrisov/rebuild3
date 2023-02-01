@@ -3,7 +3,7 @@ import HomeLayout from './layouts/Home';
 import AppLayout from './layouts/App';
 import Page404 from './routes/Page404';
 import Dashboard from './routes/Dashboard';
-import Applications from './routes/Applications';
+import Fundraisers from './routes/Fundraisers';
 import Validators from './routes/Validators';
 
 export const router = createBrowserRouter([
@@ -17,9 +17,9 @@ export const router = createBrowserRouter([
     element: <AppLayout />,
     errorElement: <Page404 />,
     children: [
-      { element: <Navigate to="/app/applications" />, index: true },
-      { path: '/app/dashboard', element: <Dashboard /> },
-      { path: 'applications', element: <Applications /> },
+      { element: <Navigate to="/app/dashboard" />, index: true },
+      { path: 'dashboard', element: <Dashboard /> },
+      { path: 'fundraisers', element: <Fundraisers /> },
       { path: 'validators', element: <Validators /> },
       { path: '404', element: <Page404 /> },
       { path: '*', element: <Navigate to="/404" replace /> }

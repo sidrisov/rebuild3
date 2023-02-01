@@ -8,11 +8,6 @@ async function main() {
 
   await contract.deployed();
 
-  await contract.activateRegion('Ukraine');
-
-  await contract.registerOrganization(addr1.address, 'ORG1', 'We Rebuild', 'Ukraine');
-  await contract.registerOrganization(addr2.address, 'ORG2', 'We Rebuild', 'Ukraine');
-
   await contract.setGoalThreshold(ethers.utils.parseEther('1'));
 
   console.log(`RB3Fundraising deployed to ${contract.address}`);

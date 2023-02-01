@@ -10,6 +10,8 @@ describe('RB3Fundraising', function () {
     const RB3Fundraising = await ethers.getContractFactory('RB3Fundraising');
     const contract = await RB3Fundraising.deploy();
 
+    await contract.setGoalThreshold(ethers.utils.parseEther('1'));
+
     return { contract, owner, addr1, addr2 };
   }
 
@@ -22,6 +24,8 @@ describe('RB3Fundraising', function () {
 
     await contract.activateRegion('Ukraine');
 
+    await contract.setGoalThreshold(ethers.utils.parseEther('1'));
+
     return { contract, owner, addr1, addr2 };
   }
 
@@ -31,6 +35,8 @@ describe('RB3Fundraising', function () {
 
     const RB3Fundraising = await ethers.getContractFactory('RB3Fundraising');
     const contract = await RB3Fundraising.deploy();
+
+    await contract.setGoalThreshold(ethers.utils.parseEther('1'));
 
     await contract.activateRegion('Ukraine');
     await contract.registerOrganization(addr1.address, 'org1', 'desc1', 'Ukraine');
@@ -160,6 +166,16 @@ describe('RB3Fundraising', function () {
       expect((await contract.getAllCampaigns()).length).to.be.equal(0);
     });
 
+    it('Campaign creation not allowed', async function () {
+      const { contract, addr1 } = await loadFixture(deployFixtureWithRegionAndOrg);
+
+      await expect(
+        contract
+          .connect(addr1)
+          .submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address)
+      ).to.be.revertedWith("Campaign creator and organization can't be same!");
+    });
+
     it('Campaign added successfully', async function () {
       const { contract, addr1 } = await loadFixture(deployFixtureWithRegionAndOrg);
 
@@ -167,6 +183,41 @@ describe('RB3Fundraising', function () {
 
       expect((await contract.getAllCampaigns()).length).to.be.equal(1);
       expect((await contract.getAllCampaigns())[0].active).to.be.false;
+    });
+
+    it("Campaign doesn't exist", async function () {
+      const { contract } = await loadFixture(deployFixtureWithRegionAndOrg);
+
+      await expect(contract.approveCampaign(0)).to.be.revertedWith("Campaign doesn't exist!");
+    });
+
+    it('Campaign approval not allowed', async function () {
+      const { contract, addr1 } = await loadFixture(deployFixtureWithRegionAndOrg);
+
+      await contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address);
+      await expect(contract.approveCampaign(0)).to.be.revertedWith('Not allowed to approve!');
+    });
+
+    it('Campaign approval successful', async function () {
+      const { contract, addr1 } = await loadFixture(deployFixtureWithRegionAndOrg);
+
+      await contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address);
+
+      await contract.connect(addr1).approveCampaign(0);
+
+      expect((await contract.connect(addr1).getAllCampaigns())[0].active).to.be.true;
+    });
+
+    it("Campaign can't be approved twice", async function () {
+      const { contract, addr1 } = await loadFixture(deployFixtureWithRegionAndOrg);
+
+      await contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address);
+
+      await contract.connect(addr1).approveCampaign(0);
+
+      await expect(contract.connect(addr1).approveCampaign(0)).to.be.revertedWith(
+        'Campaign is approved already!'
+      );
     });
   });
 });

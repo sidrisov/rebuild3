@@ -22,8 +22,11 @@ export default function Validators() {
           p: 1,
           m: 1
         }}>
-        {organizations.map((organization) => (
-          <Card sx={{ m: 1, border: 1, borderRadius: 5 }} variant="elevation">
+        {organizations.map((organization, i) => (
+          <Card
+            key={`validators_${i}`}
+            sx={{ m: 1, border: 1, borderRadius: 5 }}
+            variant="elevation">
             <Box
               sx={{
                 m: 2,
@@ -53,7 +56,6 @@ export default function Validators() {
                 {organization.region}
               </Typography>
               <Badge
-                badgeContent
                 variant="dot"
                 color={organization.active ? 'success' : 'error'}
                 sx={{

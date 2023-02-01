@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 
 import {
+  Autocomplete,
   Avatar,
   AvatarGroup,
   Badge,
@@ -21,24 +22,55 @@ import {
 
 import { ethers } from 'ethers';
 
-import AddIcon from '@mui/icons-material/Add';
+import { Add, Done, DoneAll } from '@mui/icons-material';
 
 import { UserContext } from '../layouts/App';
-import { grey } from '@mui/material/colors';
 import AddressAvatar from '../components/AddressAvatar';
 import { shortenWalletAddressLabel } from '../utils';
+import { RB3Fundraising } from '../../../solidity/typechain-types';
 
-function Applications() {
+function Fundraisers() {
   const [open, setOpen] = useState(false);
-  const { isWalletConnected, regions, organizations, contract, campaigns } =
+  const { isWalletConnected, userAddress, regions, organizations, contract, campaigns } =
     useContext(UserContext);
 
-  function handleClickOpenApplicationDialog(): void {
+  const [selectedRegion, setSelectedRegion] = useState('');
+  const [selectedValidator, setSelectedValidator] = useState('');
+
+  function handleClickOpenApplicationDialog() {
     setOpen(true);
   }
 
-  function handleCloseApplicationDialog(): void {
+  function handleCloseApplicationDialog() {
     setOpen(false);
+  }
+
+  function handleOnRegionSelected(event: any, value: string | null) {
+    if (value !== null) {
+      setSelectedRegion(value);
+    }
+  }
+
+  function handleOnValidatorSelected(
+    event: any,
+    value: RB3Fundraising.OrganizationStructOutput | null
+  ) {
+    if (value !== null) {
+      setSelectedValidator(value.account);
+    }
+  }
+
+  async function handleApproveCampaign(campaignId: number) {
+    await (await contract?.approveCampaign(campaignId))?.wait();
+  }
+
+  async function handleReleaseCampaign(campaignId: number) {
+    // TODO: rename => releaseCampaign or releaseFunds
+    await (await contract?.release(campaignId))?.wait();
+  }
+
+  async function handleDonateToCampaign(campaignId: number) {
+    await (await contract?.donate(campaignId, { value: ethers.utils.parseEther('0.1') }))?.wait();
   }
 
   async function submitCampaign() {
@@ -47,12 +79,10 @@ function Applications() {
     const goal = ethers.utils.parseEther(
       (document.getElementById('eth') as HTMLInputElement).value
     );
-    const region = (document.getElementById('region') as HTMLInputElement).value;
-    const org = (document.getElementById('org') as HTMLInputElement).value;
 
-    await contract?.deactivateOrganization(organizations[1].account);
-
-    await (await contract?.submitCampaign(title, description, goal, region, org))?.wait();
+    await (
+      await contract?.submitCampaign(title, description, goal, selectedRegion, selectedValidator)
+    )?.wait();
   }
 
   return (
@@ -66,7 +96,7 @@ function Applications() {
         {isWalletConnected && (
           <Button
             variant="outlined"
-            startIcon={<AddIcon />}
+            startIcon={<Add />}
             sx={{ mr: -2 }}
             onClick={handleClickOpenApplicationDialog}>
             New
@@ -84,8 +114,9 @@ function Applications() {
           p: 1,
           m: 1
         }}>
-        {campaigns.map((campaign) => (
+        {campaigns.map((campaign, i) => (
           <Card
+            key={`campaigns_${i}`}
             sx={{
               maxWidth: '0.8',
               minWidth: '0.3',
@@ -111,10 +142,10 @@ function Applications() {
                     display: 'flex',
                     alignItems: 'center'
                   }}>
-                  <AddressAvatar size={40} name={campaign.recipient}></AddressAvatar>
+                  <AddressAvatar size={40} name={campaign.owner}></AddressAvatar>
                   <Box sx={{ ml: 1 }}>
                     <Typography variant="body1">
-                      {shortenWalletAddressLabel(campaign.recipient)}
+                      {shortenWalletAddressLabel(campaign.owner)}
                     </Typography>
                     <Typography variant="caption" color="gray">
                       {ethers.utils.formatEther(campaign.fundsRaised.toString()) +
@@ -124,7 +155,32 @@ function Applications() {
                     </Typography>
                   </Box>
                 </Box>
-                <Button>Donate</Button>
+                <Button
+                  onClick={() => {
+                    handleDonateToCampaign(i);
+                  }}>
+                  Donate
+                </Button>
+
+                {campaign.organization === userAddress && !campaign.active && (
+                  <Button
+                    onClick={() => {
+                      handleApproveCampaign(i);
+                    }}>
+                    Approve
+                  </Button>
+                )}
+
+                {campaign.organization === userAddress &&
+                  campaign.active &&
+                  campaign.fundsRaised >= campaign.goal && (
+                    <Button
+                      onClick={() => {
+                        handleReleaseCampaign(i);
+                      }}>
+                      Release
+                    </Button>
+                  )}
               </Box>
               <Typography variant="h6">{campaign.title}</Typography>
               <CardMedia
@@ -158,15 +214,11 @@ function Applications() {
                     donated by
                   </Typography>
                 </Box>
-                <Badge
-                  badgeContent
-                  variant="dot"
-                  color={campaign.active ? 'success' : 'warning'}
-                  sx={{
-                    alignSelf: 'center',
-                    justifySelf: 'center'
-                  }}
-                />
+                {!campaign.released ? (
+                  <Done color={campaign.active ? 'success' : 'warning'} />
+                ) : (
+                  <DoneAll color="success" />
+                )}
               </Box>
             </Stack>
           </Card>
@@ -193,35 +245,28 @@ function Applications() {
               label="Description"
               id="description"
             />
-            <TextField
-              select
-              variant="standard"
-              label="Region"
+            {
+              //TODO: clear input value for organization whenever region is changed
+            }
+            <Autocomplete
+              autoHighlight
               id="region"
-              SelectProps={{
-                native: true
-              }}>
-              {regions.map((region) => (
-                <option key={region} value={region}>
-                  {region}
-                </option>
-              ))}
-            </TextField>
-            <TextField
-              select
-              variant="standard"
-              label="Organization"
+              onChange={handleOnRegionSelected}
+              options={regions}
+              renderInput={(params) => <TextField variant="standard" {...params} label="Region" />}
+            />
+            <Autocomplete
+              autoHighlight
               id="org"
-              SelectProps={{
-                native: true
-              }}>
-              {organizations.map((org) => (
-                <option key={org.name} value={org.account}>
-                  {org.name}
-                </option>
-              ))}
-            </TextField>
-
+              getOptionLabel={(option) => option.name}
+              onChange={handleOnValidatorSelected}
+              options={organizations.filter((org) => {
+                return org.active && selectedRegion === org.region;
+              })}
+              renderInput={(params) => (
+                <TextField variant="standard" {...params} label="Organization" />
+              )}
+            />
             <TextField
               variant="standard"
               label="Campaign Goal"
@@ -259,4 +304,4 @@ function Applications() {
   );
 }
 
-export default Applications;
+export default Fundraisers;

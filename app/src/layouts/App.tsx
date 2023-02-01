@@ -29,6 +29,7 @@ import { RB3Fundraising } from '../../../solidity/typechain-types';
 import AddressAvatar from '../components/AddressAvatar';
 
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
+const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
 
 var magic: InstanceWithExtensions<SDKBase, ConnectExtension[]>;
 var provider: ethers.providers.Web3Provider;
@@ -48,6 +49,7 @@ if (MAGIC_ENABLED) {
 interface UserContextType {
   darkMode: boolean;
   isWalletConnected: boolean;
+  userAddress: string;
   provider: ethers.providers.Web3Provider;
   regions: string[];
   organizations: RB3Fundraising.OrganizationStructOutput[];
@@ -88,6 +90,13 @@ export default function AppLayout() {
     setUserAddress(address);
     setWalletConnected(true);
   }
+
+  useMemo(async () => {
+    if (INIT_CONNECT) {
+      console.log('Initializing wallet connect on start up!');
+      connectWallet();
+    }
+  }, []);
 
   useMemo(async () => {
     // load all countries
@@ -176,6 +185,7 @@ export default function AppLayout() {
               value={{
                 darkMode,
                 isWalletConnected,
+                userAddress,
                 provider,
                 regions,
                 organizations,
