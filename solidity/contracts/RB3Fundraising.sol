@@ -26,7 +26,8 @@ contract RB3Fundraising is Ownable {
     string title;
     string description;
     uint256 goal;
-    uint256 fundsRaised;
+    uint256 raised;
+    uint donated;
     bool released;
     string region;
     address organization;
@@ -182,7 +183,7 @@ contract RB3Fundraising is Ownable {
     require(msg.sender != _organization, "Campaign creator and organization can't be same!");
 
     campaigns.push(
-      Campaign(false, msg.sender, _title, _description, _goal, 0, false, _region, _organization)
+      Campaign(false, msg.sender, _title, _description, _goal, 0, 0, false, _region, _organization)
     );
 
     emit CampaignCreated(campaigns.length - 1, msg.sender);
@@ -214,7 +215,8 @@ contract RB3Fundraising is Ownable {
 
     donatedTo[_campaignId].push(donationId);
     donatedBy[donor].push(donationId);
-    campaigns[_campaignId].fundsRaised += amount;
+    campaigns[_campaignId].raised += amount;
+    campaigns[_campaignId].donated += 1;
 
     emit DonationMade(_campaignId, msg.sender, amount);
   }
@@ -227,7 +229,7 @@ contract RB3Fundraising is Ownable {
     );
 
     require(
-      campaigns[_campaignId].fundsRaised >= campaigns[_campaignId].goal,
+      campaigns[_campaignId].raised >= campaigns[_campaignId].goal,
       'The goal amount is not raised!'
     );
 
@@ -239,15 +241,11 @@ contract RB3Fundraising is Ownable {
     }
 
     (bool sent, ) = payable(campaigns[_campaignId].owner).call{
-      value: campaigns[_campaignId].fundsRaised
+      value: campaigns[_campaignId].raised
     }('');
     require(sent, 'Failed to release funds!');
 
-    emit CampaignSuccess(
-      _campaignId,
-      campaigns[_campaignId].owner,
-      campaigns[_campaignId].fundsRaised
-    );
+    emit CampaignSuccess(_campaignId, campaigns[_campaignId].owner, campaigns[_campaignId].raised);
   }
 
   function setGoalThreshold(uint256 _threshold) external onlyOwner {

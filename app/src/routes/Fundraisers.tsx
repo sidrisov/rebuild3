@@ -4,7 +4,6 @@ import {
   Autocomplete,
   Avatar,
   AvatarGroup,
-  Badge,
   Box,
   Button,
   Card,
@@ -28,6 +27,7 @@ import { UserContext } from '../layouts/App';
 import AddressAvatar from '../components/AddressAvatar';
 import { shortenWalletAddressLabel } from '../utils';
 import { RB3Fundraising } from '../../../solidity/typechain-types';
+import { green } from '@mui/material/colors';
 
 function Fundraisers() {
   const [open, setOpen] = useState(false);
@@ -70,7 +70,7 @@ function Fundraisers() {
   }
 
   async function handleDonateToCampaign(campaignId: number) {
-    await (await contract?.donate(campaignId, { value: ethers.utils.parseEther('0.1') }))?.wait();
+    await (await contract?.donate(campaignId, { value: ethers.utils.parseEther('1') }))?.wait();
   }
 
   async function submitCampaign() {
@@ -83,6 +83,24 @@ function Fundraisers() {
     await (
       await contract?.submitCampaign(title, description, goal, selectedRegion, selectedValidator)
     )?.wait();
+  }
+
+  function getCampaignStatusLabel(campaign: RB3Fundraising.CampaignStructOutput) {
+    if (campaign.released) {
+      return 'funded';
+    } else if (!campaign.active) {
+      return 'new';
+    } else {
+      return 'live';
+    }
+  }
+
+  function CampaignStatusIcon(props: any) {
+    return !props.released ? (
+      <Done color={props.active ? 'success' : 'warning'} />
+    ) : (
+      <DoneAll color="success" />
+    );
   }
 
   return (
@@ -114,9 +132,9 @@ function Fundraisers() {
           p: 1,
           m: 1
         }}>
-        {campaigns.map((campaign, i) => (
+        {campaigns.map((campaign, campaignId) => (
           <Card
-            key={`campaigns_${i}`}
+            key={`campaigns_${campaignId}`}
             sx={{
               maxWidth: '0.8',
               minWidth: '0.3',
@@ -147,25 +165,29 @@ function Fundraisers() {
                     <Typography variant="body1">
                       {shortenWalletAddressLabel(campaign.owner)}
                     </Typography>
-                    <Typography variant="caption" color="gray">
-                      {ethers.utils.formatEther(campaign.fundsRaised.toString()) +
+                    <Typography
+                      variant="subtitle2"
+                      color={campaign.raised >= campaign.goal ? green[400] : 'gray'}>
+                      {ethers.utils.formatEther(campaign.raised.toString()) +
                         '/' +
                         ethers.utils.formatEther(campaign.goal.toString()) +
                         ' ETH'}
                     </Typography>
                   </Box>
                 </Box>
-                <Button
-                  onClick={() => {
-                    handleDonateToCampaign(i);
-                  }}>
-                  Donate
-                </Button>
 
+                {campaign.active && !campaign.released && (
+                  <Button
+                    onClick={() => {
+                      handleDonateToCampaign(campaignId);
+                    }}>
+                    Donate
+                  </Button>
+                )}
                 {campaign.organization === userAddress && !campaign.active && (
                   <Button
                     onClick={() => {
-                      handleApproveCampaign(i);
+                      handleApproveCampaign(campaignId);
                     }}>
                     Approve
                   </Button>
@@ -173,16 +195,26 @@ function Fundraisers() {
 
                 {campaign.organization === userAddress &&
                   campaign.active &&
-                  campaign.fundsRaised >= campaign.goal && (
+                  !campaign.released &&
+                  campaign.raised >= campaign.goal && (
                     <Button
                       onClick={() => {
-                        handleReleaseCampaign(i);
+                        handleReleaseCampaign(campaignId);
                       }}>
                       Release
                     </Button>
                   )}
               </Box>
-              <Typography variant="h6">{campaign.title}</Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                <Typography variant="h6">{campaign.title}</Typography>
+                <Typography variant="body2" color="grey">{`in ${campaign.region}`}</Typography>
+              </Box>
+
               <CardMedia
                 component="img"
                 width="200"
@@ -191,34 +223,28 @@ function Fundraisers() {
                 alt="Paella dish"
               />
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Box display="flex" flexDirection="row" alignItems="center">
-                  <AvatarGroup
-                    max={3}
-                    sx={{
-                      '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
-                    }}>
-                    <Avatar>
-                      <AddressAvatar name={'Remy Sharp'} />
-                    </Avatar>
-                    <Avatar>
-                      <AddressAvatar name={'Travis Howard'} />
-                    </Avatar>
-                    <Avatar>
-                      <AddressAvatar name={'Cindy Baker'} />
-                    </Avatar>
-                    <Avatar>
-                      <AddressAvatar name={'Agnes Walker'} />
-                    </Avatar>
-                  </AvatarGroup>
-                  <Typography variant="subtitle2" color="grey" alignSelf="start">
-                    donated by
-                  </Typography>
+                <Box display="flex" flexDirection="row">
+                  {campaign.active && (
+                    <>
+                      <AvatarGroup
+                        max={3}
+                        total={campaign.donated.toNumber()}
+                        sx={{
+                          '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
+                        }}>
+                        {[...Array(Math.min(2, campaign.donated.toNumber()))].map((item, i) => (
+                          <Avatar key={`${campaignId}_${i}`}>
+                            <AddressAvatar name={`${campaignId}_${i}`} />
+                          </Avatar>
+                        ))}
+                      </AvatarGroup>
+                      <Typography variant="body2" color="grey">
+                        donated by
+                      </Typography>
+                    </>
+                  )}
                 </Box>
-                {!campaign.released ? (
-                  <Done color={campaign.active ? 'success' : 'warning'} />
-                ) : (
-                  <DoneAll color="success" />
-                )}
+                <CampaignStatusIcon active={campaign.active} released={campaign.released} />
               </Box>
             </Stack>
           </Card>

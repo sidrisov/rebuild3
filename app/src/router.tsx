@@ -1,20 +1,26 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import HomeLayout from './layouts/Home';
-import AppLayout from './layouts/App';
+import Home from './layouts/Home';
+import App from './layouts/App';
 import Page404 from './routes/Page404';
 import Dashboard from './routes/Dashboard';
 import Fundraisers from './routes/Fundraisers';
 import Validators from './routes/Validators';
 
+import { SnackbarProvider } from 'notistack';
+
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomeLayout />,
+    element: <Home />,
     errorElement: <Page404 />
   },
   {
     path: '/app',
-    element: <AppLayout />,
+    element: (
+      <SnackbarProvider maxSnack={3}>
+        <App />
+      </SnackbarProvider>
+    ),
     errorElement: <Page404 />,
     children: [
       { element: <Navigate to="/app/dashboard" />, index: true },

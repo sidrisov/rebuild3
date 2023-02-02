@@ -9,9 +9,10 @@ import {
   Box,
   Container,
   Chip,
-  useMediaQuery,
-  Stack
+  useMediaQuery
 } from '@mui/material';
+
+import { useSnackbar } from 'notistack';
 
 import CustomThemeProvider from '../theme/CustomThemeProvider';
 import { Wallet, PowerSettingsNew, LightModeOutlined, DarkModeOutlined } from '@mui/icons-material';
@@ -70,6 +71,8 @@ export default function AppLayout() {
   const [organizations, setOrganizations] = useState<RB3Fundraising.OrganizationStructOutput[]>([]);
   const [campaigns, setCampaigns] = useState<RB3Fundraising.CampaignStructOutput[]>([]);
 
+  const { enqueueSnackbar } = useSnackbar();
+
   async function connectWallet() {
     if (!MAGIC_ENABLED) {
       await provider.send('eth_requestAccounts', []);
@@ -98,15 +101,76 @@ export default function AppLayout() {
     }
   }, []);
 
+  async function fetchRegionData(contract: RB3Fundraising) {
+    if (contract !== undefined) {
+      const regions = await contract.getActiveRegions();
+      setRegions(regions);
+    }
+  }
+
+  async function fetchOrganizationData(contract: RB3Fundraising) {
+    if (contract !== undefined) {
+      const organizations = await contract.getAllOrganizations();
+      setOrganizations(organizations);
+    }
+  }
+  async function fetchCampaignData(contract: RB3Fundraising) {
+    if (contract !== undefined) {
+      const campaigns = await contract.getAllCampaigns();
+      setCampaigns(campaigns);
+    }
+  }
+
+  async function subscribeToAllEvents(contract: RB3Fundraising) {
+    if (contract !== undefined) {
+      contract.removeAllListeners();
+      contract.on(contract.filters.RegionActivated(), (event) => {
+        fetchRegionData(contract);
+        enqueueSnackbar('New region registered!', { variant: 'success' });
+      });
+
+      contract.on(contract.filters.RegionDeactivated(), (event) => {
+        fetchRegionData(contract);
+        enqueueSnackbar('Region deactivated!', { variant: 'warning' });
+      });
+
+      contract.on(contract.filters.OrganizationRegistered(), (event) => {
+        fetchOrganizationData(contract);
+        enqueueSnackbar('New organization registered!', { variant: 'success' });
+      });
+      contract.on(contract.filters.OrganizationDeactivated(), (event) => {
+        fetchOrganizationData(contract);
+        enqueueSnackbar('Organiation deactivated!', { variant: 'warning' });
+      });
+
+      contract.on(contract.filters.CampaignCreated(), (event) => {
+        fetchCampaignData(contract);
+        enqueueSnackbar('New campaign created!', { variant: 'success' });
+      });
+      contract.on(contract.filters.CampaignActive(), (event) => {
+        fetchCampaignData(contract);
+        enqueueSnackbar('Campaing is available for donations!', { variant: 'info' });
+      });
+      contract.on(contract.filters.CampaignSuccess(), (event) => {
+        fetchCampaignData(contract);
+        enqueueSnackbar('Campaign was successful!', { variant: 'success' });
+      });
+      contract.on(contract.filters.DonationMade(), (event) => {
+        fetchCampaignData(contract);
+        enqueueSnackbar('New donation was made!', { variant: 'info' });
+      });
+    }
+  }
+
   useMemo(async () => {
     // load all countries
     if (isWalletConnected && rb3Contract !== undefined) {
-      const regions = await rb3Contract.getActiveRegions();
-      setRegions(regions);
-      const organizations = await rb3Contract.getAllOrganizations();
-      setOrganizations(organizations);
-      const campaigns = await rb3Contract.getAllCampaigns();
-      setCampaigns(campaigns);
+      fetchRegionData(rb3Contract);
+      fetchOrganizationData(rb3Contract);
+      fetchCampaignData(rb3Contract);
+
+      // listen to all events
+      subscribeToAllEvents(rb3Contract);
     }
   }, [isWalletConnected, rb3Contract]);
 
