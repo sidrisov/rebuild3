@@ -1,10 +1,8 @@
 import { useContext } from 'react';
+import { UserContext } from '../contexts/UserContext';
+import { shortenWalletAddressLabel } from '../utils/address';
 
 import { Badge, Box, Card, Chip, Typography } from '@mui/material';
-
-import { UserContext } from '../layouts/App';
-import { shortenWalletAddressLabel } from '../utils';
-
 import AddressAvatar from '../components/AddressAvatar';
 
 export default function Validators() {

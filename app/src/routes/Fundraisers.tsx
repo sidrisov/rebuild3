@@ -23,13 +23,13 @@ import { ethers } from 'ethers';
 
 import { Add, Done, DoneAll } from '@mui/icons-material';
 
-import { UserContext } from '../layouts/App';
+import { UserContext } from '../contexts/UserContext';
 import AddressAvatar from '../components/AddressAvatar';
-import { shortenWalletAddressLabel } from '../utils';
+import { shortenWalletAddressLabel } from '../utils/address';
 import { RB3Fundraising } from '../../../solidity/typechain-types';
 import { green } from '@mui/material/colors';
 
-function Fundraisers() {
+export default function Fundraisers() {
   const [open, setOpen] = useState(false);
   const { isWalletConnected, userAddress, regions, organizations, contract, campaigns } =
     useContext(UserContext);
@@ -329,5 +329,3 @@ function Fundraisers() {
     </>
   );
 }
-
-export default Fundraisers;

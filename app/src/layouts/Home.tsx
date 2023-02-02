@@ -11,17 +11,30 @@ import {
   Typography,
   Box,
   Stack,
-  useMediaQuery
+  useMediaQuery,
+  Slide,
+  useScrollTrigger,
+  Avatar
 } from '@mui/material';
 
 import { ExitToApp, DarkModeOutlined, LightModeOutlined } from '@mui/icons-material';
+import { blue, green, red } from '@mui/material/colors';
 
 import HomeLogo from '../components/Logo';
-
 import { ReactComponent as Love } from '../assets/loving.svg';
 import { ReactComponent as LoveInverted } from '../assets/loving_inverted.svg';
-import { blue, green, red } from '@mui/material/colors';
 import CustomThemeProvider from '../theme/CustomThemeProvider';
+
+function HideOnScroll(props: any) {
+  const { children } = props;
+  const trigger = useScrollTrigger();
+
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  );
+}
 
 export default function HomeLayout() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -29,26 +42,28 @@ export default function HomeLayout() {
 
   return (
     <CustomThemeProvider darkMode={darkMode}>
-      <AppBar
-        position="sticky"
-        color="transparent"
-        elevation={0}
-        sx={{ backdropFilter: 'blur(5px)' }}>
-        <Toolbar>
-          <HomeLogo flexGrow={1} />
-          <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
-            {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
-          </IconButton>
-          <Button
-            variant="contained"
-            component={Link}
-            to={'/app'}
-            endIcon={<ExitToApp />}
-            sx={{ width: 150 }}>
-            Go To App
-          </Button>
-        </Toolbar>
-      </AppBar>
+      <HideOnScroll>
+        <AppBar
+          position="sticky"
+          color="transparent"
+          elevation={0}
+          sx={{ backdropFilter: 'blur(5px)' }}>
+          <Toolbar>
+            <HomeLogo flexGrow={1} />
+            <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
+              {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
+            </IconButton>
+            <Button
+              variant="contained"
+              component={Link}
+              to={'/app'}
+              endIcon={<ExitToApp />}
+              sx={{ width: 150 }}>
+              Go To App
+            </Button>
+          </Toolbar>
+        </AppBar>
+      </HideOnScroll>
 
       <Container>
         <Card sx={{ my: 5, border: 2, borderRadius: 16 }} variant="elevation">
@@ -75,39 +90,46 @@ export default function HomeLayout() {
             {darkMode ? <LoveInverted width={350} /> : <Love width={350} />}
           </Box>
         </Card>
+
+        <Typography m={5} align="center" variant="h3">
+          How it works
+        </Typography>
         <Box
           sx={{
-            m: 5,
             display: 'flex',
             flexDirection: 'row',
-            //flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between'
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignContent: 'center',
+            spacing: 100
           }}>
-          <Box sx={{ m: 2, spacing: 2, flexWrap: 'wrap' }}>
+          <Stack m={3} width={300} spacing={1} alignItems="center">
+            <Avatar sx={{ bgcolor: red[400] }}>1</Avatar>
             <Typography color={red[400]} variant="h4">
               Submit
             </Typography>
             <Typography color="grey" variant="body1">
-              Provide information on fundraising campaign.
+              User initiates a new campaign
             </Typography>
-          </Box>
-          <Box sx={{ m: 2, spacing: 2, flexWrap: 'wrap' }}>
+          </Stack>
+          <Stack m={3} width={300} spacing={1} alignItems="center">
+            <Avatar sx={{ bgcolor: blue[400] }}>2</Avatar>
             <Typography color={blue[400]} variant="h4">
+              Approve
+            </Typography>
+            <Typography color="grey" variant="body1">
+              Validator opens it for donation
+            </Typography>
+          </Stack>
+          <Stack m={3} width={300} spacing={1} alignItems="center">
+            <Avatar sx={{ bgcolor: green[400] }}>3</Avatar>
+            <Typography color={green[400]} variant="h4">
               Release
             </Typography>
             <Typography color="grey" variant="body1">
-              Validator confirms the details of campaign and releases the funds
+              Validator releases the funds
             </Typography>
-          </Box>
-          <Box sx={{ m: 2, spacing: 2, flexWrap: 'wrap' }}>
-            <Typography color={green[400]} variant="h4">
-              Validate
-            </Typography>
-            <Typography color="grey" variant="body1">
-              Validator check what was rebuilt.
-            </Typography>
-          </Box>
+          </Stack>
         </Box>
       </Container>
     </CustomThemeProvider>

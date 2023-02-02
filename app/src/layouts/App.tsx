@@ -1,4 +1,4 @@
-import { createContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import {
@@ -22,12 +22,13 @@ import { Magic } from 'magic-sdk';
 import { ethers } from 'ethers';
 
 import { ConnectExtension } from '@magic-ext/connect';
-import { shortenWalletAddressLabel } from '../utils';
+import { shortenWalletAddressLabel } from '../utils/address';
 import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider';
 
 import Rebuild3ContractArtifact from '../../../solidity/artifacts/contracts/RB3Fundraising.sol/RB3Fundraising.json';
 import { RB3Fundraising } from '../../../solidity/typechain-types';
 import AddressAvatar from '../components/AddressAvatar';
+import { UserContext } from '../contexts/UserContext';
 
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
@@ -46,20 +47,6 @@ if (MAGIC_ENABLED) {
 } else {
   provider = new ethers.providers.Web3Provider(window.ethereum as any);
 }
-
-interface UserContextType {
-  darkMode: boolean;
-  isWalletConnected: boolean;
-  userAddress: string;
-  provider: ethers.providers.Web3Provider;
-  regions: string[];
-  organizations: RB3Fundraising.OrganizationStructOutput[];
-  campaigns: RB3Fundraising.CampaignStructOutput[];
-  contract: RB3Fundraising | undefined;
-}
-
-export const UserContext = createContext<UserContextType>({} as UserContextType);
-
 export default function AppLayout() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [darkMode, setDarkMode] = useState(prefersDarkMode);

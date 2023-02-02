@@ -1,38 +1,14 @@
 import { useContext, useMemo, useState } from 'react';
 import { ethers } from 'ethers';
 
-import { Box, Card, CardProps, Container, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
-import { UserContext } from '../layouts/App';
-
-interface DashboardStatsType {
-  activeRegions: number | undefined;
-  organizations: number | undefined;
-  campaigns: number | undefined;
-  threshold: string | undefined;
-}
-
-function StatsCard(props: CardProps) {
-  return (
-    <Card
-      {...props}
-      sx={{
-        maxWidth: '0.8',
-        minWidth: '0.2',
-        flexGrow: 1,
-        m: 2,
-        p: 2,
-        border: 1,
-        borderColor: 'gray',
-        borderRadius: 1
-      }}
-    />
-  );
-}
+import { UserContext } from '../contexts/UserContext';
+import { DashboardStatsType } from '../types/DashboardStatsType';
+import { StatsCard } from '../components/StatsCard';
 
 export default function Dashboard() {
   const { isWalletConnected, regions, organizations, contract } = useContext(UserContext);
-
   const [stats, setStats] = useState<DashboardStatsType>({} as DashboardStatsType);
 
   useMemo(async () => {
