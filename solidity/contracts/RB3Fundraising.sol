@@ -25,6 +25,7 @@ contract RB3Fundraising is Ownable {
     address owner;
     string title;
     string description;
+    string cid;
     uint256 goal;
     uint256 raised;
     uint donated;
@@ -173,6 +174,7 @@ contract RB3Fundraising is Ownable {
   function submitCampaign(
     string memory _title,
     string memory _description,
+    string memory _cid,
     uint256 _goal,
     string memory _region,
     address _organization
@@ -183,7 +185,19 @@ contract RB3Fundraising is Ownable {
     require(msg.sender != _organization, "Campaign creator and organization can't be same!");
 
     campaigns.push(
-      Campaign(false, msg.sender, _title, _description, _goal, 0, 0, false, _region, _organization)
+      Campaign(
+        false,
+        msg.sender,
+        _title,
+        _description,
+        _cid,
+        _goal,
+        0,
+        0,
+        false,
+        _region,
+        _organization
+      )
     );
 
     emit CampaignCreated(campaigns.length - 1, msg.sender);

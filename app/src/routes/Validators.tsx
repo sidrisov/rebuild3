@@ -16,7 +16,8 @@ export default function Validators() {
       <Box
         sx={{
           display: 'flex',
-          flexWrap: 'nowrap',
+          flexWrap: 'wrap',
+          justifyContent: 'space-evenly',
           p: 1,
           m: 1
         }}>

@@ -29,6 +29,7 @@ import Rebuild3ContractArtifact from '../../../solidity/artifacts/contracts/RB3F
 import { RB3Fundraising } from '../../../solidity/typechain-types';
 import AddressAvatar from '../components/AddressAvatar';
 import { UserContext } from '../contexts/UserContext';
+import Moralis from 'moralis';
 
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
@@ -37,7 +38,7 @@ var magic: InstanceWithExtensions<SDKBase, ConnectExtension[]>;
 var provider: ethers.providers.Web3Provider;
 
 if (MAGIC_ENABLED) {
-  magic = new Magic(import.meta.env.VITE_MAGIC_KEY, {
+  magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
     network: 'goerli',
     locale: 'en_US',
     extensions: [new ConnectExtension()]
@@ -47,6 +48,11 @@ if (MAGIC_ENABLED) {
 } else {
   provider = new ethers.providers.Web3Provider(window.ethereum as any);
 }
+
+await Moralis.start({
+  apiKey: import.meta.env.VITE_MORALIS_API_KEY
+});
+
 export default function AppLayout() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [darkMode, setDarkMode] = useState(prefersDarkMode);
@@ -79,6 +85,8 @@ export default function AppLayout() {
     setRB3Contract(contract);
     setUserAddress(address);
     setWalletConnected(true);
+
+    enqueueSnackbar((MAGIC_ENABLED ? 'Magic ' : '') + 'Wallet Connected!', { variant: 'success' });
   }
 
   useMemo(async () => {

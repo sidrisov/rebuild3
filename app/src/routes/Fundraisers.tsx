@@ -21,13 +21,16 @@ import {
 
 import { ethers } from 'ethers';
 
-import { Add, Done, DoneAll } from '@mui/icons-material';
+import { Add, AttachFile, Done, DoneAll } from '@mui/icons-material';
 
 import { UserContext } from '../contexts/UserContext';
 import AddressAvatar from '../components/AddressAvatar';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { RB3Fundraising } from '../../../solidity/typechain-types';
 import { green } from '@mui/material/colors';
+
+import { uploadToIpfs } from '../utils/ipfs';
+import { useSnackbar } from 'notistack';
 
 export default function Fundraisers() {
   const [open, setOpen] = useState(false);
@@ -36,12 +39,18 @@ export default function Fundraisers() {
 
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedValidator, setSelectedValidator] = useState('');
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   function handleClickOpenApplicationDialog() {
     setOpen(true);
   }
 
   function handleCloseApplicationDialog() {
+    setSelectedImage(null);
+    setSelectedRegion('');
+    setSelectedValidator('');
     setOpen(false);
   }
 
@@ -57,6 +66,12 @@ export default function Fundraisers() {
   ) {
     if (value !== null) {
       setSelectedValidator(value.account);
+    }
+  }
+
+  function handleFileChange(event: any) {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedImage(event.target.files[0]);
     }
   }
 
@@ -80,8 +95,35 @@ export default function Fundraisers() {
       (document.getElementById('eth') as HTMLInputElement).value
     );
 
+    let cid = '';
+    if (selectedImage !== null) {
+      const result = await uploadToIpfs(selectedImage);
+      if (result) {
+        cid = result[0].path;
+      }
+    }
+
+    if (cid === '') {
+      enqueueSnackbar('Image upload to IPFS failed!', {
+        variant: 'error'
+      });
+      return;
+    } else {
+      enqueueSnackbar('Successfully uploaded image to IPFS!', {
+        variant: 'success'
+      });
+    }
+
+    // TODO: for now save the whole path, ideally, we want to save only cid, and then load all files based on the metadata stored
     await (
-      await contract?.submitCampaign(title, description, goal, selectedRegion, selectedValidator)
+      await contract?.submitCampaign(
+        title,
+        description,
+        cid,
+        goal,
+        selectedRegion,
+        selectedValidator
+      )
     )?.wait();
   }
 
@@ -214,13 +256,12 @@ export default function Fundraisers() {
                 <Typography variant="h6">{campaign.title}</Typography>
                 <Typography variant="body2" color="grey">{`in ${campaign.region}`}</Typography>
               </Box>
-
               <CardMedia
                 component="img"
                 width="200"
                 height="200"
-                image={`/borodyanka${Math.floor(Math.random() * 3) + 1}.jpg`}
-                alt="Paella dish"
+                image={campaign.cid}
+                loading="lazy"
               />
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box display="flex" flexDirection="row">
@@ -250,22 +291,27 @@ export default function Fundraisers() {
           </Card>
         ))}
       </Box>
-      <Dialog open={open} onClose={handleCloseApplicationDialog}>
+      <Dialog fullWidth open={open} onClose={handleCloseApplicationDialog}>
         <DialogTitle>New Campaign</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            To submit a new application please specify following fields:
+        <DialogContent sx={{ m: 1 }}>
+          <DialogContentText m={1}>
+            Please, provide information on what you you are raising funds, including images of
+            descruted objects:
           </DialogContentText>
           <Box
             component="form"
             id="application"
             sx={{
-              '& > :not(style)': { m: 1, width: '25ch' }
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-start',
+              '& > :not(style)': { m: 1 }
             }}>
-            <TextField variant="standard" label="Title" id="title" />
+            <TextField variant="outlined" label="Title" id="title" />
             <TextField
-              variant="standard"
+              variant="outlined"
               fullWidth
+              minRows={3}
               multiline
               maxRows={10}
               label="Description"
@@ -274,36 +320,56 @@ export default function Fundraisers() {
             {
               //TODO: clear input value for organization whenever region is changed
             }
-            <Autocomplete
-              autoHighlight
-              id="region"
-              onChange={handleOnRegionSelected}
-              options={regions}
-              renderInput={(params) => <TextField variant="standard" {...params} label="Region" />}
-            />
-            <Autocomplete
-              autoHighlight
-              id="org"
-              getOptionLabel={(option) => option.name}
-              onChange={handleOnValidatorSelected}
-              options={organizations.filter((org) => {
-                return org.active && selectedRegion === org.region;
-              })}
-              renderInput={(params) => (
-                <TextField variant="standard" {...params} label="Organization" />
-              )}
-            />
-            <TextField
-              variant="standard"
-              label="Campaign Goal"
-              id="eth"
-              type="number"
-              InputProps={{
-                endAdornment: <InputAdornment position="end">ETH</InputAdornment>,
-                inputMode: 'numeric'
-                //pattern: '[0-9]*'
-              }}
-            />
+
+            <Stack direction="row" spacing={2} width={1} justifyContent="start" alignItems="center">
+              <Autocomplete
+                sx={{ flexGrow: 1 }}
+                autoHighlight
+                id="region"
+                onChange={handleOnRegionSelected}
+                options={regions}
+                renderInput={(params) => (
+                  <TextField variant="outlined" {...params} label="Region" sx={{ flexGrow: '1' }} />
+                )}
+              />
+              <Autocomplete
+                sx={{ flexGrow: 1 }}
+                autoHighlight
+                id="org"
+                getOptionLabel={(option) => option.name}
+                onChange={handleOnValidatorSelected}
+                options={organizations.filter((org) => {
+                  return org.active && selectedRegion === org.region;
+                })}
+                renderInput={(params) => (
+                  <TextField variant="outlined" {...params} label="Organization" />
+                )}
+              />
+              <TextField
+                sx={{ flexGrow: 0 }}
+                variant="outlined"
+                label="Campaign Goal"
+                id="eth"
+                type="number"
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">ETH</InputAdornment>,
+                  inputMode: 'numeric'
+                  //pattern: '[0-9]*'
+                }}
+              />
+            </Stack>
+            {selectedImage !== null && (
+              <img width="95%" src={URL.createObjectURL(selectedImage)} loading="lazy" />
+            )}
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Button size="small" variant="outlined" component="label" startIcon={<AttachFile />}>
+                Upload
+                <input hidden accept="image/*" multiple type="file" onChange={handleFileChange} />
+              </Button>
+              <Typography sx={{ wordWrap: 'break-word' }}>
+                {selectedImage !== null && selectedImage.name}
+              </Typography>
+            </Stack>
           </Box>
         </DialogContent>
         <DialogActions>

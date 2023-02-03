@@ -29,40 +29,45 @@ export default function Dashboard() {
   }, [isWalletConnected, contract]);
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        overflowWrap: 'break-word',
-        alignContent: 'center',
-        justifyContent: 'space-evenly',
-        p: 1,
-        m: 1
-      }}>
-      <StatsCard>
-        <Typography variant="overline" color="grey">
-          Active Regions:
-        </Typography>
-        <Typography variant="h6">{stats.activeRegions}</Typography>
-      </StatsCard>
-      <StatsCard>
-        <Typography variant="overline" color="grey">
-          Organizations:
-        </Typography>
-        <Typography variant="h6">{stats.organizations}</Typography>
-      </StatsCard>
-      <StatsCard>
-        <Typography variant="overline" color="grey">
-          Campaigns:
-        </Typography>
-        <Typography variant="h6">{stats.campaigns}</Typography>
-      </StatsCard>
-      <StatsCard>
-        <Typography variant="overline" color="grey">
-          Goal Threashold:
-        </Typography>
-        <Typography variant="h6">{stats.threshold} ETH</Typography>
-      </StatsCard>
+    <Box>
+      <Typography variant="h4" m={5}>
+        Welcome to ReBuild3
+      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          overflowWrap: 'break-word',
+          alignContent: 'center',
+          justifyContent: 'space-evenly',
+          p: 1,
+          m: 1
+        }}>
+        <StatsCard>
+          <Typography variant="overline" color="grey">
+            Active Regions:
+          </Typography>
+          <Typography variant="h6">{stats.activeRegions}</Typography>
+        </StatsCard>
+        <StatsCard>
+          <Typography variant="overline" color="grey">
+            Organizations:
+          </Typography>
+          <Typography variant="h6">{stats.organizations}</Typography>
+        </StatsCard>
+        <StatsCard>
+          <Typography variant="overline" color="grey">
+            Campaigns:
+          </Typography>
+          <Typography variant="h6">{stats.campaigns}</Typography>
+        </StatsCard>
+        <StatsCard>
+          <Typography variant="overline" color="grey">
+            Goal Threashold:
+          </Typography>
+          <Typography variant="h6">{stats.threshold} ETH</Typography>
+        </StatsCard>
+      </Box>
     </Box>
   );
 }

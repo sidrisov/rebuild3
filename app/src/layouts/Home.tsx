@@ -14,7 +14,9 @@ import {
   useMediaQuery,
   Slide,
   useScrollTrigger,
-  Avatar
+  Avatar,
+  TypographyProps,
+  Link as MuiLink
 } from '@mui/material';
 
 import { ExitToApp, DarkModeOutlined, LightModeOutlined } from '@mui/icons-material';
@@ -24,6 +26,7 @@ import HomeLogo from '../components/Logo';
 import { ReactComponent as Love } from '../assets/loving.svg';
 import { ReactComponent as LoveInverted } from '../assets/loving_inverted.svg';
 import CustomThemeProvider from '../theme/CustomThemeProvider';
+import { fontWeight } from '@mui/system';
 
 function HideOnScroll(props: any) {
   const { children } = props;
@@ -35,6 +38,40 @@ function HideOnScroll(props: any) {
     </Slide>
   );
 }
+
+function randomCardBgcolor() {
+  const number = Math.floor(Math.random() * 3) + 1;
+  switch (number) {
+    case 1:
+      return red[400];
+    case 2:
+      return blue[400];
+    case 3:
+      return green[400];
+  }
+}
+
+function TechUsedCard(props: TypographyProps) {
+  return (
+    <Card sx={{ m: 5, p: 2, border: 2, borderRadius: 5, color: randomCardBgcolor() }}>
+      <Typography {...props} fontStyle="oblique" fontWeight="bold" fontSize={20}></Typography>
+    </Card>
+  );
+}
+
+const techStack = [
+  'React',
+  'TS',
+  'MUI',
+  'Vite',
+  'Vercel',
+  'Ethereum',
+  'HardHat',
+  'MagicLink',
+  'Metamask',
+  'Moralis',
+  'IPFS'
+];
 
 export default function HomeLayout() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -91,17 +128,17 @@ export default function HomeLayout() {
           </Box>
         </Card>
 
-        <Typography m={5} align="center" variant="h3">
+        <Typography mt={10} align="center" variant="h3">
           How it works
         </Typography>
         <Box
           sx={{
+            p: 2,
             display: 'flex',
             flexDirection: 'row',
             flexWrap: 'wrap',
             justifyContent: 'center',
-            alignContent: 'center',
-            spacing: 100
+            alignContent: 'center'
           }}>
           <Stack m={3} width={300} spacing={1} alignItems="center">
             <Avatar sx={{ bgcolor: red[400] }}>1</Avatar>
@@ -131,6 +168,35 @@ export default function HomeLayout() {
             </Typography>
           </Stack>
         </Box>
+
+        <Typography mt={10} align="center" variant="h4">
+          Technology Stack
+        </Typography>
+
+        <Box
+          sx={{
+            p: 2,
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignContent: 'center'
+          }}>
+          {techStack.map((tech) => (
+            <TechUsedCard key={tech}>{tech}</TechUsedCard>
+          ))}
+        </Box>
+
+        <MuiLink
+          my={2}
+          display="flex"
+          justifyContent="center"
+          variant="body2"
+          underline="hover"
+          color="grey"
+          href="https://github.com/sidrisov">
+          Made by Sinaver
+        </MuiLink>
       </Container>
     </CustomThemeProvider>
   );
