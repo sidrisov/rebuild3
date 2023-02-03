@@ -178,86 +178,86 @@ export default function AppLayout() {
   }
   return (
     <CustomThemeProvider darkMode={darkMode}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-evenly'
+      <UserContext.Provider
+        value={{
+          darkMode,
+          isWalletConnected,
+          userAddress,
+          provider,
+          regions,
+          organizations,
+          contract: rb3Contract,
+          campaigns
         }}>
-        <Nav />
-        <Box flexGrow={1}>
-          <AppBar
-            position="sticky"
-            color="transparent"
-            elevation={0}
-            sx={{ alignSelf: 'self-end', width: '100%', backdropFilter: 'blur(5px)' }}>
-            <Toolbar sx={{ justifyContent: 'flex-end' }}>
-              <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
-                {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
-              </IconButton>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-evenly'
+          }}>
+          <Nav />
+          <Box flexGrow={1}>
+            <AppBar
+              position="sticky"
+              color="transparent"
+              elevation={0}
+              sx={{ alignSelf: 'self-end', width: '100%', backdropFilter: 'blur(5px)' }}>
+              <Toolbar sx={{ justifyContent: 'flex-end' }}>
+                <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
+                  {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
+                </IconButton>
 
-              {!isWalletConnected ? (
-                <Button
-                  variant="contained"
-                  endIcon={<Wallet />}
-                  onClick={() => {
-                    connectWallet();
-                  }}
-                  sx={{ width: 150 }}>
-                  Connect
-                </Button>
-              ) : (
-                <Chip
-                  label={shortenWalletAddressLabel(userAddress)}
-                  onClick={() => {
-                    if (MAGIC_ENABLED) {
-                      magic.connect.showWallet();
+                {!isWalletConnected ? (
+                  <Button
+                    variant="contained"
+                    endIcon={<Wallet />}
+                    onClick={() => {
+                      connectWallet();
+                    }}
+                    sx={{ width: 150 }}>
+                    Connect
+                  </Button>
+                ) : (
+                  <Chip
+                    label={shortenWalletAddressLabel(userAddress)}
+                    onClick={() => {
+                      if (MAGIC_ENABLED) {
+                        magic.connect.showWallet();
+                      }
+                    }}
+                    icon={
+                      <Box display="flex">
+                        <AddressAvatar size={25} name={userAddress} />
+                      </Box>
                     }
-                  }}
-                  icon={
-                    <Box display="flex">
-                      <AddressAvatar size={25} name={userAddress} />
-                    </Box>
-                  }
-                  sx={{
-                    height: 40,
-                    width: 150,
-                    fontSize: 15,
-                    fontWeight: 'bold'
-                  }}
-                  deleteIcon={<PowerSettingsNew />}
-                  onDelete={() => {
-                    disconnectWallet();
-                  }}
-                />
-              )}
-            </Toolbar>
-          </AppBar>
-          <Box
-            sx={{
-              my: 5,
-              flexGrow: 1,
-              display: 'flex',
-              flexDirection: 'row'
-            }}>
-            <UserContext.Provider
-              value={{
-                darkMode,
-                isWalletConnected,
-                userAddress,
-                provider,
-                regions,
-                organizations,
-                contract: rb3Contract,
-                campaigns
+                    sx={{
+                      height: 40,
+                      width: 150,
+                      fontSize: 15,
+                      fontWeight: 'bold'
+                    }}
+                    deleteIcon={<PowerSettingsNew />}
+                    onDelete={() => {
+                      disconnectWallet();
+                    }}
+                  />
+                )}
+              </Toolbar>
+            </AppBar>
+            <Box
+              sx={{
+                my: 5,
+                flexGrow: 1,
+                display: 'flex',
+                flexDirection: 'row'
               }}>
               <Container>
                 <Outlet />
               </Container>
-            </UserContext.Provider>
+            </Box>
           </Box>
         </Box>
-      </Box>
+      </UserContext.Provider>
     </CustomThemeProvider>
   );
 }

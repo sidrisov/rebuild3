@@ -10,16 +10,16 @@ export default function Validators() {
 
   return (
     <Box>
-      <Typography variant="h4" m={5}>
+      <Typography variant="h4" m={3}>
         Validators
       </Typography>
       <Box
         sx={{
           display: 'flex',
           flexWrap: 'wrap',
-          justifyContent: 'space-evenly',
+          justifyContent: 'flex-start',
           p: 1,
-          m: 1
+          mt: 6
         }}>
         {organizations.map((organization, i) => (
           <Card
@@ -29,6 +29,7 @@ export default function Validators() {
             <Box
               sx={{
                 m: 2,
+                p: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'

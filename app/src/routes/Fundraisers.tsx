@@ -148,7 +148,7 @@ export default function Fundraisers() {
   return (
     <>
       <Stack
-        sx={{ m: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        sx={{ m: 3, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h4" gutterBottom>
           Campaigns
         </Typography>
@@ -172,7 +172,7 @@ export default function Fundraisers() {
           alignContent: 'center',
           justifyContent: 'space-evenly',
           p: 1,
-          m: 1
+          mt: 5
         }}>
         {campaigns.map((campaign, campaignId) => (
           <Card
@@ -181,7 +181,7 @@ export default function Fundraisers() {
               maxWidth: '0.8',
               minWidth: '0.3',
               flexGrow: 1,
-              m: 2,
+              m: 1,
               p: 2,
               border: 1,
               borderColor: 'divider',

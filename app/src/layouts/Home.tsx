@@ -15,7 +15,6 @@ import {
   Slide,
   useScrollTrigger,
   Avatar,
-  TypographyProps,
   Link as MuiLink
 } from '@mui/material';
 
@@ -26,7 +25,6 @@ import HomeLogo from '../components/Logo';
 import { ReactComponent as Love } from '../assets/loving.svg';
 import { ReactComponent as LoveInverted } from '../assets/loving_inverted.svg';
 import CustomThemeProvider from '../theme/CustomThemeProvider';
-import { fontWeight } from '@mui/system';
 
 function HideOnScroll(props: any) {
   const { children } = props;
@@ -51,26 +49,79 @@ function randomCardBgcolor() {
   }
 }
 
-function TechUsedCard(props: TypographyProps) {
+function TechUsedCard(props: any) {
   return (
-    <Card sx={{ m: 5, p: 2, border: 2, borderRadius: 5, color: randomCardBgcolor() }}>
-      <Typography {...props} fontStyle="oblique" fontWeight="bold" fontSize={20}></Typography>
+    <Card
+      component={MuiLink}
+      href={props.href}
+      underline="none"
+      sx={{
+        m: 5,
+        p: 2,
+        border: 2,
+        borderRadius: 5,
+        color: randomCardBgcolor(),
+        '&:hover': {
+          borderStyle: 'dashed'
+        }
+      }}>
+      <Typography fontStyle="oblique" fontWeight="bold" fontSize={20}>
+        {props.children}
+      </Typography>
     </Card>
   );
 }
 
 const techStack = [
-  'React',
-  'TS',
-  'MUI',
-  'Vite',
-  'Vercel',
-  'Ethereum',
-  'HardHat',
-  'MagicLink',
-  'Metamask',
-  'Moralis',
-  'IPFS'
+  {
+    name: 'React',
+
+    link: 'https://reactjs.org'
+  },
+  {
+    name: 'TS',
+    link: 'https://www.typescriptlang.org/'
+  },
+  {
+    name: 'MUI',
+    link: 'https://mui.com/'
+  },
+  {
+    name: 'Vite',
+    link: 'https://vitejs.dev/'
+  },
+  {
+    name: 'Vercel',
+    link: 'https://vercel.com/'
+  },
+  {
+    name: 'Ethereum',
+    link: 'https://ethereum.org/'
+  },
+  {
+    name: 'HardHat',
+    link: 'https://hardhat.org/'
+  },
+  {
+    name: 'OpenZeppelin',
+    link: 'https://www.openzeppelin.com/'
+  },
+  {
+    name: 'MagicLink',
+    link: 'https://magic.link/'
+  },
+  {
+    name: 'Metamask',
+    link: 'https://metamask.io/'
+  },
+  {
+    name: 'Moralis',
+    link: 'https://moralis.io/'
+  },
+  {
+    name: 'IPFS',
+    link: 'https://ipfs.tech/'
+  }
 ];
 
 export default function HomeLayout() {
@@ -103,7 +154,7 @@ export default function HomeLayout() {
       </HideOnScroll>
 
       <Container>
-        <Card sx={{ my: 5, border: 2, borderRadius: 16 }} variant="elevation">
+        <Card sx={{ my: 3, border: 2, borderRadius: 16 }} variant="elevation">
           <Box
             sx={{
               m: 5,
@@ -183,7 +234,9 @@ export default function HomeLayout() {
             alignContent: 'center'
           }}>
           {techStack.map((tech) => (
-            <TechUsedCard key={tech}>{tech}</TechUsedCard>
+            <TechUsedCard key={tech.name} href={tech.link}>
+              {tech.name}
+            </TechUsedCard>
           ))}
         </Box>
 

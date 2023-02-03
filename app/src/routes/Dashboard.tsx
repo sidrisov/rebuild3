@@ -30,7 +30,7 @@ export default function Dashboard() {
 
   return (
     <Box>
-      <Typography variant="h4" m={5}>
+      <Typography variant="h4" m={3}>
         Welcome to ReBuild3
       </Typography>
       <Box
@@ -41,7 +41,7 @@ export default function Dashboard() {
           alignContent: 'center',
           justifyContent: 'space-evenly',
           p: 1,
-          m: 1
+          mt: 5
         }}>
         <StatsCard>
           <Typography variant="overline" color="grey">
