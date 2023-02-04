@@ -11,9 +11,7 @@
     <script type="module" src="/src/main.tsx"></script>
 
     <script>
-      if (global === undefined) {
-        var global = globalThis;
-      }
+      window.global = window;
     </script>
 
   </body>

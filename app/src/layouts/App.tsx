@@ -53,10 +53,13 @@ if (MAGIC_ENABLED) {
   magic.preload();
   provider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
 } else {
-  provider = new ethers.providers.Web3Provider(window.ethereum as any);
+  // TODO: add check so that it can be opened on mobile, need to add further checks across all calls
+  if (window.ethereum) {
+    provider = new ethers.providers.Web3Provider(window.ethereum as any);
+  }
 }
 
-await Moralis.start({
+Moralis.start({
   apiKey: import.meta.env.VITE_MORALIS_API_KEY
 });
 
