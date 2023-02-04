@@ -291,12 +291,12 @@ export default function Fundraisers() {
           </Card>
         ))}
       </Box>
-      <Dialog fullWidth open={open} onClose={handleCloseApplicationDialog}>
+      <Dialog fullScreen open={open} onClose={handleCloseApplicationDialog}>
         <DialogTitle>New Campaign</DialogTitle>
         <DialogContent sx={{ m: 1 }}>
           <DialogContentText m={1}>
-            Please, provide information on what you you are raising funds, including images of
-            descruted objects:
+            Please, provide information on what you are raising funds, including images of what you
+            want to rebuild:
           </DialogContentText>
           <Box
             component="form"
@@ -346,9 +346,9 @@ export default function Fundraisers() {
                 )}
               />
               <TextField
-                sx={{ flexGrow: 0 }}
+                sx={{ width: 150 }}
                 variant="outlined"
-                label="Campaign Goal"
+                label="Goal"
                 id="eth"
                 type="number"
                 InputProps={{
@@ -361,12 +361,18 @@ export default function Fundraisers() {
             {selectedImage !== null && (
               <img width="95%" src={URL.createObjectURL(selectedImage)} loading="lazy" />
             )}
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{
+                wordBreak: 'break-all'
+              }}>
               <Button size="small" variant="outlined" component="label" startIcon={<AttachFile />}>
                 Upload
                 <input hidden accept="image/*" multiple type="file" onChange={handleFileChange} />
               </Button>
-              <Typography sx={{ wordWrap: 'break-word' }}>
+              <Typography maxWidth={0.8} variant="subtitle2" color="grey">
                 {selectedImage !== null && selectedImage.name}
               </Typography>
             </Stack>

@@ -9,13 +9,20 @@ import {
   Box,
   Container,
   Chip,
-  useMediaQuery
+  useMediaQuery,
+  Drawer
 } from '@mui/material';
 
 import { useSnackbar } from 'notistack';
 
 import CustomThemeProvider from '../theme/CustomThemeProvider';
-import { Wallet, PowerSettingsNew, LightModeOutlined, DarkModeOutlined } from '@mui/icons-material';
+import {
+  Wallet,
+  PowerSettingsNew,
+  LightModeOutlined,
+  DarkModeOutlined,
+  Menu
+} from '@mui/icons-material';
 import Nav from '../components/Navigation';
 
 import { Magic } from 'magic-sdk';
@@ -53,12 +60,13 @@ await Moralis.start({
   apiKey: import.meta.env.VITE_MORALIS_API_KEY
 });
 
+const drawerWidth = 220;
+
 export default function AppLayout() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [darkMode, setDarkMode] = useState(prefersDarkMode);
   const [isWalletConnected, setWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState('');
-  const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>();
   const [rb3Contract, setRB3Contract] = useState<RB3Fundraising>();
   const [regions, setRegions] = useState<string[]>([]);
   const [organizations, setOrganizations] = useState<RB3Fundraising.OrganizationStructOutput[]>([]);
@@ -66,14 +74,18 @@ export default function AppLayout() {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   async function connectWallet() {
     if (!MAGIC_ENABLED) {
       await provider.send('eth_requestAccounts', []);
     }
 
     const signer = provider.getSigner();
-
-    setSigner(signer);
     const address = await signer.getAddress();
 
     const contract = new ethers.Contract(
@@ -176,6 +188,8 @@ export default function AppLayout() {
 
     setWalletConnected(false);
   }
+
+  const drawer = <Nav />;
   return (
     <CustomThemeProvider darkMode={darkMode}>
       <UserContext.Provider
@@ -195,53 +209,89 @@ export default function AppLayout() {
             flexDirection: 'row',
             justifyContent: 'space-evenly'
           }}>
-          <Nav />
+          <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
+            <Drawer
+              variant="temporary"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              ModalProps={{
+                keepMounted: true
+              }}
+              sx={{
+                display: { xs: 'block', sm: 'none' },
+                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+              }}>
+              {drawer}
+            </Drawer>
+            <Drawer
+              variant="permanent"
+              sx={{
+                display: { xs: 'none', sm: 'block' },
+                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+              }}
+              open>
+              {drawer}
+            </Drawer>
+          </Box>
           <Box flexGrow={1}>
             <AppBar
               position="sticky"
               color="transparent"
               elevation={0}
-              sx={{ alignSelf: 'self-end', width: '100%', backdropFilter: 'blur(5px)' }}>
-              <Toolbar sx={{ justifyContent: 'flex-end' }}>
-                <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
-                  {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
-                </IconButton>
+              sx={{ backdropFilter: 'blur(5px)' }}>
+              <Toolbar
+                sx={{
+                  justifyContent: 'space-between'
+                }}>
+                <Box>
+                  <IconButton
+                    color="inherit"
+                    onClick={handleDrawerToggle}
+                    sx={{ display: { sm: 'none' } }}>
+                    <Menu />
+                  </IconButton>
+                </Box>
+                <Box>
+                  <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
+                    {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
+                  </IconButton>
 
-                {!isWalletConnected ? (
-                  <Button
-                    variant="contained"
-                    endIcon={<Wallet />}
-                    onClick={() => {
-                      connectWallet();
-                    }}
-                    sx={{ width: 150 }}>
-                    Connect
-                  </Button>
-                ) : (
-                  <Chip
-                    label={shortenWalletAddressLabel(userAddress)}
-                    onClick={() => {
-                      if (MAGIC_ENABLED) {
-                        magic.connect.showWallet();
+                  {!isWalletConnected ? (
+                    <Button
+                      variant="contained"
+                      endIcon={<Wallet />}
+                      onClick={() => {
+                        connectWallet();
+                      }}
+                      sx={{ width: 150 }}>
+                      Connect
+                    </Button>
+                  ) : (
+                    <Chip
+                      label={shortenWalletAddressLabel(userAddress)}
+                      onClick={() => {
+                        if (MAGIC_ENABLED) {
+                          magic.connect.showWallet();
+                        }
+                      }}
+                      icon={
+                        <Box display="flex">
+                          <AddressAvatar size={25} name={userAddress} />
+                        </Box>
                       }
-                    }}
-                    icon={
-                      <Box display="flex">
-                        <AddressAvatar size={25} name={userAddress} />
-                      </Box>
-                    }
-                    sx={{
-                      height: 40,
-                      width: 150,
-                      fontSize: 15,
-                      fontWeight: 'bold'
-                    }}
-                    deleteIcon={<PowerSettingsNew />}
-                    onDelete={() => {
-                      disconnectWallet();
-                    }}
-                  />
-                )}
+                      sx={{
+                        height: 40,
+                        width: 150,
+                        fontSize: 15,
+                        fontWeight: 'bold'
+                      }}
+                      deleteIcon={<PowerSettingsNew />}
+                      onDelete={() => {
+                        disconnectWallet();
+                      }}
+                    />
+                  )}
+                </Box>
               </Toolbar>
             </AppBar>
             <Box

@@ -8,12 +8,12 @@ function newTheme(darkMode: boolean): Theme {
       mode: darkMode ? 'dark' : 'light'
     },
     components: {
-      ...(!darkMode
+      ...(darkMode
         ? {
-            MuiAppBar: {
+            MuiDrawer: {
               styleOverrides: {
-                colorPrimary: {
-                  backgroundColor: 'white'
+                paper: {
+                  backgroundColor: '#242424'
                 }
               }
             }
