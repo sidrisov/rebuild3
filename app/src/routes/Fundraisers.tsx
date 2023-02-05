@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useState } from 'react';
 
 import {
   Autocomplete,
@@ -13,13 +13,16 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
   FormControl,
   FormControlLabel,
   FormLabel,
   IconButton,
   InputAdornment,
+  MenuItem,
   Radio,
   RadioGroup,
+  Select,
   Stack,
   TextField,
   Typography
@@ -46,30 +49,27 @@ import { green } from '@mui/material/colors';
 import { uploadToIpfs } from '../utils/ipfs';
 import { useSnackbar } from 'notistack';
 import { copyToClipboard } from '../utils/copyToClipboard';
-
-export type ByUserType = 'all' | 'createdByMe' | 'assignedToMe';
-
-interface CampaignFilters {
-  byUser: ByUserType;
-}
+import { ByUserType, CampaignFilters, CampaignStatus, Region } from '../types/CampaignFiltersType';
 
 export default function Fundraisers() {
   const [openNewCampaign, setOpenNewCampaign] = useState(false);
   const [openFilters, setOpenFilters] = useState(false);
-  const [campaignFilters, setCampaignFilters] = useState<CampaignFilters>({ byUser: 'all' });
-  const { isWalletConnected, userAddress, regions, organizations, contract, campaigns } =
-    useContext(UserContext);
+  const {
+    isWalletConnected,
+    userAddress,
+    regions,
+    organizations,
+    contract,
+    campaigns,
+    campaignFilters,
+    setCampaignFilters
+  } = useContext(UserContext);
 
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedValidator, setSelectedValidator] = useState('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const { enqueueSnackbar } = useSnackbar();
-
-  // reset filters whenever user changes the connection state
-  useMemo(() => {
-    setCampaignFilters({ byUser: 'all' });
-  }, [isWalletConnected]);
 
   function handleCloseApplicationDialog() {
     setSelectedImage(null);
@@ -173,9 +173,9 @@ export default function Fundraisers() {
     <>
       <Stack
         sx={{ m: 3, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h4" gutterBottom>
+        {/*         <Typography variant="h4" gutterBottom>
           Campaigns
-        </Typography>
+        </Typography> */}
 
         <Button
           variant="text"
@@ -207,17 +207,61 @@ export default function Fundraisers() {
         }}>
         {campaigns
           .filter((campaign) => {
-            switch (campaignFilters.byUser) {
-              case 'all':
-                return true;
-              case 'createdByMe':
-                return campaign.owner === userAddress;
+            let result = false;
 
-              case 'assignedToMe':
-                return campaign.organization === userAddress;
-              default:
-                return true;
+            if (campaignFilters.region === ('all' as Region)) {
+              result = true;
+            } else {
+              console.log(campaignFilters.region);
+              console.log(campaign.region);
+
+              result = campaignFilters.region === campaign.region;
             }
+
+            if (!result) {
+              return false;
+            }
+
+            switch (campaignFilters.user) {
+              case 'all':
+                result = true;
+                break;
+              case 'createdByMe':
+                result = campaign.owner === userAddress;
+                break;
+              case 'assignedToMe':
+                result = campaign.organization === userAddress;
+                break;
+              default:
+                result = true;
+            }
+
+            if (!result) {
+              return false;
+            }
+
+            switch (campaignFilters.status) {
+              case 'all':
+                result = true;
+                break;
+              case 'pending':
+                result = !campaign.active;
+                break;
+              case 'live':
+                result = campaign.active && !campaign.released;
+                break;
+              case 'funded':
+                result = campaign.active && campaign.released;
+                break;
+              case 'rejected':
+                // TODO: not supported
+                result = false;
+                break;
+              default:
+                result = true;
+            }
+
+            return result;
           })
           .map((campaign, campaignId) => (
             <Card
@@ -450,18 +494,100 @@ export default function Fundraisers() {
       </Dialog>
       <Dialog open={openFilters} onClose={() => setOpenFilters(false)}>
         <DialogContent>
-          <FormControl>
-            <FormLabel>User</FormLabel>
-            <RadioGroup
-              value={campaignFilters.byUser}
-              onChange={(event, value) => {
-                setCampaignFilters({ byUser: value as ByUserType });
-              }}>
-              <FormControlLabel value="all" control={<Radio />} label="All" />
-              <FormControlLabel value="createdByMe" control={<Radio />} label="Created by me" />
-              <FormControlLabel value="assignedToMe" control={<Radio />} label="Assigned to me" />
-            </RadioGroup>
-          </FormControl>
+          <Stack spacing={1} direction="column">
+            {isWalletConnected && (
+              <FormControl>
+                <FormLabel>User</FormLabel>
+                <RadioGroup
+                  value={campaignFilters.user}
+                  onChange={(event, value) => {
+                    setCampaignFilters({ ...campaignFilters, user: value as ByUserType });
+                  }}>
+                  <FormControlLabel value={'all' as ByUserType} control={<Radio />} label="All" />
+                  <FormControlLabel
+                    value={'createdByMe' as ByUserType}
+                    control={<Radio />}
+                    label="Created by me"
+                  />
+                  <FormControlLabel
+                    value={'assignedToMe' as ByUserType}
+                    control={<Radio />}
+                    label="Assigned to me"
+                  />
+                </RadioGroup>
+              </FormControl>
+            )}
+
+            {isWalletConnected && (
+              <Divider
+                orientation="horizontal"
+                variant="middle"
+                sx={{ border: 1, borderColor: 'divider', borderStyle: 'dashed' }}
+              />
+            )}
+
+            <FormControl>
+              <FormLabel>Status</FormLabel>
+              <RadioGroup
+                value={campaignFilters.status}
+                onChange={(event, value) => {
+                  setCampaignFilters({ ...campaignFilters, status: value as CampaignStatus });
+                }}>
+                <FormControlLabel value={'all' as CampaignStatus} control={<Radio />} label="All" />
+                <FormControlLabel
+                  value={'pending' as CampaignStatus}
+                  control={<Radio />}
+                  label="Pending"
+                />
+                <FormControlLabel
+                  value={'live' as CampaignStatus}
+                  control={<Radio />}
+                  label="Live"
+                />
+                <FormControlLabel
+                  value={'funded' as CampaignStatus}
+                  control={<Radio />}
+                  label="Funded"
+                />
+                <FormControlLabel
+                  value={'rejected' as CampaignStatus}
+                  control={<Radio />}
+                  label="Rejected"
+                />
+              </RadioGroup>
+            </FormControl>
+
+            <Divider
+              orientation="horizontal"
+              variant="middle"
+              sx={{ border: 1, borderColor: 'divider', borderStyle: 'dashed' }}
+            />
+            <FormControl>
+              <FormLabel>Region</FormLabel>
+              <Select
+                variant="standard"
+                disableUnderline
+                value={campaignFilters.region}
+                onChange={(event) => {
+                  setCampaignFilters({ ...campaignFilters, region: event.target.value as Region });
+                }}
+                sx={{
+                  'label + &': {
+                    marginTop: 1
+                  }
+                }}>
+                <MenuItem value={'all' as Region}>All</MenuItem>
+
+                {regions.map((region) => {
+                  return (
+                    <MenuItem key={`filter_region_item_${region}`} value={region}>
+                      {region}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </Stack>
         </DialogContent>
         <DialogActions></DialogActions>
       </Dialog>

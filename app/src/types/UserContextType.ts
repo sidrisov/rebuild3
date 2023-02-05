@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { RB3Fundraising } from '../../../solidity/typechain-types';
+import { CampaignFilters } from './CampaignFiltersType';
 
 export interface UserContextType {
   darkMode: boolean;
@@ -10,4 +11,6 @@ export interface UserContextType {
   organizations: RB3Fundraising.OrganizationStructOutput[];
   campaigns: RB3Fundraising.CampaignStructOutput[];
   contract: RB3Fundraising | undefined;
+  campaignFilters: CampaignFilters;
+  setCampaignFilters: React.Dispatch<React.SetStateAction<CampaignFilters>>;
 }

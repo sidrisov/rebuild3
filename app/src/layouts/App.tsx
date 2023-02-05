@@ -39,6 +39,7 @@ import { RB3Fundraising } from '../../../solidity/typechain-types';
 import AddressAvatar from '../components/AddressAvatar';
 import { UserContext } from '../contexts/UserContext';
 import Moralis from 'moralis';
+import { CampaignFilters } from '../types/CampaignFiltersType';
 
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
@@ -82,12 +83,20 @@ export default function AppLayout() {
   const [regions, setRegions] = useState<string[]>([]);
   const [organizations, setOrganizations] = useState<RB3Fundraising.OrganizationStructOutput[]>([]);
   const [campaigns, setCampaigns] = useState<RB3Fundraising.CampaignStructOutput[]>([]);
+  const [campaignFilters, setCampaignFilters] = useState<CampaignFilters>({
+    user: 'all',
+    status: 'all',
+    region: 'all'
+  });
 
   const { enqueueSnackbar } = useSnackbar();
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useMemo(async () => {
+    // reset filters whenever user changes the connection state
+    setCampaignFilters({ user: 'all', status: 'all', region: 'all' });
+
     if (!isWalletConnected && provider) {
       const contract = new ethers.Contract(
         import.meta.env.VITE_REBUILD3_CONTRACT_ADDR,
@@ -224,7 +233,9 @@ export default function AppLayout() {
           regions,
           organizations,
           contract: rb3Contract,
-          campaigns
+          campaigns,
+          campaignFilters,
+          setCampaignFilters
         }}>
         <Box
           sx={{
