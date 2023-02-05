@@ -8,11 +8,11 @@ import { DashboardStatsType } from '../types/DashboardStatsType';
 import { StatsCard } from '../components/StatsCard';
 
 export default function Dashboard() {
-  const { isWalletConnected, regions, organizations, contract } = useContext(UserContext);
+  const { contract } = useContext(UserContext);
   const [stats, setStats] = useState<DashboardStatsType>({} as DashboardStatsType);
 
   useMemo(async () => {
-    if (isWalletConnected) {
+    if (contract) {
       const thresholdWei = await contract?.goalThreshold();
 
       let threshold;
@@ -26,7 +26,7 @@ export default function Dashboard() {
         threshold
       });
     }
-  }, [isWalletConnected, contract]);
+  }, [contract]);
 
   return (
     <Box>

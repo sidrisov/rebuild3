@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 
 import {
   Autocomplete,
@@ -13,7 +13,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
   InputAdornment,
+  Radio,
+  RadioGroup,
   Stack,
   TextField,
   Typography
@@ -21,7 +27,15 @@ import {
 
 import { ethers } from 'ethers';
 
-import { Add, AttachFile, Done, DoneAll } from '@mui/icons-material';
+import {
+  Add,
+  AttachFile,
+  ContentCopy,
+  Done,
+  DoneAll,
+  Filter,
+  FilterList
+} from '@mui/icons-material';
 
 import { UserContext } from '../contexts/UserContext';
 import AddressAvatar from '../components/AddressAvatar';
@@ -31,9 +45,18 @@ import { green } from '@mui/material/colors';
 
 import { uploadToIpfs } from '../utils/ipfs';
 import { useSnackbar } from 'notistack';
+import { copyToClipboard } from '../utils/copyToClipboard';
+
+export type ByUserType = 'all' | 'createdByMe' | 'assignedToMe';
+
+interface CampaignFilters {
+  byUser: ByUserType;
+}
 
 export default function Fundraisers() {
-  const [open, setOpen] = useState(false);
+  const [openNewCampaign, setOpenNewCampaign] = useState(false);
+  const [openFilters, setOpenFilters] = useState(false);
+  const [campaignFilters, setCampaignFilters] = useState<CampaignFilters>({ byUser: 'all' });
   const { isWalletConnected, userAddress, regions, organizations, contract, campaigns } =
     useContext(UserContext);
 
@@ -43,15 +66,16 @@ export default function Fundraisers() {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  function handleClickOpenApplicationDialog() {
-    setOpen(true);
-  }
+  // reset filters whenever user changes the connection state
+  useMemo(() => {
+    setCampaignFilters({ byUser: 'all' });
+  }, [isWalletConnected]);
 
   function handleCloseApplicationDialog() {
     setSelectedImage(null);
     setSelectedRegion('');
     setSelectedValidator('');
-    setOpen(false);
+    setOpenNewCampaign(false);
   }
 
   function handleOnRegionSelected(event: any, value: string | null) {
@@ -153,12 +177,19 @@ export default function Fundraisers() {
           Campaigns
         </Typography>
 
+        <Button
+          variant="text"
+          size="small"
+          onClick={() => setOpenFilters(true)}
+          endIcon={<FilterList />}>
+          Filters
+        </Button>
         {isWalletConnected && (
           <Button
-            variant="outlined"
-            startIcon={<Add />}
-            sx={{ mr: -2 }}
-            onClick={handleClickOpenApplicationDialog}>
+            size="small"
+            variant="text"
+            endIcon={<Add />}
+            onClick={() => setOpenNewCampaign(true)}>
             New
           </Button>
         )}
@@ -174,124 +205,143 @@ export default function Fundraisers() {
           p: 1,
           mt: 5
         }}>
-        {campaigns.map((campaign, campaignId) => (
-          <Card
-            key={`campaigns_${campaignId}`}
-            sx={{
-              maxWidth: '0.8',
-              minWidth: '0.3',
-              flexGrow: 1,
-              m: 1,
-              p: 2,
-              border: 1,
-              borderColor: 'divider',
-              borderRadius: 3,
-              '&:hover': {
-                borderColor: 'text.secondary'
-              }
-            }}>
-            <Stack spacing={1}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'start'
-                }}>
+        {campaigns
+          .filter((campaign) => {
+            switch (campaignFilters.byUser) {
+              case 'all':
+                return true;
+              case 'createdByMe':
+                return campaign.owner === userAddress;
+
+              case 'assignedToMe':
+                return campaign.organization === userAddress;
+              default:
+                return true;
+            }
+          })
+          .map((campaign, campaignId) => (
+            <Card
+              key={`campaigns_${campaignId}`}
+              sx={{
+                maxWidth: '0.8',
+                minWidth: '0.3',
+                flexGrow: 1,
+                m: 1,
+                p: 2,
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 3,
+                '&:hover': {
+                  borderColor: 'text.secondary'
+                }
+              }}>
+              <Stack spacing={1}>
                 <Box
                   sx={{
                     display: 'flex',
-                    alignItems: 'center'
+                    justifyContent: 'space-between',
+                    alignItems: 'start'
                   }}>
-                  <AddressAvatar size={40} name={campaign.owner}></AddressAvatar>
-                  <Box sx={{ ml: 1 }}>
-                    <Typography variant="body1">
-                      {shortenWalletAddressLabel(campaign.owner)}
-                    </Typography>
-                    <Typography
-                      variant="subtitle2"
-                      color={campaign.raised >= campaign.goal ? green[400] : 'gray'}>
-                      {ethers.utils.formatEther(campaign.raised.toString()) +
-                        '/' +
-                        ethers.utils.formatEther(campaign.goal.toString()) +
-                        ' ETH'}
-                    </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}>
+                    <AddressAvatar size={40} name={campaign.owner}></AddressAvatar>
+                    <Box sx={{ ml: 1 }}>
+                      <Stack direction="row" alignItems="center">
+                        <Typography variant="body1">
+                          {shortenWalletAddressLabel(campaign.owner)}
+                        </Typography>
+                        <IconButton size="small" onClick={() => copyToClipboard(campaign.owner)}>
+                          <ContentCopy fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                      <Typography
+                        variant="subtitle2"
+                        color={campaign.raised >= campaign.goal ? green[400] : 'gray'}>
+                        {ethers.utils.formatEther(campaign.raised.toString()) +
+                          '/' +
+                          ethers.utils.formatEther(campaign.goal.toString()) +
+                          ' ETH'}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
 
-                {campaign.active && !campaign.released && (
-                  <Button
-                    onClick={() => {
-                      handleDonateToCampaign(campaignId);
-                    }}>
-                    Donate
-                  </Button>
-                )}
-                {campaign.organization === userAddress && !campaign.active && (
-                  <Button
-                    onClick={() => {
-                      handleApproveCampaign(campaignId);
-                    }}>
-                    Approve
-                  </Button>
-                )}
-
-                {campaign.organization === userAddress &&
-                  campaign.active &&
-                  !campaign.released &&
-                  campaign.raised >= campaign.goal && (
+                  {campaign.active && !campaign.released && (
                     <Button
                       onClick={() => {
-                        handleReleaseCampaign(campaignId);
+                        handleDonateToCampaign(campaignId);
                       }}>
-                      Release
+                      Donate
                     </Button>
                   )}
-              </Box>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}>
-                <Typography variant="h6">{campaign.title}</Typography>
-                <Typography variant="body2" color="grey">{`in ${campaign.region}`}</Typography>
-              </Box>
-              <CardMedia
-                component="img"
-                width="200"
-                height="200"
-                image={campaign.cid}
-                loading="lazy"
-              />
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Box display="flex" flexDirection="row">
-                  {campaign.active && (
-                    <>
-                      <AvatarGroup
-                        max={3}
-                        total={campaign.donated.toNumber()}
-                        sx={{
-                          '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
-                        }}>
-                        {[...Array(Math.min(2, campaign.donated.toNumber()))].map((item, i) => (
-                          <Avatar key={`${campaignId}_${i}`}>
-                            <AddressAvatar name={`${campaignId}_${i}`} />
-                          </Avatar>
-                        ))}
-                      </AvatarGroup>
-                      <Typography variant="body2" color="grey">
-                        donated by
-                      </Typography>
-                    </>
+                  {campaign.organization === userAddress && !campaign.active && (
+                    <Button
+                      onClick={() => {
+                        handleApproveCampaign(campaignId);
+                      }}>
+                      Approve
+                    </Button>
                   )}
+
+                  {campaign.organization === userAddress &&
+                    campaign.active &&
+                    !campaign.released &&
+                    campaign.raised >= campaign.goal && (
+                      <Button
+                        onClick={() => {
+                          handleReleaseCampaign(campaignId);
+                        }}>
+                        Release
+                      </Button>
+                    )}
                 </Box>
-                <CampaignStatusIcon active={campaign.active} released={campaign.released} />
-              </Box>
-            </Stack>
-          </Card>
-        ))}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                  <Typography variant="h6">{campaign.title}</Typography>
+                  <Typography variant="body2" color="grey">{`in ${campaign.region}`}</Typography>
+                </Box>
+                <CardMedia
+                  component="img"
+                  width="200"
+                  height="200"
+                  image={campaign.cid}
+                  loading="lazy"
+                />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Box display="flex" flexDirection="row">
+                    {campaign.active && (
+                      <>
+                        <AvatarGroup
+                          max={3}
+                          total={campaign.donated.toNumber()}
+                          sx={{
+                            '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
+                          }}>
+                          {[...Array(Math.min(2, campaign.donated.toNumber()))].map((item, i) => (
+                            <Avatar key={`${campaignId}_${i}`}>
+                              <AddressAvatar name={`${campaignId}_${i}`} />
+                            </Avatar>
+                          ))}
+                        </AvatarGroup>
+                        <Typography variant="body2" color="grey">
+                          donated by
+                        </Typography>
+                      </>
+                    )}
+                  </Box>
+                  <CampaignStatusIcon active={campaign.active} released={campaign.released} />
+                </Box>
+              </Stack>
+            </Card>
+          ))}
       </Box>
-      <Dialog fullScreen open={open} onClose={handleCloseApplicationDialog}>
+      <Dialog fullScreen open={openNewCampaign} onClose={handleCloseApplicationDialog}>
         <DialogTitle>New Campaign</DialogTitle>
         <DialogContent sx={{ m: 1 }}>
           <DialogContentText m={1}>
@@ -369,7 +419,7 @@ export default function Fundraisers() {
                 wordBreak: 'break-all'
               }}>
               <Button size="small" variant="outlined" component="label" startIcon={<AttachFile />}>
-                Upload
+                Attach
                 <input hidden accept="image/*" multiple type="file" onChange={handleFileChange} />
               </Button>
               <Typography maxWidth={0.8} variant="subtitle2" color="grey">
@@ -397,6 +447,23 @@ export default function Fundraisers() {
             Submit
           </Button>
         </DialogActions>
+      </Dialog>
+      <Dialog open={openFilters} onClose={() => setOpenFilters(false)}>
+        <DialogContent>
+          <FormControl>
+            <FormLabel>User</FormLabel>
+            <RadioGroup
+              value={campaignFilters.byUser}
+              onChange={(event, value) => {
+                setCampaignFilters({ byUser: value as ByUserType });
+              }}>
+              <FormControlLabel value="all" control={<Radio />} label="All" />
+              <FormControlLabel value="createdByMe" control={<Radio />} label="Created by me" />
+              <FormControlLabel value="assignedToMe" control={<Radio />} label="Assigned to me" />
+            </RadioGroup>
+          </FormControl>
+        </DialogContent>
+        <DialogActions></DialogActions>
       </Dialog>
     </>
   );

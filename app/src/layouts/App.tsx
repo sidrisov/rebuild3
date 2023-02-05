@@ -23,9 +23,11 @@ import {
   DarkModeOutlined,
   Menu
 } from '@mui/icons-material';
+
 import Nav from '../components/Navigation';
 
 import { Magic } from 'magic-sdk';
+import { EthNetworkName } from '@magic-sdk/types';
 import { ethers } from 'ethers';
 
 import { ConnectExtension } from '@magic-ext/connect';
@@ -42,20 +44,26 @@ const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
 
 var magic: InstanceWithExtensions<SDKBase, ConnectExtension[]>;
-var provider: ethers.providers.Web3Provider;
+var provider: ethers.providers.Web3Provider | ethers.providers.AlchemyProvider;
 
+// if magic enabled
 if (MAGIC_ENABLED) {
   magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
-    network: 'goerli',
-    locale: 'en_US',
+    network: import.meta.env.VITE_DEFAULT_NETWORK as EthNetworkName,
     extensions: [new ConnectExtension()]
   });
   magic.preload();
   provider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
 } else {
-  // TODO: add check so that it can be opened on mobile, need to add further checks across all calls
+  // otherwise try to use metamask provider
   if (window.ethereum) {
     provider = new ethers.providers.Web3Provider(window.ethereum as any);
+  } else {
+    // default to alchemy provider
+    provider = new ethers.providers.AlchemyProvider(
+      import.meta.env.VITE_DEFAULT_NETWORK,
+      import.meta.env.VITE_ALCHEMY_API_KEY
+    );
   }
 }
 
@@ -79,9 +87,24 @@ export default function AppLayout() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  useMemo(async () => {
+    if (!isWalletConnected && provider) {
+      const contract = new ethers.Contract(
+        import.meta.env.VITE_REBUILD3_CONTRACT_ADDR,
+        Rebuild3ContractArtifact.abi,
+        provider
+      ) as RB3Fundraising;
+
+      setRB3Contract(contract);
+    }
+  }, [isWalletConnected, provider]);
+
+  useMemo(async () => {
+    if (INIT_CONNECT) {
+      console.log('Initializing wallet connect on start up!');
+      connectWallet();
+    }
+  }, []);
 
   async function connectWallet() {
     if (!MAGIC_ENABLED) {
@@ -104,12 +127,9 @@ export default function AppLayout() {
     enqueueSnackbar((MAGIC_ENABLED ? 'Magic ' : '') + 'Wallet Connected!', { variant: 'success' });
   }
 
-  useMemo(async () => {
-    if (INIT_CONNECT) {
-      console.log('Initializing wallet connect on start up!');
-      connectWallet();
-    }
-  }, []);
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   async function fetchRegionData(contract: RB3Fundraising) {
     if (contract !== undefined) {
@@ -174,7 +194,7 @@ export default function AppLayout() {
 
   useMemo(async () => {
     // load all countries
-    if (isWalletConnected && rb3Contract !== undefined) {
+    if (rb3Contract) {
       fetchRegionData(rb3Contract);
       fetchOrganizationData(rb3Contract);
       fetchCampaignData(rb3Contract);
@@ -182,7 +202,7 @@ export default function AppLayout() {
       // listen to all events
       subscribeToAllEvents(rb3Contract);
     }
-  }, [isWalletConnected, rb3Contract]);
+  }, [rb3Contract]);
 
   async function disconnectWallet(): Promise<void> {
     if (MAGIC_ENABLED) {
@@ -226,15 +246,17 @@ export default function AppLayout() {
               }}>
               {drawer}
             </Drawer>
-            <Drawer
-              variant="permanent"
-              sx={{
-                display: { xs: 'none', sm: 'block' },
-                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
-              }}
-              open>
-              {drawer}
-            </Drawer>
+            {
+              <Drawer
+                variant="permanent"
+                sx={{
+                  display: { xs: 'none', sm: 'block' },
+                  '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+                }}
+                open>
+                {drawer}
+              </Drawer>
+            }
           </Box>
           <Box flexGrow={1}>
             <AppBar

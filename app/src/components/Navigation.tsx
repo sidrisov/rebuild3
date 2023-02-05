@@ -1,15 +1,26 @@
-import { Stack, Tabs, Tab, Link as MuiLink, Box, Typography } from '@mui/material';
+import {
+  Stack,
+  Tabs,
+  Tab,
+  Link as MuiLink,
+  Box,
+  Typography,
+  IconButton,
+  Avatar
+} from '@mui/material';
 import { useContext, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import HomeLogo from './Logo';
 
 const paths = ['/app/dashboard', '/app/fundraisers', '/app/validators'];
 
-import { QueryStats, VolunteerActivism, VerifiedUser } from '@mui/icons-material';
+import { QueryStats, VolunteerActivism, VerifiedUser, ContentCopy } from '@mui/icons-material';
 import AddressAvatar from './AddressAvatar';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { UserContext } from '../contexts/UserContext';
 import { ethers } from 'ethers';
+import { copyToClipboard } from '../utils/copyToClipboard';
+import { blue } from '@mui/material/colors';
 
 export default function Navigation() {
   const { pathname } = useLocation();
@@ -27,7 +38,6 @@ export default function Navigation() {
       const weiBalance = await provider.getBalance(userAddress);
       setBalance(parseFloat(ethers.utils.formatEther(weiBalance)).toPrecision(8));
     }
-    provider.getBalance(userAddress);
   }, [isWalletConnected, userAddress, provider]);
 
   function AlignedLinkTab(props: any) {
@@ -40,23 +50,19 @@ export default function Navigation() {
     <Stack
       sx={{
         ml: 1,
-        height: '100vh',
-        border: 0,
-        borderRight: 1,
-        borderColor: 'divider',
-        borderStyle: 'dashed'
+        height: '100vh'
       }}>
       <HomeLogo m={2} />
       {isWalletConnected && (
         <Box
           sx={{
-            m: 1,
             p: 1,
-            border: 1,
+            border: 2,
             borderRadius: 5,
             borderStyle: 'dashed',
+            borderColor: blue[300],
             mt: 5,
-            width: 180,
+            width: 200,
             height: 100,
             display: 'flex',
             alignItems: 'center',
@@ -64,11 +70,16 @@ export default function Navigation() {
               borderStyle: 'solid'
             }
           }}>
-          <AddressAvatar size={50} name={userAddress}></AddressAvatar>
+          <AddressAvatar size={50} name={userAddress} />
           <Box sx={{ ml: 1 }}>
-            <Typography variant="h6" color="grey">
-              {shortenWalletAddressLabel(userAddress)}
-            </Typography>
+            <Stack direction="row" alignItems="center">
+              <Typography variant="h6" color="primary">
+                {shortenWalletAddressLabel(userAddress)}
+              </Typography>
+              <IconButton color="primary" size="small" onClick={() => copyToClipboard(userAddress)}>
+                <ContentCopy fontSize="small" />
+              </IconButton>
+            </Stack>
             <Typography variant="subtitle2">{balance} ETH</Typography>
           </Box>
         </Box>
