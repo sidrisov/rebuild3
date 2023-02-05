@@ -74,12 +74,18 @@ contract RB3Fundraising is Ownable {
   event CampaignSuccess(uint indexed campaignId, address indexed receiver, uint256 amount);
 
   // Activate region
-  function activateRegion(string memory _name) public onlyOwner {
-    require(!isRegion(_name), 'Region already exists!');
-    regions.push(Region(true, _name));
-    regionIds[_name] = regions.length;
+  function activateRegion(string memory _region) public onlyOwner {
+    require(!isRegion(_region), 'Region already exists!');
+    regions.push(Region(true, _region));
+    regionIds[_region] = regions.length;
     activeRegionsCount++;
-    emit RegionActivated(_name);
+    emit RegionActivated(_region);
+  }
+
+  function activateRegions(string[] memory _regions) public onlyOwner {
+    for (uint i = 0; i < _regions.length; i++) {
+      activateRegion(_regions[i]);
+    }
   }
 
   // Deactive region

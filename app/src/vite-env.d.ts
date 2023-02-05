@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly VITE_MORALIS_API_KEY: string;
   readonly VITE_ALCHEMY_API_KEY: string;
   readonly VITE_DEFAULT_NETWORK: string;
+  readonly VITE_DEFAULT_DONATION_AMOUNT: string;
 }
 
 interface ImportMeta {

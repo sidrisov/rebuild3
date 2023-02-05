@@ -109,7 +109,11 @@ export default function Fundraisers() {
   }
 
   async function handleDonateToCampaign(campaignId: number) {
-    await (await contract?.donate(campaignId, { value: ethers.utils.parseEther('1') }))?.wait();
+    await (
+      await contract?.donate(campaignId, {
+        value: ethers.utils.parseEther(import.meta.env.VITE_DEFAULT_DONATION_AMOUNT)
+      })
+    )?.wait();
   }
 
   async function submitCampaign() {

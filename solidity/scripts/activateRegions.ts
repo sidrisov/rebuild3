@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const regions = ['Ukraine', 'USA', 'UK', 'Poland'];
+const regions = ['Ukraine', 'USA', 'UK'];
 async function main() {
   const [owner] = await ethers.getSigners();
 
@@ -12,9 +12,10 @@ async function main() {
     `Activating regions in contract: ${contract.address}: ${JSON.stringify(regions, null, 2)}`
   );
 
-  regions.forEach(async (region) => {
+  await contract.activateRegions(regions);
+  /* regions.forEach(async (region) => {
     await contract.activateRegion(region);
-  });
+  }); */
 }
 
 // We recommend this pattern to be able to use async/await everywhere

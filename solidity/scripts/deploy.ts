@@ -1,8 +1,6 @@
 import { ethers } from 'hardhat';
 
 async function main() {
-  const [owner, addr1, addr2] = await ethers.getSigners();
-
   const RB3Fundraising = await ethers.getContractFactory('RB3Fundraising');
   const contract = await RB3Fundraising.deploy();
 

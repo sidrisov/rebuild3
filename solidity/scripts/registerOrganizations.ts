@@ -6,8 +6,7 @@ dotenv.config();
 const organizations = [
   { name: 'ORG1', description: 'We Rebuild in Ukraine', region: 'Ukraine' },
   { name: 'ORG2', description: 'We Rebuild in USA', region: 'USA' },
-  { name: 'ORG3', description: 'We Rebuild in UK', region: 'UK' },
-  { name: 'ORG4', description: 'We Rebuild in Poland', region: 'Poland' }
+  { name: 'ORG3', description: 'We Rebuild in UK', region: 'UK' }
 ];
 async function main() {
   const signers = await ethers.getSigners();
@@ -18,16 +17,15 @@ async function main() {
   );
 
   console.log(
-    `Registring organizations in contract: ${contract.address}: ${JSON.stringify(organizations, null, 2)}`
+    `Registring organizations in contract: ${contract.address}: ${JSON.stringify(
+      organizations,
+      null,
+      2
+    )}`
   );
 
   organizations.forEach(async (org, i) => {
-    await contract.registerOrganization(
-      signers[i + 1].address,
-      org.name,
-      org.description,
-      org.region
-    );
+    await contract.registerOrganization(signers[i].address, org.name, org.description, org.region);
   });
 }
 
