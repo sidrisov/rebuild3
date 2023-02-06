@@ -21,6 +21,7 @@ import { UserContext } from '../contexts/UserContext';
 import { ethers } from 'ethers';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { blue } from '@mui/material/colors';
+import { useSnackbar } from 'notistack';
 
 export default function Navigation() {
   const { pathname } = useLocation();
@@ -28,6 +29,8 @@ export default function Navigation() {
   const [balance, setBalance] = useState('');
 
   const { isWalletConnected, userAddress, provider } = useContext(UserContext);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   useMemo(() => {
     setTabValue(paths.indexOf(pathname));
@@ -76,7 +79,13 @@ export default function Navigation() {
               <Typography variant="h6" color="primary">
                 {shortenWalletAddressLabel(userAddress)}
               </Typography>
-              <IconButton color="primary" size="small" onClick={() => copyToClipboard(userAddress)}>
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={() => {
+                  copyToClipboard(userAddress);
+                  enqueueSnackbar('Wallet address is copied to clipboard!');
+                }}>
                 <ContentCopy fontSize="small" />
               </IconButton>
             </Stack>

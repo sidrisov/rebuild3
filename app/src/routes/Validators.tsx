@@ -2,11 +2,15 @@ import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { shortenWalletAddressLabel } from '../utils/address';
 
-import { Badge, Box, Card, Chip, Typography } from '@mui/material';
+import { Badge, Box, Card, CardActionArea, Chip, Typography } from '@mui/material';
 import AddressAvatar from '../components/AddressAvatar';
+import { ContentCopy } from '@mui/icons-material';
+import { copyToClipboard } from '../utils/copyToClipboard';
+import { useSnackbar } from 'notistack';
 
 export default function Validators() {
   const { organizations } = useContext(UserContext);
+  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <Box>
@@ -24,49 +28,63 @@ export default function Validators() {
         {organizations.map((organization, i) => (
           <Card
             key={`validators_${i}`}
-            sx={{ m: 1, border: 1, borderRadius: 5 }}
+            sx={{
+              m: 1,
+              border: 1,
+              borderRadius: 5,
+              '&:hover': {
+                borderStyle: 'dashed'
+              }
+            }}
+            onClick={() => {
+              alert('Description: ' + organization.description);
+            }}
             variant="elevation">
-            <Box
-              sx={{
-                m: 2,
-                p: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-              }}>
-              <Chip
-                label={shortenWalletAddressLabel(organization.account)}
-                onClick={() => {
-                  alert('Description: ' + organization.description);
-                }}
-                icon={
-                  <Box display="flex">
-                    <AddressAvatar size={20} name={organization.account} />
-                  </Box>
-                }
+            <CardActionArea>
+              <Box
                 sx={{
-                  height: 30,
-                  width: 105,
-                  fontSize: 10,
-                  fontWeight: 'bold'
-                }}
-              />
-              <Typography variant="h6">{organization.name}</Typography>
-              <Typography variant="body1" color="grey">
-                {organization.region}
-              </Typography>
-              <Badge
-                variant="dot"
-                color={organization.active ? 'success' : 'error'}
-                sx={{
-                  alignSelf: 'flex-end'
-                }}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right'
-                }}
-              />
-            </Box>
+                  m: 2,
+                  p: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}>
+                <Chip
+                  label={shortenWalletAddressLabel(organization.account)}
+                  icon={
+                    <Box display="flex">
+                      <AddressAvatar size={20} name={organization.account} />
+                    </Box>
+                  }
+                  deleteIcon={<ContentCopy fontSize="inherit" />}
+                  onDelete={() => {
+                    copyToClipboard(organization.account);
+                    enqueueSnackbar('Wallet address is copied to clipboard!');
+                  }}
+                  sx={{
+                    height: 30,
+                    width: 130,
+                    fontSize: 10,
+                    fontWeight: 'bold'
+                  }}
+                />
+                <Typography variant="h6">{organization.name}</Typography>
+                <Typography variant="body1" color="grey">
+                  {organization.region}
+                </Typography>
+                <Badge
+                  variant="dot"
+                  color={organization.active ? 'success' : 'error'}
+                  sx={{
+                    alignSelf: 'flex-end'
+                  }}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right'
+                  }}
+                />
+              </Box>
+            </CardActionArea>
           </Card>
         ))}
       </Box>

@@ -301,7 +301,12 @@ export default function Fundraisers() {
                         <Typography variant="body1">
                           {shortenWalletAddressLabel(campaign.owner)}
                         </Typography>
-                        <IconButton size="small" onClick={() => copyToClipboard(campaign.owner)}>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            copyToClipboard(campaign.owner);
+                            enqueueSnackbar('Wallet address is copied to clipboard!');
+                          }}>
                           <ContentCopy fontSize="small" />
                         </IconButton>
                       </Stack>
@@ -421,7 +426,7 @@ export default function Fundraisers() {
 
             <Stack direction="row" spacing={2} width={1} justifyContent="start" alignItems="center">
               <Autocomplete
-                sx={{ flexGrow: 1 }}
+                sx={{ flexGrow: 1, maxWidth: 400 }}
                 autoHighlight
                 id="region"
                 onChange={handleOnRegionSelected}
@@ -431,7 +436,7 @@ export default function Fundraisers() {
                 )}
               />
               <Autocomplete
-                sx={{ flexGrow: 1 }}
+                sx={{ flexGrow: 1, maxWidth: 400 }}
                 autoHighlight
                 id="org"
                 getOptionLabel={(option) => option.name}
@@ -443,23 +448,24 @@ export default function Fundraisers() {
                   <TextField variant="outlined" {...params} label="Organization" />
                 )}
               />
-              <TextField
-                sx={{ width: 150 }}
-                variant="outlined"
-                label="Goal"
-                id="eth"
-                type="number"
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">ETH</InputAdornment>,
-                  inputMode: 'numeric'
-                  //pattern: '[0-9]*'
-                }}
-              />
             </Stack>
+            <TextField
+              sx={{ flexGrow: 1, maxWidth: 400 }}
+              variant="outlined"
+              label="Goal"
+              id="eth"
+              type="number"
+              InputProps={{
+                endAdornment: <InputAdornment position="end">ETH</InputAdornment>,
+                inputMode: 'numeric'
+                //pattern: '[0-9]*'
+              }}
+            />
             {selectedImage !== null && (
               <img width="95%" src={URL.createObjectURL(selectedImage)} loading="lazy" />
             )}
             <Stack
+              width={1}
               direction="row"
               spacing={1}
               alignItems="center"
