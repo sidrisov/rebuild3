@@ -6,6 +6,9 @@ import svgr from 'vite-plugin-svgr';
 export default defineConfig({
   plugins: [react(), svgr()],
   server: {
-    host: 'rebuild3.local.xyz'
+    host: 'rebuild3.xyz.local'
+  },
+  define: {
+    APP_VERSION: JSON.stringify(process.env.npm_package_version)
   }
 });

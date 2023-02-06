@@ -6,7 +6,7 @@ export interface UserContextType {
   darkMode: boolean;
   isWalletConnected: boolean;
   userAddress: string;
-  provider: ethers.providers.Web3Provider | ethers.providers.AlchemyProvider;
+  provider: ethers.providers.Web3Provider | ethers.providers.AlchemyProvider | undefined;
   regions: string[];
   organizations: ReBuild3.OrganizationStructOutput[];
   campaigns: ReBuild3.CampaignStructOutput[];

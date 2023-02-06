@@ -8,7 +8,7 @@ import { DashboardStatsType } from '../types/DashboardStatsType';
 import { StatsCard } from '../components/StatsCard';
 
 export default function Dashboard() {
-  const { contract, regions, organizations, campaigns, threshold } = useContext(UserContext);
+  const { regions, organizations, campaigns, threshold } = useContext(UserContext);
   const [stats, setStats] = useState<DashboardStatsType>({} as DashboardStatsType);
 
   useMemo(async () => {

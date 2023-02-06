@@ -37,7 +37,7 @@ export default function Navigation() {
   }, [pathname]);
 
   useMemo(async () => {
-    if (isWalletConnected) {
+    if (isWalletConnected && provider) {
       const weiBalance = await provider.getBalance(userAddress);
       setBalance(parseFloat(ethers.utils.formatEther(weiBalance)).toPrecision(8));
     }

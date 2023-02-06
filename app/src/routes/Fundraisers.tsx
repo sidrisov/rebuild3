@@ -30,15 +30,7 @@ import {
 
 import { ethers } from 'ethers';
 
-import {
-  Add,
-  AttachFile,
-  ContentCopy,
-  Done,
-  DoneAll,
-  Filter,
-  FilterList
-} from '@mui/icons-material';
+import { Add, AttachFile, ContentCopy, Done, DoneAll, FilterList } from '@mui/icons-material';
 
 import { UserContext } from '../contexts/UserContext';
 import AddressAvatar from '../components/AddressAvatar';
@@ -49,7 +41,7 @@ import { green } from '@mui/material/colors';
 import { uploadToIpfs } from '../utils/ipfs';
 import { useSnackbar } from 'notistack';
 import { copyToClipboard } from '../utils/copyToClipboard';
-import { ByUserType, CampaignFilters, CampaignStatus, Region } from '../types/CampaignFiltersType';
+import { ByUserType, CampaignStatus, Region } from '../types/CampaignFiltersType';
 
 export default function Fundraisers() {
   const [openNewCampaign, setOpenNewCampaign] = useState(false);

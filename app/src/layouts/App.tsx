@@ -45,7 +45,7 @@ const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
 
 var magic: InstanceWithExtensions<SDKBase, ConnectExtension[]>;
-var provider: ethers.providers.Web3Provider | ethers.providers.AlchemyProvider;
+var signerProvider: ethers.providers.Web3Provider | undefined;
 
 // if magic enabled
 if (MAGIC_ENABLED) {
@@ -54,19 +54,20 @@ if (MAGIC_ENABLED) {
     extensions: [new ConnectExtension()]
   });
   magic.preload();
-  provider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
-} else {
+  signerProvider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
+} else if (window.ethereum) {
   // otherwise try to use metamask provider
-  if (window.ethereum) {
-    provider = new ethers.providers.Web3Provider(window.ethereum as any);
-  } else {
-    // default to alchemy provider
-    provider = new ethers.providers.AlchemyProvider(
-      import.meta.env.VITE_DEFAULT_NETWORK,
-      import.meta.env.VITE_ALCHEMY_API_KEY
-    );
-  }
+  signerProvider = new ethers.providers.Web3Provider(window.ethereum as any);
 }
+
+// use alchemy as default provider, fallback to wallet provider if network wasn't set up, e.g. local hardhat
+const defaultProvider =
+  import.meta.env.VITE_DEFAULT_NETWORK === ''
+    ? signerProvider
+    : new ethers.providers.AlchemyProvider(
+        import.meta.env.VITE_DEFAULT_NETWORK,
+        import.meta.env.VITE_ALCHEMY_API_KEY
+      );
 
 Moralis.start({
   apiKey: import.meta.env.VITE_MORALIS_API_KEY
@@ -100,16 +101,16 @@ export default function AppLayout() {
     // reset filters whenever user changes the connection state
     setCampaignFilters({ user: 'all', status: 'all', region: 'all' });
 
-    if (!isWalletConnected && provider) {
+    if (!isWalletConnected && defaultProvider) {
       const contract = new ethers.Contract(
         import.meta.env.VITE_REBUILD3_CONTRACT_ADDR,
         Rebuild3ContractArtifact.abi,
-        provider
+        defaultProvider
       ) as ReBuild3;
 
       setRB3Contract(contract);
     }
-  }, [isWalletConnected, provider]);
+  }, [isWalletConnected]);
 
   useMemo(async () => {
     if (INIT_CONNECT) {
@@ -119,20 +120,25 @@ export default function AppLayout() {
   }, []);
 
   async function connectWallet() {
-    if (!MAGIC_ENABLED) {
-      await provider.send('eth_requestAccounts', []);
+    if (!signerProvider) {
+      enqueueSnackbar('Wallet Provider is not available!', { variant: 'warning' });
+      return;
     }
 
-    const signer = provider.getSigner();
+    if (!MAGIC_ENABLED) {
+      await signerProvider.send('eth_requestAccounts', []);
+    }
+
+    const signer = signerProvider.getSigner();
     const address = await signer.getAddress();
 
     const contract = new ethers.Contract(
       import.meta.env.VITE_REBUILD3_CONTRACT_ADDR,
       Rebuild3ContractArtifact.abi,
-      signer
+      defaultProvider
     ) as ReBuild3;
 
-    setRB3Contract(contract);
+    setRB3Contract(contract.connect(signer));
     setUserAddress(address);
     setWalletConnected(true);
 
@@ -177,7 +183,7 @@ export default function AppLayout() {
     console.log('subscribeToAllEvents');
     if (contract !== undefined) {
       // subscribe from the next block
-      provider.once('block', async () => {
+      defaultProvider?.once('block', async () => {
         contract.once(contract.filters.RegionActivated(), () => {
           fetchRegionData(contract);
           enqueueSnackbar('New region registered!', { variant: 'success' });
@@ -267,7 +273,7 @@ export default function AppLayout() {
           darkMode,
           isWalletConnected,
           userAddress,
-          provider,
+          provider: defaultProvider,
           regions,
           organizations,
           contract: rb3Contract,
