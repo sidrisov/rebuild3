@@ -6,6 +6,11 @@ const config: HardhatUserConfig = {
   solidity: '0.8.17',
   defaultNetwork: 'localhost',
   networks: {
+    hardhat: {
+      mining: {
+        interval: 5000
+      }
+    }
     // comment it, as it requires those variables during build on vercel
     /*goerli: {
       url: process.env.GOERLI_ALCHEMY_API_KEY,

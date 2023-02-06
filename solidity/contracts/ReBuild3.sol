@@ -190,6 +190,7 @@ contract ReBuild3 is Ownable {
     require(_goal <= goalThreshold, "You can't raise more than allowed threshold!");
     require(msg.sender != _organization, "Campaign creator and organization can't be same!");
 
+    // TODO: add check so that region and organization should match available
     campaigns.push(
       Campaign(
         false,

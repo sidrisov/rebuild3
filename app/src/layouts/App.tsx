@@ -82,12 +82,15 @@ export default function AppLayout() {
   const [rb3Contract, setRB3Contract] = useState<ReBuild3>();
   const [regions, setRegions] = useState<string[]>([]);
   const [organizations, setOrganizations] = useState<ReBuild3.OrganizationStructOutput[]>([]);
+  const [threshold, setThreshold] = useState('N/A');
   const [campaigns, setCampaigns] = useState<ReBuild3.CampaignStructOutput[]>([]);
   const [campaignFilters, setCampaignFilters] = useState<CampaignFilters>({
     user: 'all',
     status: 'all',
     region: 'all'
   });
+
+  const [isSubscribedToEvents, setSubscribedToEvents] = useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -147,6 +150,16 @@ export default function AppLayout() {
     }
   }
 
+  async function fetchConfig(contract: ReBuild3) {
+    if (contract !== undefined) {
+      const thresholdWei = await rb3Contract?.goalThreshold();
+
+      if (thresholdWei) {
+        setThreshold(ethers.utils.formatEther(thresholdWei));
+      }
+    }
+  }
+
   async function fetchOrganizationData(contract: ReBuild3) {
     if (contract !== undefined) {
       const organizations = await contract.getAllOrganizations();
@@ -161,42 +174,54 @@ export default function AppLayout() {
   }
 
   async function subscribeToAllEvents(contract: ReBuild3) {
+    console.log('subscribeToAllEvents');
     if (contract !== undefined) {
-      contract.removeAllListeners();
-      contract.on(contract.filters.RegionActivated(), (event) => {
-        fetchRegionData(contract);
-        enqueueSnackbar('New region registered!', { variant: 'success' });
-      });
+      // subscribe from the next block
+      provider.once('block', async () => {
+        contract.once(contract.filters.RegionActivated(), () => {
+          fetchRegionData(contract);
+          enqueueSnackbar('New region registered!', { variant: 'success' });
+          setSubscribedToEvents(false);
+        });
 
-      contract.on(contract.filters.RegionDeactivated(), (event) => {
-        fetchRegionData(contract);
-        enqueueSnackbar('Region deactivated!', { variant: 'warning' });
-      });
+        contract.once(contract.filters.RegionDeactivated(), () => {
+          fetchRegionData(contract);
+          enqueueSnackbar('Region deactivated!', { variant: 'warning' });
+          setSubscribedToEvents(false);
+        });
 
-      contract.on(contract.filters.OrganizationRegistered(), (event) => {
-        fetchOrganizationData(contract);
-        enqueueSnackbar('New organization registered!', { variant: 'success' });
-      });
-      contract.on(contract.filters.OrganizationDeactivated(), (event) => {
-        fetchOrganizationData(contract);
-        enqueueSnackbar('Organiation deactivated!', { variant: 'warning' });
-      });
+        contract.once(contract.filters.OrganizationRegistered(), () => {
+          fetchOrganizationData(contract);
+          enqueueSnackbar('New organization registered!', { variant: 'success' });
+          setSubscribedToEvents(false);
+        });
+        contract.once(contract.filters.OrganizationDeactivated(), () => {
+          fetchOrganizationData(contract);
+          enqueueSnackbar('Organiation deactivated!', { variant: 'warning' });
+          setSubscribedToEvents(false);
+        });
 
-      contract.on(contract.filters.CampaignCreated(), (event) => {
-        fetchCampaignData(contract);
-        enqueueSnackbar('New campaign created!', { variant: 'success' });
-      });
-      contract.on(contract.filters.CampaignActive(), (event) => {
-        fetchCampaignData(contract);
-        enqueueSnackbar('Campaing is available for donations!', { variant: 'info' });
-      });
-      contract.on(contract.filters.CampaignSuccess(), (event) => {
-        fetchCampaignData(contract);
-        enqueueSnackbar('Campaign was successful!', { variant: 'success' });
-      });
-      contract.on(contract.filters.DonationMade(), (event) => {
-        fetchCampaignData(contract);
-        enqueueSnackbar('New donation was made!', { variant: 'info' });
+        contract.once(contract.filters.CampaignCreated(), () => {
+          fetchCampaignData(contract);
+          enqueueSnackbar('New campaign created!', { variant: 'success' });
+          setSubscribedToEvents(false);
+        });
+
+        contract.once(contract.filters.CampaignActive(), () => {
+          fetchCampaignData(contract);
+          enqueueSnackbar('Campaing is available for donations!', { variant: 'info' });
+          setSubscribedToEvents(false);
+        });
+        contract.once(contract.filters.CampaignSuccess(), () => {
+          fetchCampaignData(contract);
+          enqueueSnackbar('Campaign was successful!', { variant: 'success' });
+          setSubscribedToEvents(false);
+        });
+        contract.once(contract.filters.DonationMade(), () => {
+          fetchCampaignData(contract);
+          enqueueSnackbar('New donation was made!', { variant: 'info' });
+          setSubscribedToEvents(false);
+        });
       });
     }
   }
@@ -204,14 +229,27 @@ export default function AppLayout() {
   useMemo(async () => {
     // load all countries
     if (rb3Contract) {
+      const thresholdWei = await rb3Contract?.goalThreshold();
+
+      let threshold;
+      if (thresholdWei) {
+        threshold = ethers.utils.formatEther(thresholdWei);
+      }
+
+      fetchConfig(rb3Contract);
       fetchRegionData(rb3Contract);
       fetchOrganizationData(rb3Contract);
       fetchCampaignData(rb3Contract);
-
-      // listen to all events
-      subscribeToAllEvents(rb3Contract);
     }
   }, [rb3Contract]);
+
+  useMemo(async () => {
+    if (!isSubscribedToEvents && rb3Contract) {
+      console.log('subscribing');
+      subscribeToAllEvents(rb3Contract);
+      setSubscribedToEvents(true);
+    }
+  }, [isSubscribedToEvents, rb3Contract]);
 
   async function disconnectWallet(): Promise<void> {
     if (MAGIC_ENABLED) {
@@ -234,6 +272,7 @@ export default function AppLayout() {
           organizations,
           contract: rb3Contract,
           campaigns,
+          threshold,
           campaignFilters,
           setCampaignFilters
         }}>

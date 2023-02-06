@@ -10,6 +10,7 @@ export interface UserContextType {
   regions: string[];
   organizations: ReBuild3.OrganizationStructOutput[];
   campaigns: ReBuild3.CampaignStructOutput[];
+  threshold: string;
   contract: ReBuild3 | undefined;
   campaignFilters: CampaignFilters;
   setCampaignFilters: React.Dispatch<React.SetStateAction<CampaignFilters>>;

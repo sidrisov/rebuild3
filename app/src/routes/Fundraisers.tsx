@@ -309,7 +309,11 @@ export default function Fundraisers() {
                       </Stack>
                       <Typography
                         variant="subtitle2"
-                        color={campaign.raised >= campaign.goal ? green[400] : 'gray'}>
+                        color={
+                          campaign.raised.toNumber() >= campaign.goal.toNumber()
+                            ? green[400]
+                            : 'gray'
+                        }>
                         {ethers.utils.formatEther(campaign.raised.toString()) +
                           '/' +
                           ethers.utils.formatEther(campaign.goal.toString()) +
@@ -338,7 +342,7 @@ export default function Fundraisers() {
                   {campaign.organization === userAddress &&
                     campaign.active &&
                     !campaign.released &&
-                    campaign.raised >= campaign.goal && (
+                    campaign.raised.toNumber() >= campaign.goal.toNumber() && (
                       <Button
                         onClick={() => {
                           handleReleaseCampaign(campaignId);

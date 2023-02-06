@@ -8,25 +8,17 @@ import { DashboardStatsType } from '../types/DashboardStatsType';
 import { StatsCard } from '../components/StatsCard';
 
 export default function Dashboard() {
-  const { contract } = useContext(UserContext);
+  const { contract, regions, organizations, campaigns, threshold } = useContext(UserContext);
   const [stats, setStats] = useState<DashboardStatsType>({} as DashboardStatsType);
 
   useMemo(async () => {
-    if (contract) {
-      const thresholdWei = await contract?.goalThreshold();
-
-      let threshold;
-      if (thresholdWei) {
-        threshold = ethers.utils.formatEther(thresholdWei);
-      }
-      setStats({
-        activeRegions: (await contract?.getActiveRegions())?.length,
-        organizations: (await contract?.getAllOrganizations())?.length,
-        campaigns: (await contract?.getAllCampaigns())?.length,
-        threshold
-      });
-    }
-  }, [contract]);
+    setStats({
+      activeRegions: regions.length,
+      organizations: organizations.length,
+      campaigns: campaigns.length,
+      threshold
+    });
+  }, [regions, organizations, campaigns]);
 
   return (
     <Box>
