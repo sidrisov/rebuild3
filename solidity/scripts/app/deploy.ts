@@ -1,14 +1,14 @@
 import { ethers } from 'hardhat';
 
 async function main() {
-  const RB3Fundraising = await ethers.getContractFactory('RB3Fundraising');
-  const contract = await RB3Fundraising.deploy();
+  const ReBuild3 = await ethers.getContractFactory('ReBuild3');
+  const contract = await ReBuild3.deploy();
 
   await contract.deployed();
 
   await contract.setGoalThreshold(ethers.utils.parseEther('1'));
 
-  console.log(`RB3Fundraising deployed to ${contract.address}`);
+  console.log(`ReBuild3 deployed to ${contract.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

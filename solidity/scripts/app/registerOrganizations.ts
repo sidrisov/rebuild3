@@ -10,11 +10,7 @@ const organizations = [
 ];
 async function main() {
   const signers = await ethers.getSigners();
-  const contract = await ethers.getContractAt(
-    'RB3Fundraising',
-    process.env.CONTRACT_ADDR,
-    signers[0]
-  );
+  const contract = await ethers.getContractAt('ReBuild3', process.env.CONTRACT_ADDR, signers[0]);
 
   console.log(
     `Registring organizations in contract: ${contract.address}: ${JSON.stringify(

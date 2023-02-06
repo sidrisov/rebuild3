@@ -43,7 +43,7 @@ import {
 import { UserContext } from '../contexts/UserContext';
 import AddressAvatar from '../components/AddressAvatar';
 import { shortenWalletAddressLabel } from '../utils/address';
-import { RB3Fundraising } from '../../../solidity/typechain-types';
+import { ReBuild3 } from '../../../solidity/typechain-types';
 import { green } from '@mui/material/colors';
 
 import { uploadToIpfs } from '../utils/ipfs';
@@ -84,10 +84,7 @@ export default function Fundraisers() {
     }
   }
 
-  function handleOnValidatorSelected(
-    event: any,
-    value: RB3Fundraising.OrganizationStructOutput | null
-  ) {
+  function handleOnValidatorSelected(event: any, value: ReBuild3.OrganizationStructOutput | null) {
     if (value !== null) {
       setSelectedValidator(value.account);
     }
@@ -155,7 +152,7 @@ export default function Fundraisers() {
     )?.wait();
   }
 
-  function getCampaignStatusLabel(campaign: RB3Fundraising.CampaignStructOutput) {
+  function getCampaignStatusLabel(campaign: ReBuild3.CampaignStructOutput) {
     if (campaign.released) {
       return 'funded';
     } else if (!campaign.active) {

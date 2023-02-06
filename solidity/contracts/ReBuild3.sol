@@ -5,7 +5,7 @@ pragma solidity ^0.8.17;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract RB3Fundraising is Ownable {
+contract ReBuild3 is Ownable {
   struct Region {
     bool active;
     string name;

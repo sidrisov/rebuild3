@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { RB3Fundraising } from '../../../solidity/typechain-types';
+import { ReBuild3 } from '../../../solidity/typechain-types';
 import { CampaignFilters } from './CampaignFiltersType';
 
 export interface UserContextType {
@@ -8,9 +8,9 @@ export interface UserContextType {
   userAddress: string;
   provider: ethers.providers.Web3Provider | ethers.providers.AlchemyProvider;
   regions: string[];
-  organizations: RB3Fundraising.OrganizationStructOutput[];
-  campaigns: RB3Fundraising.CampaignStructOutput[];
-  contract: RB3Fundraising | undefined;
+  organizations: ReBuild3.OrganizationStructOutput[];
+  campaigns: ReBuild3.CampaignStructOutput[];
+  contract: ReBuild3 | undefined;
   campaignFilters: CampaignFilters;
   setCampaignFilters: React.Dispatch<React.SetStateAction<CampaignFilters>>;
 }

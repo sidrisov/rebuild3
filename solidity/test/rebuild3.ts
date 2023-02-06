@@ -1,14 +1,14 @@
+import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
 
-describe('RB3Fundraising', function () {
+describe('ReBuild3', function () {
   async function deployFixture() {
     // Contracts are deployed using the first signer/account by default
     const [owner, addr1, addr2] = await ethers.getSigners();
 
-    const RB3Fundraising = await ethers.getContractFactory('RB3Fundraising');
-    const contract = await RB3Fundraising.deploy();
+    const ReBuild3 = await ethers.getContractFactory('ReBuild3');
+    const contract = await ReBuild3.deploy();
 
     await contract.setGoalThreshold(ethers.utils.parseEther('1'));
 
@@ -19,8 +19,8 @@ describe('RB3Fundraising', function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, addr1, addr2] = await ethers.getSigners();
 
-    const RB3Fundraising = await ethers.getContractFactory('RB3Fundraising');
-    const contract = await RB3Fundraising.deploy();
+    const ReBuild3 = await ethers.getContractFactory('ReBuild3');
+    const contract = await ReBuild3.deploy();
 
     await contract.activateRegion('Ukraine');
 
@@ -33,8 +33,8 @@ describe('RB3Fundraising', function () {
     // Contracts are deployed using the first signer/account by default
     const [owner, addr1, addr2] = await ethers.getSigners();
 
-    const RB3Fundraising = await ethers.getContractFactory('RB3Fundraising');
-    const contract = await RB3Fundraising.deploy();
+    const ReBuild3 = await ethers.getContractFactory('ReBuild3');
+    const contract = await ReBuild3.deploy();
 
     await contract.setGoalThreshold(ethers.utils.parseEther('1'));
 
@@ -146,13 +146,13 @@ describe('RB3Fundraising', function () {
       const { contract, addr1 } = await loadFixture(deployFixture);
 
       await expect(
-        contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address)
+        contract.submitCampaign('Campaign1', 'Campaign1', '', 10000, 'Ukraine', addr1.address)
       ).to.be.revertedWith('Region is not active!');
 
       await contract.activateRegion('Ukraine');
 
       await expect(
-        contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address)
+        contract.submitCampaign('Campaign1', 'Campaign1', '', 10000, 'Ukraine', addr1.address)
       ).to.be.revertedWith('Organization is not active!');
 
       await contract.registerOrganization(addr1.address, 'org1', 'desc1', 'Ukraine');
@@ -160,7 +160,7 @@ describe('RB3Fundraising', function () {
       await contract.deactivateOrganization(addr1.address);
 
       await expect(
-        contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address)
+        contract.submitCampaign('Campaign1', 'Campaign1', '', 10000, 'Ukraine', addr1.address)
       ).to.be.revertedWith('Organization is not active!');
 
       expect((await contract.getAllCampaigns()).length).to.be.equal(0);
@@ -172,14 +172,14 @@ describe('RB3Fundraising', function () {
       await expect(
         contract
           .connect(addr1)
-          .submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address)
+          .submitCampaign('Campaign1', 'Campaign1', '', 10000, 'Ukraine', addr1.address)
       ).to.be.revertedWith("Campaign creator and organization can't be same!");
     });
 
     it('Campaign added successfully', async function () {
       const { contract, addr1 } = await loadFixture(deployFixtureWithRegionAndOrg);
 
-      await contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address);
+      await contract.submitCampaign('Campaign1', 'Campaign1', '', 10000, 'Ukraine', addr1.address);
 
       expect((await contract.getAllCampaigns()).length).to.be.equal(1);
       expect((await contract.getAllCampaigns())[0].active).to.be.false;
@@ -194,14 +194,14 @@ describe('RB3Fundraising', function () {
     it('Campaign approval not allowed', async function () {
       const { contract, addr1 } = await loadFixture(deployFixtureWithRegionAndOrg);
 
-      await contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address);
+      await contract.submitCampaign('Campaign1', 'Campaign1', '', 10000, 'Ukraine', addr1.address);
       await expect(contract.approveCampaign(0)).to.be.revertedWith('Not allowed to approve!');
     });
 
     it('Campaign approval successful', async function () {
       const { contract, addr1 } = await loadFixture(deployFixtureWithRegionAndOrg);
 
-      await contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address);
+      await contract.submitCampaign('Campaign1', 'Campaign1', '', 10000, 'Ukraine', addr1.address);
 
       await contract.connect(addr1).approveCampaign(0);
 
@@ -211,7 +211,7 @@ describe('RB3Fundraising', function () {
     it("Campaign can't be approved twice", async function () {
       const { contract, addr1 } = await loadFixture(deployFixtureWithRegionAndOrg);
 
-      await contract.submitCampaign('Campaign1', 'Campaign1', 10000, 'Ukraine', addr1.address);
+      await contract.submitCampaign('Campaign1', 'Campaign1', '', 10000, 'Ukraine', addr1.address);
 
       await contract.connect(addr1).approveCampaign(0);
 

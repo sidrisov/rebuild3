@@ -34,8 +34,8 @@ import { ConnectExtension } from '@magic-ext/connect';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider';
 
-import Rebuild3ContractArtifact from '../../../solidity/artifacts/contracts/RB3Fundraising.sol/RB3Fundraising.json';
-import { RB3Fundraising } from '../../../solidity/typechain-types';
+import Rebuild3ContractArtifact from '../../../solidity/artifacts/contracts/ReBuild3.sol/ReBuild3.json';
+import { ReBuild3 } from '../../../solidity/typechain-types';
 import AddressAvatar from '../components/AddressAvatar';
 import { UserContext } from '../contexts/UserContext';
 import Moralis from 'moralis';
@@ -79,10 +79,10 @@ export default function AppLayout() {
   const [darkMode, setDarkMode] = useState(prefersDarkMode);
   const [isWalletConnected, setWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState('');
-  const [rb3Contract, setRB3Contract] = useState<RB3Fundraising>();
+  const [rb3Contract, setRB3Contract] = useState<ReBuild3>();
   const [regions, setRegions] = useState<string[]>([]);
-  const [organizations, setOrganizations] = useState<RB3Fundraising.OrganizationStructOutput[]>([]);
-  const [campaigns, setCampaigns] = useState<RB3Fundraising.CampaignStructOutput[]>([]);
+  const [organizations, setOrganizations] = useState<ReBuild3.OrganizationStructOutput[]>([]);
+  const [campaigns, setCampaigns] = useState<ReBuild3.CampaignStructOutput[]>([]);
   const [campaignFilters, setCampaignFilters] = useState<CampaignFilters>({
     user: 'all',
     status: 'all',
@@ -102,7 +102,7 @@ export default function AppLayout() {
         import.meta.env.VITE_REBUILD3_CONTRACT_ADDR,
         Rebuild3ContractArtifact.abi,
         provider
-      ) as RB3Fundraising;
+      ) as ReBuild3;
 
       setRB3Contract(contract);
     }
@@ -127,7 +127,7 @@ export default function AppLayout() {
       import.meta.env.VITE_REBUILD3_CONTRACT_ADDR,
       Rebuild3ContractArtifact.abi,
       signer
-    ) as RB3Fundraising;
+    ) as ReBuild3;
 
     setRB3Contract(contract);
     setUserAddress(address);
@@ -140,27 +140,27 @@ export default function AppLayout() {
     setMobileOpen(!mobileOpen);
   };
 
-  async function fetchRegionData(contract: RB3Fundraising) {
+  async function fetchRegionData(contract: ReBuild3) {
     if (contract !== undefined) {
       const regions = await contract.getActiveRegions();
       setRegions(regions);
     }
   }
 
-  async function fetchOrganizationData(contract: RB3Fundraising) {
+  async function fetchOrganizationData(contract: ReBuild3) {
     if (contract !== undefined) {
       const organizations = await contract.getAllOrganizations();
       setOrganizations(organizations);
     }
   }
-  async function fetchCampaignData(contract: RB3Fundraising) {
+  async function fetchCampaignData(contract: ReBuild3) {
     if (contract !== undefined) {
       const campaigns = await contract.getAllCampaigns();
       setCampaigns(campaigns);
     }
   }
 
-  async function subscribeToAllEvents(contract: RB3Fundraising) {
+  async function subscribeToAllEvents(contract: ReBuild3) {
     if (contract !== undefined) {
       contract.removeAllListeners();
       contract.on(contract.filters.RegionActivated(), (event) => {

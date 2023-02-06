@@ -11,6 +11,7 @@
     <script type="module" src="/src/main.tsx"></script>
 
     <script>
+      // fix for global undefined, required by moralis internal api calls
       window.global = window;
     </script>
 

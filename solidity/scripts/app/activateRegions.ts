@@ -7,7 +7,7 @@ const regions = ['Ukraine', 'USA', 'UK'];
 async function main() {
   const [owner] = await ethers.getSigners();
 
-  const contract = await ethers.getContractAt('RB3Fundraising', process.env.CONTRACT_ADDR, owner);
+  const contract = await ethers.getContractAt('ReBuild3', process.env.CONTRACT_ADDR, owner);
   console.log(
     `Activating regions in contract: ${contract.address}: ${JSON.stringify(regions, null, 2)}`
   );

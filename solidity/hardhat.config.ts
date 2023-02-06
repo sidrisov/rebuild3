@@ -7,7 +7,7 @@ const config: HardhatUserConfig = {
   defaultNetwork: 'localhost',
   networks: {
     // comment it, as it requires those variables during build on vercel
-    /* goerli: {
+    /*goerli: {
       url: process.env.GOERLI_ALCHEMY_API_KEY,
       accounts: [
         process.env.GOERLI_PRIVATE_KEY_1,
@@ -16,7 +16,10 @@ const config: HardhatUserConfig = {
       ],
       gas: 2100000,
       gasPrice: 8000000000
-    } */
+    }*/
+  },
+  etherscan: {
+    //apiKey: process.env.GOERLI_ETHERSCAN_API_KEY
   }
 };
 
