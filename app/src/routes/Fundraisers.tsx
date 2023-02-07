@@ -46,6 +46,9 @@ import { ByUserType, CampaignStatus, Region } from '../types/CampaignFiltersType
 export default function Fundraisers() {
   const [openNewCampaign, setOpenNewCampaign] = useState(false);
   const [openFilters, setOpenFilters] = useState(false);
+  const [openDonation, setOpenDonation] = useState(false);
+  const [campaignId, setCampaingId] = useState<number | undefined>();
+
   const {
     isWalletConnected,
     userAddress,
@@ -97,12 +100,17 @@ export default function Fundraisers() {
     await (await contract?.release(campaignId))?.wait();
   }
 
-  async function handleDonateToCampaign(campaignId: number) {
-    await (
-      await contract?.donate(campaignId, {
-        value: ethers.utils.parseEther(import.meta.env.VITE_DEFAULT_DONATION_AMOUNT)
-      })
-    )?.wait();
+  async function handleDonateToCampaign(campaignId: number | undefined) {
+    if (campaignId) {
+      const donation = ethers.utils.parseEther(
+        (document.getElementById('eth-donation-amount') as HTMLInputElement).value
+      );
+      await (
+        await contract?.donate(campaignId, {
+          value: donation
+        })
+      )?.wait();
+    }
   }
 
   async function submitCampaign() {
@@ -302,7 +310,7 @@ export default function Fundraisers() {
                       <Typography
                         variant="subtitle2"
                         color={
-                          campaign.raised.toNumber() >= campaign.goal.toNumber()
+                          campaign.raised.toBigInt() >= campaign.goal.toBigInt()
                             ? green[400]
                             : 'gray'
                         }>
@@ -317,7 +325,8 @@ export default function Fundraisers() {
                   {campaign.active && !campaign.released && (
                     <Button
                       onClick={() => {
-                        handleDonateToCampaign(campaignId);
+                        setCampaingId(campaignId);
+                        setOpenDonation(true);
                       }}>
                       Donate
                     </Button>
@@ -334,7 +343,7 @@ export default function Fundraisers() {
                   {campaign.organization === userAddress &&
                     campaign.active &&
                     !campaign.released &&
-                    campaign.raised.toNumber() >= campaign.goal.toNumber() && (
+                    campaign.raised.toBigInt() >= campaign.goal.toBigInt() && (
                       <Button
                         onClick={() => {
                           handleReleaseCampaign(campaignId);
@@ -488,8 +497,9 @@ export default function Fundraisers() {
             size="small"
             color="primary"
             onClick={(e) => {
-              submitCampaign();
-              handleCloseApplicationDialog();
+              submitCampaign().then(() => {
+                handleCloseApplicationDialog();
+              });
             }}>
             Submit
           </Button>
@@ -592,7 +602,44 @@ export default function Fundraisers() {
             </FormControl>
           </Stack>
         </DialogContent>
-        <DialogActions></DialogActions>
+      </Dialog>
+      <Dialog open={openDonation} onClose={() => setOpenDonation(false)}>
+        <DialogTitle>Donation</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Choose amount to donate:</DialogContentText>
+          <TextField
+            variant="outlined"
+            label="Amount"
+            id="eth-donation-amount"
+            type="number"
+            sx={{ m: 1 }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">ETH</InputAdornment>,
+              inputMode: 'numeric'
+              //pattern: '[0-9]*'
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            size="small"
+            color="primary"
+            onClick={() => setOpenDonation(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            color="primary"
+            onClick={() => {
+              handleDonateToCampaign(campaignId).then(() => {
+                setOpenDonation(false);
+              });
+            }}>
+            Confirm
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );
