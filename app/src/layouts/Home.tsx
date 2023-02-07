@@ -12,8 +12,6 @@ import {
   Box,
   Stack,
   useMediaQuery,
-  Slide,
-  useScrollTrigger,
   Avatar,
   Link as MuiLink
 } from '@mui/material';
@@ -22,20 +20,11 @@ import { ExitToApp, DarkModeOutlined, LightModeOutlined } from '@mui/icons-mater
 import { blue, green, red } from '@mui/material/colors';
 
 import HomeLogo from '../components/Logo';
+import HideOnScroll from '../components/HideOnScroll';
 import { ReactComponent as Love } from '../assets/loving.svg';
 import { ReactComponent as LoveInverted } from '../assets/loving_inverted.svg';
 import CustomThemeProvider from '../theme/CustomThemeProvider';
-
-function HideOnScroll(props: any) {
-  const { children } = props;
-  const trigger = useScrollTrigger();
-
-  return (
-    <Slide appear={false} direction="down" in={!trigger}>
-      {children}
-    </Slide>
-  );
-}
+import { TECH_STACK } from './techStack';
 
 function randomCardBgcolor() {
   const number = Math.floor(Math.random() * 3) + 1;
@@ -71,58 +60,6 @@ function TechUsedCard(props: any) {
     </Card>
   );
 }
-
-const techStack = [
-  {
-    name: 'React',
-
-    link: 'https://reactjs.org'
-  },
-  {
-    name: 'TS',
-    link: 'https://www.typescriptlang.org/'
-  },
-  {
-    name: 'MUI',
-    link: 'https://mui.com/'
-  },
-  {
-    name: 'Vite',
-    link: 'https://vitejs.dev/'
-  },
-  {
-    name: 'Vercel',
-    link: 'https://vercel.com/'
-  },
-  {
-    name: 'Ethereum',
-    link: 'https://ethereum.org/'
-  },
-  {
-    name: 'HardHat',
-    link: 'https://hardhat.org/'
-  },
-  {
-    name: 'OpenZeppelin',
-    link: 'https://www.openzeppelin.com/'
-  },
-  {
-    name: 'MagicLink',
-    link: 'https://magic.link/'
-  },
-  {
-    name: 'Metamask',
-    link: 'https://metamask.io/'
-  },
-  {
-    name: 'Moralis',
-    link: 'https://moralis.io/'
-  },
-  {
-    name: 'IPFS',
-    link: 'https://ipfs.tech/'
-  }
-];
 
 export default function HomeLayout() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -233,7 +170,7 @@ export default function HomeLayout() {
             justifyContent: 'center',
             alignContent: 'center'
           }}>
-          {techStack.map((tech) => (
+          {TECH_STACK.map((tech) => (
             <TechUsedCard key={tech.name} href={tech.link}>
               {tech.name}
             </TechUsedCard>

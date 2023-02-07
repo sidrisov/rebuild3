@@ -40,6 +40,7 @@ import AddressAvatar from '../components/AddressAvatar';
 import { UserContext } from '../contexts/UserContext';
 import Moralis from 'moralis';
 import { CampaignFilters } from '../types/CampaignFiltersType';
+import HideOnScroll from '../components/HideOnScroll';
 
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
@@ -315,66 +316,69 @@ export default function AppLayout() {
             }
           </Box>
           <Box flexGrow={1}>
-            <AppBar
-              position="sticky"
-              color="transparent"
-              elevation={0}
-              sx={{ backdropFilter: 'blur(5px)' }}>
-              <Toolbar
-                sx={{
-                  justifyContent: 'space-between'
-                }}>
-                <Box>
-                  <IconButton
-                    color="inherit"
-                    onClick={handleDrawerToggle}
-                    sx={{ display: { sm: 'none' } }}>
-                    <Menu />
-                  </IconButton>
-                </Box>
-                <Box>
-                  <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
-                    {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
-                  </IconButton>
+            <HideOnScroll>
+              <AppBar
+                position="sticky"
+                color="transparent"
+                elevation={0}
+                sx={{ backdropFilter: 'blur(5px)' }}>
+                <Toolbar
+                  sx={{
+                    justifyContent: 'space-between'
+                  }}>
+                  <Box>
+                    <IconButton
+                      color="inherit"
+                      onClick={handleDrawerToggle}
+                      sx={{ display: { sm: 'none' } }}>
+                      <Menu />
+                    </IconButton>
+                  </Box>
+                  <Box>
+                    <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
+                      {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
+                    </IconButton>
 
-                  {!isWalletConnected ? (
-                    <Button
-                      variant="contained"
-                      endIcon={<Wallet />}
-                      onClick={() => {
-                        connectWallet();
-                      }}
-                      sx={{ width: 150 }}>
-                      Connect
-                    </Button>
-                  ) : (
-                    <Chip
-                      label={shortenWalletAddressLabel(userAddress)}
-                      onClick={() => {
-                        if (MAGIC_ENABLED) {
-                          magic.connect.showWallet();
+                    {!isWalletConnected ? (
+                      <Button
+                        variant="contained"
+                        endIcon={<Wallet />}
+                        onClick={() => {
+                          connectWallet();
+                        }}
+                        sx={{ width: 150 }}>
+                        Connect
+                      </Button>
+                    ) : (
+                      <Chip
+                        label={shortenWalletAddressLabel(userAddress)}
+                        onClick={() => {
+                          if (MAGIC_ENABLED) {
+                            magic.connect.showWallet();
+                          }
+                        }}
+                        icon={
+                          <Box display="flex">
+                            <AddressAvatar size={25} name={userAddress} />
+                          </Box>
                         }
-                      }}
-                      icon={
-                        <Box display="flex">
-                          <AddressAvatar size={25} name={userAddress} />
-                        </Box>
-                      }
-                      sx={{
-                        height: 40,
-                        width: 150,
-                        fontSize: 15,
-                        fontWeight: 'bold'
-                      }}
-                      deleteIcon={<PowerSettingsNew />}
-                      onDelete={() => {
-                        disconnectWallet();
-                      }}
-                    />
-                  )}
-                </Box>
-              </Toolbar>
-            </AppBar>
+                        sx={{
+                          height: 40,
+                          width: 150,
+                          fontSize: 15,
+                          fontWeight: 'bold'
+                        }}
+                        deleteIcon={<PowerSettingsNew />}
+                        onDelete={() => {
+                          disconnectWallet();
+                        }}
+                      />
+                    )}
+                  </Box>
+                </Toolbar>
+              </AppBar>
+            </HideOnScroll>
+
             <Box
               sx={{
                 my: 5,
