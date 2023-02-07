@@ -85,7 +85,7 @@ export default function HomeLayout() {
               component={Link}
               to={'/app'}
               endIcon={<ExitToApp />}
-              sx={{ width: 150 }}>
+              sx={{ width: 155 }}>
               Go To App
             </Button>
           </Toolbar>

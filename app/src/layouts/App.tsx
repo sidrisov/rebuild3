@@ -355,7 +355,7 @@ export default function AppLayout() {
                         onClick={() => {
                           connectWallet();
                         }}
-                        sx={{ width: 150 }}>
+                        sx={{ width: 155 }}>
                         Connect
                       </Button>
                     ) : (
@@ -370,7 +370,7 @@ export default function AppLayout() {
                         avatar={<WalletTypeAvatar walletType={walletType} address={userAddress} />}
                         sx={{
                           height: 40,
-                          width: 150,
+                          width: 155,
                           fontSize: 15,
                           fontWeight: 'bold'
                         }}
