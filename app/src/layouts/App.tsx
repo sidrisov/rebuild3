@@ -10,19 +10,18 @@ import {
   Container,
   Chip,
   useMediaQuery,
-  Drawer,
-  Avatar
+  Drawer
 } from '@mui/material';
 
 import { useSnackbar } from 'notistack';
 
 import CustomThemeProvider from '../theme/CustomThemeProvider';
 import {
-  Wallet,
   PowerSettingsNew,
   LightModeOutlined,
   DarkModeOutlined,
-  Menu
+  Menu,
+  Wallet
 } from '@mui/icons-material';
 
 import Nav from '../components/Navigation';
@@ -31,7 +30,7 @@ import { Magic } from 'magic-sdk';
 import { EthNetworkName } from '@magic-sdk/types';
 import { ethers } from 'ethers';
 
-import { ConnectExtension } from '@magic-ext/connect';
+import { ConnectExtension, WalletInfo } from '@magic-ext/connect';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider';
 
@@ -41,7 +40,8 @@ import { UserContext } from '../contexts/UserContext';
 import Moralis from 'moralis';
 import { CampaignFilters } from '../types/CampaignFiltersType';
 import HideOnScroll from '../components/HideOnScroll';
-import AddressAvatar from '../components/AddressAvatar';
+
+import { WalletTypeAvatar } from '../components/WalletTypeAvatar';
 
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
@@ -93,6 +93,8 @@ export default function AppLayout() {
     region: 'all'
   });
 
+  const [walletType, setWalletType] = useState<WalletInfo['walletType']>();
+
   const [isSubscribedToEvents, setSubscribedToEvents] = useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
@@ -139,6 +141,12 @@ export default function AppLayout() {
       Rebuild3ContractArtifact.abi,
       defaultProvider
     ) as ReBuild3;
+
+    if (MAGIC_ENABLED) {
+      setWalletType((await magic.connect.getWalletInfo()).walletType);
+    } else {
+      setWalletType('metamask');
+    }
 
     setRB3Contract(contract.connect(signer));
     setUserAddress(address);
@@ -353,12 +361,13 @@ export default function AppLayout() {
                     ) : (
                       <Chip
                         label={shortenWalletAddressLabel(userAddress)}
-                        onClick={() => {
-                          if (MAGIC_ENABLED) {
-                            magic.connect.showWallet();
+                        clickable={walletType === 'magic'}
+                        onClick={async () => {
+                          if (walletType === 'magic') {
+                            await magic.connect.showWallet();
                           }
                         }}
-                        avatar={<AddressAvatar address={userAddress} />}
+                        avatar={<WalletTypeAvatar walletType={walletType} address={userAddress} />}
                         sx={{
                           height: 40,
                           width: 150,

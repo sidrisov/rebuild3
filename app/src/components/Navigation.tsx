@@ -6,6 +6,7 @@ import {
   Box,
   Typography,
   IconButton,
+  Card
 } from '@mui/material';
 
 import { useContext, useMemo, useState } from 'react';
@@ -20,7 +21,6 @@ import { shortenWalletAddressLabel } from '../utils/address';
 import { UserContext } from '../contexts/UserContext';
 import { ethers } from 'ethers';
 import { copyToClipboard } from '../utils/copyToClipboard';
-import { blue } from '@mui/material/colors';
 import { useSnackbar } from 'notistack';
 import AddressAvatar from './AddressAvatar';
 
@@ -58,24 +58,23 @@ export default function Navigation() {
       }}>
       <HomeLogo m={2} />
       {isWalletConnected && (
-        <Box
+        <Card
+          elevation={10}
           sx={{
             p: 1,
-            border: 2,
-            borderRadius: 5,
-            borderStyle: 'dashed',
-            borderColor: blue[300],
             mt: 5,
-            width: 200,
-            height: 100,
+            ml: 0.5,
+            border: 2,
+            borderColor: 'divider',
+            borderStyle: 'double',
+            borderRadius: 5,
+            width: 195,
+            height: 90,
             display: 'flex',
-            alignItems: 'center',
-            '&:hover': {
-              borderStyle: 'solid'
-            }
+            alignItems: 'center'
           }}>
           <AddressAvatar address={userAddress} />
-          <Box sx={{ ml: 1 }}>
+          <Box sx={{ ml: 0.5 }}>
             <Stack direction="row" alignItems="center">
               <Typography variant="h6" color="primary">
                 {shortenWalletAddressLabel(userAddress)}
@@ -92,7 +91,7 @@ export default function Navigation() {
             </Stack>
             <Typography variant="subtitle2">{balance} ETH</Typography>
           </Box>
-        </Box>
+        </Card>
       )}
 
       <Tabs
