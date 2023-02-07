@@ -37,7 +37,8 @@ import {
   ContentCopy,
   Done,
   DoneAll,
-  FilterList} from '@mui/icons-material';
+  FilterList
+} from '@mui/icons-material';
 
 import { UserContext } from '../contexts/UserContext';
 import { shortenWalletAddressLabel } from '../utils/address';
@@ -48,6 +49,7 @@ import { uploadToIpfs } from '../utils/ipfs';
 import { useSnackbar } from 'notistack';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { ByUserType, CampaignStatus, Region } from '../types/CampaignFiltersType';
+import AddressAvatar from '../components/AddressAvatar';
 
 export default function Fundraisers() {
   const [openNewCampaign, setOpenNewCampaign] = useState(false);
@@ -298,7 +300,7 @@ export default function Fundraisers() {
                       display: 'flex',
                       alignItems: 'center'
                     }}>
-                    <Avatar src={`https://cdn.stamp.fyi/avatar/${userAddress}`} />
+                    <AddressAvatar address={userAddress} />
                     <Box sx={{ ml: 1 }}>
                       <Stack direction="row" alignItems="center">
                         <Typography variant="body1">
@@ -386,10 +388,10 @@ export default function Fundraisers() {
                             '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
                           }}>
                           {[...Array(Math.min(2, campaign.donated.toNumber()))].map((item, i) => (
-                            <Avatar
+                            <AddressAvatar
                               key={`${campaignId}_${i}`}
                               // TODO: fetch real address
-                              src={`https://cdn.stamp.fyi/avatar/${campaignId}_${i}}`}
+                              address={`${campaignId}_${i}`}
                             />
                           ))}
                         </AvatarGroup>

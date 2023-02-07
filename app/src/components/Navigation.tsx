@@ -6,7 +6,6 @@ import {
   Box,
   Typography,
   IconButton,
-  Avatar
 } from '@mui/material';
 
 import { useContext, useMemo, useState } from 'react';
@@ -23,6 +22,7 @@ import { ethers } from 'ethers';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { blue } from '@mui/material/colors';
 import { useSnackbar } from 'notistack';
+import AddressAvatar from './AddressAvatar';
 
 export default function Navigation() {
   const { pathname } = useLocation();
@@ -74,10 +74,7 @@ export default function Navigation() {
               borderStyle: 'solid'
             }
           }}>
-          {/*
-           // TODO: generate with blockies lib instead to avoid extra network load
-           */}
-          <Avatar src={`https://cdn.stamp.fyi/avatar/${userAddress}`} />
+          <AddressAvatar address={userAddress} />
           <Box sx={{ ml: 1 }}>
             <Stack direction="row" alignItems="center">
               <Typography variant="h6" color="primary">

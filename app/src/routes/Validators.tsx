@@ -6,6 +6,7 @@ import { Badge, Box, Card, CardActionArea, Chip, Typography, Avatar } from '@mui
 import { ContentCopy } from '@mui/icons-material';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { useSnackbar } from 'notistack';
+import AddressAvatar from '../components/AddressAvatar';
 
 export default function Validators() {
   const { organizations } = useContext(UserContext);
@@ -50,7 +51,7 @@ export default function Validators() {
                 }}>
                 <Chip
                   label={shortenWalletAddressLabel(organization.account)}
-                  avatar={<Avatar src={`https://cdn.stamp.fyi/avatar/${organization.account}`} />}
+                  avatar={<AddressAvatar address={organization.account} />}
                   deleteIcon={<ContentCopy fontSize="inherit" />}
                   onDelete={() => {
                     copyToClipboard(organization.account);

@@ -41,6 +41,7 @@ import { UserContext } from '../contexts/UserContext';
 import Moralis from 'moralis';
 import { CampaignFilters } from '../types/CampaignFiltersType';
 import HideOnScroll from '../components/HideOnScroll';
+import AddressAvatar from '../components/AddressAvatar';
 
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
@@ -357,7 +358,7 @@ export default function AppLayout() {
                             magic.connect.showWallet();
                           }
                         }}
-                        avatar={<Avatar src={`https://cdn.stamp.fyi/avatar/${userAddress}`} />}
+                        avatar={<AddressAvatar address={userAddress} />}
                         sx={{
                           height: 40,
                           width: 150,
