@@ -2,7 +2,6 @@ import { useContext, useState } from 'react';
 
 import {
   Autocomplete,
-  Avatar,
   AvatarGroup,
   Box,
   Button,
@@ -300,7 +299,7 @@ export default function Fundraisers() {
                       display: 'flex',
                       alignItems: 'center'
                     }}>
-                    <AddressAvatar address={userAddress} />
+                    <AddressAvatar address={campaign.owner} />
                     <Box sx={{ ml: 1 }}>
                       <Stack direction="row" alignItems="center">
                         <Typography variant="body1">
