@@ -57,9 +57,9 @@ export default function Validators() {
                     enqueueSnackbar('Wallet address is copied to clipboard!');
                   }}
                   sx={{
-                    height: 30,
-                    width: 130,
-                    fontSize: 10,
+                    height: 40,
+                    width: 140,
+                    fontSize: 12,
                     fontWeight: 'bold'
                   }}
                 />

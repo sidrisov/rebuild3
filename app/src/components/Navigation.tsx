@@ -74,6 +74,9 @@ export default function Navigation() {
               borderStyle: 'solid'
             }
           }}>
+          {/*
+           // TODO: generate with blockies lib instead to avoid extra network load
+           */}
           <Avatar src={`https://cdn.stamp.fyi/avatar/${userAddress}`} />
           <Box sx={{ ml: 1 }}>
             <Stack direction="row" alignItems="center">

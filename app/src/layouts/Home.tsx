@@ -13,7 +13,8 @@ import {
   Stack,
   useMediaQuery,
   Avatar,
-  Link as MuiLink
+  Link as MuiLink,
+  SvgIcon
 } from '@mui/material';
 
 import { ExitToApp, DarkModeOutlined, LightModeOutlined } from '@mui/icons-material';
@@ -25,6 +26,7 @@ import { ReactComponent as Love } from '../assets/loving.svg';
 import { ReactComponent as LoveInverted } from '../assets/loving_inverted.svg';
 import CustomThemeProvider from '../theme/CustomThemeProvider';
 import { TECH_STACK } from './techStack';
+import Logo from '../components/Logo';
 
 function randomCardBgcolor() {
   const number = Math.floor(Math.random() * 3) + 1;
@@ -157,7 +159,46 @@ export default function HomeLayout() {
           </Stack>
         </Box>
 
-        <Typography mt={10} align="center" variant="h4">
+        <Box
+          sx={{
+            mt: 10,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+          <Typography variant="h4">Decentralized Governance</Typography>
+          <Card
+            component={MuiLink}
+            href="https://www.tally.xyz/gov/rebuild3-pre-alpha-001"
+            sx={{
+              m: 5,
+              p: 2,
+              textDecoration: 'none',
+              border: 2,
+              borderRadius: 5,
+              '&:hover': {
+                borderStyle: 'dashed'
+              }
+            }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+              <SvgIcon>
+                <Logo />
+              </SvgIcon>
+              <Typography ml={0.5} variant="h6" color="primary">
+                ReBuild3 DAO
+              </Typography>
+            </Box>
+          </Card>
+        </Box>
+
+        <Typography mt={10} align="center" variant="h5">
           Technology Stack
         </Typography>
 

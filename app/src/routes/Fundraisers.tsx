@@ -30,10 +30,16 @@ import {
 
 import { ethers } from 'ethers';
 
-import { Add, AttachFile, ContentCopy, Done, DoneAll, FilterList } from '@mui/icons-material';
+import {
+  Add,
+  AttachFile,
+  AttachMoney,
+  ContentCopy,
+  Done,
+  DoneAll,
+  FilterList} from '@mui/icons-material';
 
 import { UserContext } from '../contexts/UserContext';
-import AddressAvatar from '../components/AddressAvatar';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { ReBuild3 } from '../../../solidity/typechain-types';
 import { green } from '@mui/material/colors';
@@ -285,7 +291,7 @@ export default function Fundraisers() {
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'start'
+                    alignItems: 'center'
                   }}>
                   <Box
                     sx={{
@@ -322,44 +328,45 @@ export default function Fundraisers() {
                     </Box>
                   </Box>
 
+                  <Typography variant="body2" color="grey">{`${campaign.region}`}</Typography>
+                </Box>
+                <Box display="flex" flexDirection="row" justifyContent="space-between">
+                  <Typography variant="h6">{campaign.title}</Typography>
+
                   {campaign.active && !campaign.released && (
                     <Button
+                      variant="contained"
+                      size="small"
                       onClick={() => {
                         setCampaingId(campaignId);
                         setOpenDonation(true);
-                      }}>
-                      Donate
+                      }}
+                      endIcon={<AttachMoney />}>
+                      Fund
                     </Button>
                   )}
-                  {campaign.organization === userAddress && !campaign.active && (
-                    <Button
-                      onClick={() => {
-                        handleApproveCampaign(campaignId);
-                      }}>
-                      Approve
-                    </Button>
-                  )}
-
-                  {campaign.organization === userAddress &&
-                    campaign.active &&
-                    !campaign.released &&
-                    campaign.raised.toBigInt() >= campaign.goal.toBigInt() && (
+                  {/* {campaign.organization === userAddress && !campaign.active && (
                       <Button
                         onClick={() => {
-                          handleReleaseCampaign(campaignId);
-                        }}>
-                        Release
+                          handleApproveCampaign(campaignId);
+                        }}
+                        endIcon={<AddTask />}>
+                        Approve
                       </Button>
                     )}
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}>
-                  <Typography variant="h6">{campaign.title}</Typography>
-                  <Typography variant="body2" color="grey">{`in ${campaign.region}`}</Typography>
+
+                    {campaign.organization === userAddress &&
+                      campaign.active &&
+                      !campaign.released &&
+                      campaign.raised.toBigInt() >= campaign.goal.toBigInt() && (
+                        <Button
+                          onClick={() => {
+                            handleReleaseCampaign(campaignId);
+                          }}
+                          endIcon={<Logout />}>
+                          Release
+                        </Button>
+                      )} */}
                 </Box>
                 <CardMedia
                   component="img"
