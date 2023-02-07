@@ -17,7 +17,6 @@
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.5",
     "alchemy-sdk": "^2.4.1",
-    "boring-avatars": "^1.7.0",
     "ethers": "^5.7.2",
     "magic-sdk": "^13.1.0",
     "moralis": "^2.12.0",

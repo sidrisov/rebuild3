@@ -2,8 +2,7 @@ import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { shortenWalletAddressLabel } from '../utils/address';
 
-import { Badge, Box, Card, CardActionArea, Chip, Typography } from '@mui/material';
-import AddressAvatar from '../components/AddressAvatar';
+import { Badge, Box, Card, CardActionArea, Chip, Typography, Avatar } from '@mui/material';
 import { ContentCopy } from '@mui/icons-material';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { useSnackbar } from 'notistack';
@@ -51,11 +50,7 @@ export default function Validators() {
                 }}>
                 <Chip
                   label={shortenWalletAddressLabel(organization.account)}
-                  icon={
-                    <Box display="flex">
-                      <AddressAvatar size={20} name={organization.account} />
-                    </Box>
-                  }
+                  avatar={<Avatar src={`https://cdn.stamp.fyi/avatar/${organization.account}`} />}
                   deleteIcon={<ContentCopy fontSize="inherit" />}
                   onDelete={() => {
                     copyToClipboard(organization.account);

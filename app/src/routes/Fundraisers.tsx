@@ -292,7 +292,7 @@ export default function Fundraisers() {
                       display: 'flex',
                       alignItems: 'center'
                     }}>
-                    <AddressAvatar size={40} name={campaign.owner}></AddressAvatar>
+                    <Avatar src={`https://cdn.stamp.fyi/avatar/${userAddress}`} />
                     <Box sx={{ ml: 1 }}>
                       <Stack direction="row" alignItems="center">
                         <Typography variant="body1">
@@ -379,9 +379,11 @@ export default function Fundraisers() {
                             '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
                           }}>
                           {[...Array(Math.min(2, campaign.donated.toNumber()))].map((item, i) => (
-                            <Avatar key={`${campaignId}_${i}`}>
-                              <AddressAvatar name={`${campaignId}_${i}`} />
-                            </Avatar>
+                            <Avatar
+                              key={`${campaignId}_${i}`}
+                              // TODO: fetch real address
+                              src={`https://cdn.stamp.fyi/avatar/${campaignId}_${i}}`}
+                            />
                           ))}
                         </AvatarGroup>
                         <Typography variant="body2" color="grey">

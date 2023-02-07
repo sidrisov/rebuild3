@@ -10,7 +10,8 @@ import {
   Container,
   Chip,
   useMediaQuery,
-  Drawer
+  Drawer,
+  Avatar
 } from '@mui/material';
 
 import { useSnackbar } from 'notistack';
@@ -36,7 +37,6 @@ import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider';
 
 import Rebuild3ContractArtifact from '../../../solidity/artifacts/contracts/ReBuild3.sol/ReBuild3.json';
 import { ReBuild3 } from '../../../solidity/typechain-types';
-import AddressAvatar from '../components/AddressAvatar';
 import { UserContext } from '../contexts/UserContext';
 import Moralis from 'moralis';
 import { CampaignFilters } from '../types/CampaignFiltersType';
@@ -357,11 +357,7 @@ export default function AppLayout() {
                             magic.connect.showWallet();
                           }
                         }}
-                        icon={
-                          <Box display="flex">
-                            <AddressAvatar size={25} name={userAddress} />
-                          </Box>
-                        }
+                        avatar={<Avatar src={`https://cdn.stamp.fyi/avatar/${userAddress}`} />}
                         sx={{
                           height: 40,
                           width: 150,

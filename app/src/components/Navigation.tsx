@@ -8,14 +8,15 @@ import {
   IconButton,
   Avatar
 } from '@mui/material';
+
 import { useContext, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+
 import HomeLogo from './Logo';
 
 const paths = ['/app/dashboard', '/app/fundraisers', '/app/validators'];
 
 import { QueryStats, VolunteerActivism, VerifiedUser, ContentCopy } from '@mui/icons-material';
-import AddressAvatar from './AddressAvatar';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { UserContext } from '../contexts/UserContext';
 import { ethers } from 'ethers';
@@ -73,7 +74,7 @@ export default function Navigation() {
               borderStyle: 'solid'
             }
           }}>
-          <AddressAvatar size={50} name={userAddress} />
+          <Avatar src={`https://cdn.stamp.fyi/avatar/${userAddress}`} />
           <Box sx={{ ml: 1 }}>
             <Stack direction="row" alignItems="center">
               <Typography variant="h6" color="primary">
