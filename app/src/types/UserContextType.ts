@@ -4,7 +4,6 @@ import { AppSettings } from './AppSettingsType';
 import { CampaignFilters } from './CampaignFiltersType';
 
 export interface UserContextType {
-  darkMode: boolean;
   isWalletConnected: boolean;
   userAddress: string;
   provider: ethers.providers.Web3Provider | ethers.providers.AlchemyProvider | undefined;

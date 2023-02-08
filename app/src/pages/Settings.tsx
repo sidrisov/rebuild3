@@ -25,11 +25,32 @@ export default function Settings() {
           alignSelf: 'flex-start',
           display: 'flex',
           flexWrap: 'wrap',
-          justifyContent: 'space-evenly',
+          flexDirection: 'row',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
           p: 1,
           mt: 3
         }}>
-        <FormControl sx={{ p: 1 }}>
+        <FormControl sx={{ m: 1, p: 1 }}>
+          <FormLabel>User Interface</FormLabel>
+          <FormGroup sx={{ m: 1 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={appSettings.darkMode}
+                  onChange={() => {
+                    setAppSettings({
+                      ...appSettings,
+                      darkMode: !appSettings.darkMode
+                    });
+                  }}
+                />
+              }
+              label="Dark Theme"
+            />
+          </FormGroup>
+        </FormControl>
+        <FormControl sx={{ m: 1, p: 1 }}>
           <FormLabel>Wallet Connection</FormLabel>
           <FormGroup sx={{ m: 1 }}>
             <FormControlLabel

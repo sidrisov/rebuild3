@@ -83,7 +83,6 @@ const drawerWidth = 220;
 
 export default function AppLayout() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [darkMode, setDarkMode] = useState(prefersDarkMode);
   const [isWalletConnected, setWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState('');
   const [rb3Contract, setRB3Contract] = useState<ReBuild3>();
@@ -104,7 +103,8 @@ export default function AppLayout() {
   const [signerProvider, setSignerProvider] = useState<ethers.providers.Web3Provider | undefined>();
   const [appSettings, setAppSettings] = useState<AppSettings>({
     magicEnabled: MAGIC_ENABLED,
-    connectOnDemand: INIT_CONNECT
+    connectOnDemand: INIT_CONNECT,
+    darkMode: prefersDarkMode
   });
 
   useMemo(async () => {
@@ -300,10 +300,9 @@ export default function AppLayout() {
 
   const drawer = <Nav />;
   return (
-    <CustomThemeProvider darkMode={darkMode}>
+    <CustomThemeProvider darkMode={appSettings.darkMode}>
       <UserContext.Provider
         value={{
-          darkMode,
           isWalletConnected,
           userAddress,
           provider: defaultProvider,
@@ -369,8 +368,11 @@ export default function AppLayout() {
                     </IconButton>
                   </Box>
                   <Box>
-                    <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
-                      {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
+                    <IconButton
+                      onClick={() =>
+                        setAppSettings({ ...appSettings, darkMode: !appSettings.darkMode })
+                      }>
+                      {appSettings.darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
                     </IconButton>
 
                     {!isWalletConnected ? (
