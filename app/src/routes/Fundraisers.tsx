@@ -7,6 +7,7 @@ import {
   Button,
   Card,
   CardMedia,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -50,11 +51,14 @@ import { copyToClipboard } from '../utils/copyToClipboard';
 import { ByUserType, CampaignStatus, Region } from '../types/CampaignFiltersType';
 import AddressAvatar from '../components/AddressAvatar';
 
+const LoadingProgress = <CircularProgress size={30} thickness={5} color="warning" sx={{ m: 2 }} />;
+
 export default function Fundraisers() {
   const [openNewCampaign, setOpenNewCampaign] = useState(false);
   const [openFilters, setOpenFilters] = useState(false);
   const [openDonation, setOpenDonation] = useState(false);
   const [campaignId, setCampaingId] = useState<number | undefined>();
+  const [loading, setLoading] = useState(false);
 
   const {
     isWalletConnected,
@@ -73,11 +77,17 @@ export default function Fundraisers() {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  function handleCloseApplicationDialog() {
+  function handleCloseCampaignDialog() {
     setSelectedImage(null);
     setSelectedRegion('');
     setSelectedValidator('');
     setOpenNewCampaign(false);
+    setLoading(false);
+  }
+
+  function handleCloseDonationDialog() {
+    setOpenDonation(false);
+    setLoading(false);
   }
 
   function handleOnRegionSelected(event: any, value: string | null) {
@@ -197,7 +207,10 @@ export default function Fundraisers() {
             size="small"
             variant="text"
             endIcon={<Add />}
-            onClick={() => setOpenNewCampaign(true)}>
+            onClick={() => {
+              setOpenNewCampaign(true);
+              setLoading(false);
+            }}>
             New
           </Button>
         )}
@@ -341,6 +354,7 @@ export default function Fundraisers() {
                       onClick={() => {
                         setCampaingId(campaignId);
                         setOpenDonation(true);
+                        setLoading(false);
                       }}
                       endIcon={<AttachMoney />}>
                       Fund
@@ -406,8 +420,11 @@ export default function Fundraisers() {
             </Card>
           ))}
       </Box>
-      <Dialog fullScreen open={openNewCampaign} onClose={handleCloseApplicationDialog}>
-        <DialogTitle>New Campaign</DialogTitle>
+      <Dialog fullScreen open={openNewCampaign} onClose={handleCloseCampaignDialog}>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <DialogTitle>New Campaign</DialogTitle>
+          {loading && LoadingProgress}
+        </Box>
         <DialogContent sx={{ m: 1 }}>
           <DialogContentText m={1}>
             Please, provide information on what you are raising funds, including images of what you
@@ -484,8 +501,13 @@ export default function Fundraisers() {
               sx={{
                 wordBreak: 'break-all'
               }}>
-              <Button size="small" variant="outlined" component="label" startIcon={<AttachFile />}>
-                Attach
+              <Button
+                size="small"
+                variant="outlined"
+                component="label"
+                startIcon={<AttachFile />}
+                sx={{ minWidth: 100 }}>
+                Images
                 <input hidden accept="image/*" multiple type="file" onChange={handleFileChange} />
               </Button>
               <Typography maxWidth={0.8} variant="subtitle2" color="grey">
@@ -494,12 +516,15 @@ export default function Fundraisers() {
             </Stack>
           </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 2 }}>
           <Button
             variant="outlined"
             size="small"
             color="primary"
-            onClick={handleCloseApplicationDialog}>
+            onClick={() => {
+              handleCloseCampaignDialog();
+              setLoading(false);
+            }}>
             Cancel
           </Button>
           <Button
@@ -507,9 +532,8 @@ export default function Fundraisers() {
             size="small"
             color="primary"
             onClick={(e) => {
-              submitCampaign().then(() => {
-                handleCloseApplicationDialog();
-              });
+              setLoading(true);
+              submitCampaign().finally(() => handleCloseCampaignDialog());
             }}>
             Submit
           </Button>
@@ -614,7 +638,10 @@ export default function Fundraisers() {
         </DialogContent>
       </Dialog>
       <Dialog open={openDonation} onClose={() => setOpenDonation(false)}>
-        <DialogTitle>Donation</DialogTitle>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <DialogTitle>Donation</DialogTitle>
+          {loading && LoadingProgress}
+        </Box>
         <DialogContent>
           <DialogContentText>Choose amount to donate:</DialogContentText>
           <TextField
@@ -630,12 +657,12 @@ export default function Fundraisers() {
             }}
           />
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 2 }}>
           <Button
             variant="outlined"
             size="small"
             color="primary"
-            onClick={() => setOpenDonation(false)}>
+            onClick={handleCloseDonationDialog}>
             Cancel
           </Button>
           <Button
@@ -643,9 +670,8 @@ export default function Fundraisers() {
             size="small"
             color="primary"
             onClick={() => {
-              handleDonateToCampaign(campaignId).then(() => {
-                setOpenDonation(false);
-              });
+              setLoading(true);
+              handleDonateToCampaign(campaignId).finally(() => handleCloseDonationDialog());
             }}>
             Confirm
           </Button>
