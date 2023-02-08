@@ -341,15 +341,51 @@ export default function Fundraisers() {
                       </Typography>
                     </Box>
                   </Box>
-
                   <Typography variant="body2" color="grey">{`${campaign.region}`}</Typography>
                 </Box>
-                <Box display="flex" flexDirection="row" justifyContent="space-between">
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  alignItems="center">
                   <Typography variant="h6">{campaign.title}</Typography>
-
+                  <CampaignStatusIcon active={campaign.active} released={campaign.released} />
+                </Box>
+                <CardMedia
+                  component="img"
+                  width="200"
+                  height="200"
+                  image={campaign.cid}
+                  loading="lazy"
+                />
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box display="flex" flexDirection="row">
+                    {campaign.active && (
+                      <>
+                        <AvatarGroup
+                          max={3}
+                          total={campaign.donated.toNumber()}
+                          sx={{
+                            '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
+                          }}>
+                          {[...Array(Math.min(2, campaign.donated.toNumber()))].map((item, i) => (
+                            <AddressAvatar
+                              key={`${campaignId}_${i}`}
+                              // TODO: fetch real address
+                              address={`${campaignId}_${i}`}
+                            />
+                          ))}
+                        </AvatarGroup>
+                        <Typography variant="body2" color="grey">
+                          donated by
+                        </Typography>
+                      </>
+                    )}
+                  </Box>
                   {campaign.active && !campaign.released && (
                     <Button
-                      variant="contained"
+                      variant="text"
                       size="small"
                       onClick={() => {
                         setCampaingId(campaignId);
@@ -357,7 +393,7 @@ export default function Fundraisers() {
                         setLoading(false);
                       }}
                       endIcon={<AttachMoney />}>
-                      Fund
+                      Donate
                     </Button>
                   )}
                   {/* {campaign.organization === userAddress && !campaign.active && (
@@ -382,39 +418,6 @@ export default function Fundraisers() {
                           Release
                         </Button>
                       )} */}
-                </Box>
-                <CardMedia
-                  component="img"
-                  width="200"
-                  height="200"
-                  image={campaign.cid}
-                  loading="lazy"
-                />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Box display="flex" flexDirection="row">
-                    {campaign.active && (
-                      <>
-                        <AvatarGroup
-                          max={3}
-                          total={campaign.donated.toNumber()}
-                          sx={{
-                            '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
-                          }}>
-                          {[...Array(Math.min(2, campaign.donated.toNumber()))].map((item, i) => (
-                            <AddressAvatar
-                              key={`${campaignId}_${i}`}
-                              // TODO: fetch real address
-                              address={`${campaignId}_${i}`}
-                            />
-                          ))}
-                        </AvatarGroup>
-                        <Typography variant="body2" color="grey">
-                          donated by
-                        </Typography>
-                      </>
-                    )}
-                  </Box>
-                  <CampaignStatusIcon active={campaign.active} released={campaign.released} />
                 </Box>
               </Stack>
             </Card>
