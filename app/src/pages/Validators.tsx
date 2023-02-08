@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { shortenWalletAddressLabel } from '../utils/address';
 
-import { Badge, Box, Card, CardActionArea, Chip, Typography, Avatar } from '@mui/material';
+import { Badge, Box, Card, Chip, Typography, Tooltip } from '@mui/material';
 import { ContentCopy } from '@mui/icons-material';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { useSnackbar } from 'notistack';
@@ -26,23 +26,24 @@ export default function Validators() {
           mt: 3
         }}>
         {organizations.map((organization, i) => (
-          <Card
-            key={`validators_${i}`}
-            elevation={1}
-            sx={{
-              m: 1,
-              border: 2,
-              borderRadius: 5,
-              borderStyle: 'double',
-              borderColor: 'divider',
-              '&:hover': {
-                borderStyle: 'dashed'
-              }
-            }}
-            onClick={() => {
-              alert('Description: ' + organization.description);
-            }}>
-            <CardActionArea>
+          <Tooltip
+            key={`validators_tooltip_${i}`}
+            title={organization.description}
+            followCursor={true}>
+            <Card
+              key={`validators_${i}`}
+              elevation={1}
+              sx={{
+                m: 1,
+                border: 2,
+                borderRadius: 5,
+                borderStyle: 'double',
+                borderColor: 'divider',
+                '&:hover': {
+                  borderStyle: 'dashed',
+                  boxShadow: 10
+                }
+              }}>
               <Box
                 sx={{
                   m: 2,
@@ -66,6 +67,7 @@ export default function Validators() {
                     fontWeight: 'bold'
                   }}
                 />
+
                 <Typography variant="h6">{organization.name}</Typography>
                 <Typography variant="body1" color="grey">
                   {organization.region}
@@ -82,8 +84,8 @@ export default function Validators() {
                   }}
                 />
               </Box>
-            </CardActionArea>
-          </Card>
+            </Card>
+          </Tooltip>
         ))}
       </Box>
     </Box>

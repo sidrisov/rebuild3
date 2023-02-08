@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Card,
+  CardActionArea,
   CardMedia,
   CircularProgress,
   Dialog,
@@ -13,16 +14,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
   IconButton,
   InputAdornment,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
   Stack,
   TextField,
   Typography
@@ -36,6 +29,7 @@ import {
   CheckCircle,
   ContentCopy,
   FilterList,
+  OpenInFull,
   VolunteerActivism
 } from '@mui/icons-material';
 
@@ -47,9 +41,11 @@ import { green, red } from '@mui/material/colors';
 import { uploadToIpfs } from '../utils/ipfs';
 import { useSnackbar } from 'notistack';
 import { copyToClipboard } from '../utils/copyToClipboard';
-import { ByUserType, CampaignStatus, Region } from '../types/CampaignFiltersType';
+import { Region } from '../types/CampaignFiltersType';
 import AddressAvatar from '../components/AddressAvatar';
 import { CampaignStatusIcon } from '../components/CampaignStatusIcon';
+import CampaignFiltersDialog from '../modals/CampaignFiltersDialog';
+import CampaignViewDialog from '../modals/CampaignViewDialog';
 
 const LoadingProgress = <CircularProgress size={30} thickness={5} color="warning" sx={{ m: 2 }} />;
 const SuccessIndicator = <CheckCircle fontSize="large" color="success" sx={{ m: 2 }} />;
@@ -57,10 +53,11 @@ const SuccessIndicator = <CheckCircle fontSize="large" color="success" sx={{ m: 
 const showSuccessTimeMs = 1000;
 
 export default function Fundraisers() {
-  const [openNewCampaign, setOpenNewCampaign] = useState(false);
-  const [openFilters, setOpenFilters] = useState(false);
-  const [openDonation, setOpenDonation] = useState(false);
-  const [campaignId, setCampaingId] = useState<number | undefined>();
+  const [openCampaignFilters, setOpenCampaignFilters] = useState(false);
+  const [openCampaignDonation, setOpenCampaignDonation] = useState(false);
+  const [openCampaignCreate, setOpenCampaignCreate] = useState(false);
+  const [openCampaignView, setOpenCampaignView] = useState(false);
+  const [campaignId, setCampaignId] = useState<number>(-1);
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -71,8 +68,7 @@ export default function Fundraisers() {
     organizations,
     contract,
     campaigns,
-    campaignFilters,
-    setCampaignFilters
+    campaignFilters
   } = useContext(UserContext);
 
   const [selectedRegion, setSelectedRegion] = useState('');
@@ -82,14 +78,14 @@ export default function Fundraisers() {
   const { enqueueSnackbar } = useSnackbar();
 
   function handleCloseCampaignDialog() {
-    setOpenNewCampaign(false);
+    setOpenCampaignCreate(false);
     setSelectedImage(null);
     setSelectedRegion('');
     setSelectedValidator('');
   }
 
   function handleCloseDonationDialog() {
-    setOpenDonation(false);
+    setOpenCampaignDonation(false);
   }
 
   function handleOnRegionSelected(event: any, value: string | null) {
@@ -188,7 +184,7 @@ export default function Fundraisers() {
         <Button
           variant="text"
           size="small"
-          onClick={() => setOpenFilters(true)}
+          onClick={() => setOpenCampaignFilters(true)}
           endIcon={<FilterList />}>
           Filters
         </Button>
@@ -198,7 +194,7 @@ export default function Fundraisers() {
             variant="text"
             endIcon={<Add />}
             onClick={() => {
-              setOpenNewCampaign(true);
+              setOpenCampaignCreate(true);
               setLoading(false);
               setShowSuccess(false);
             }}>
@@ -219,13 +215,9 @@ export default function Fundraisers() {
         {campaigns
           .filter((campaign) => {
             let result = false;
-
             if (campaignFilters.region === ('all' as Region)) {
               result = true;
             } else {
-              console.log(campaignFilters.region);
-              console.log(campaign.region);
-
               result = campaignFilters.region === campaign.region;
             }
 
@@ -288,7 +280,8 @@ export default function Fundraisers() {
                 borderStyle: 'double',
                 borderColor: 'divider',
                 '&:hover': {
-                  borderStyle: 'dashed'
+                  borderStyle: 'dashed',
+                  boxShadow: 10
                 }
               }}>
               <Stack spacing={1}>
@@ -296,7 +289,7 @@ export default function Fundraisers() {
                   sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'flex-start'
                   }}>
                   <Box
                     sx={{
@@ -332,14 +325,25 @@ export default function Fundraisers() {
                       </Typography>
                     </Box>
                   </Box>
-                  <Typography variant="body2" color="grey">{`${campaign.region}`}</Typography>
+                  <IconButton
+                    size="medium"
+                    onClick={() => {
+                      setCampaignId(campaignId);
+                      setOpenCampaignView(true);
+                    }}
+                    sx={{ mt: -1, mr: -1 }}>
+                    <OpenInFull fontSize="small" />
+                  </IconButton>
                 </Box>
                 <Box
                   display="flex"
                   flexDirection="row"
                   justifyContent="space-between"
                   alignItems="center">
-                  <Typography variant="h6">{campaign.title}</Typography>
+                  <Box>
+                    <Typography variant="h6">{campaign.title}</Typography>
+                    <Typography variant="body2" color="grey">{`${campaign.region}`}</Typography>
+                  </Box>
                   <CampaignStatusIcon active={campaign.active} released={campaign.released} />
                 </Box>
                 <CardMedia
@@ -350,7 +354,12 @@ export default function Fundraisers() {
                   loading="lazy"
                 />
                 <Box
-                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
                   <Box display="flex" flexDirection="row">
                     {campaign.active && (
                       <>
@@ -380,8 +389,8 @@ export default function Fundraisers() {
                       size="small"
                       sx={{ color: red[400] }}
                       onClick={() => {
-                        setCampaingId(campaignId);
-                        setOpenDonation(true);
+                        setCampaignId(campaignId);
+                        setOpenCampaignDonation(true);
                         setLoading(false);
                         setShowSuccess(false);
                       }}
@@ -389,34 +398,12 @@ export default function Fundraisers() {
                       Donate
                     </Button>
                   )}
-                  {/* {campaign.organization === userAddress && !campaign.active && (
-                      <Button
-                        onClick={() => {
-                          handleApproveCampaign(campaignId);
-                        }}
-                        endIcon={<AddTask />}>
-                        Approve
-                      </Button>
-                    )}
-
-                    {campaign.organization === userAddress &&
-                      campaign.active &&
-                      !campaign.released &&
-                      campaign.raised.toBigInt() >= campaign.goal.toBigInt() && (
-                        <Button
-                          onClick={() => {
-                            handleReleaseCampaign(campaignId);
-                          }}
-                          endIcon={<Logout />}>
-                          Release
-                        </Button>
-                      )} */}
                 </Box>
               </Stack>
             </Card>
           ))}
       </Box>
-      <Dialog fullScreen open={openNewCampaign} onClose={handleCloseCampaignDialog}>
+      <Dialog fullScreen open={openCampaignCreate} onClose={handleCloseCampaignDialog}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <DialogTitle>New Campaign</DialogTitle>
           {loading && LoadingProgress}
@@ -550,105 +537,17 @@ export default function Fundraisers() {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={openFilters} onClose={() => setOpenFilters(false)}>
-        <DialogContent>
-          <Stack spacing={1} direction="column">
-            {isWalletConnected && (
-              <FormControl>
-                <FormLabel>User</FormLabel>
-                <RadioGroup
-                  value={campaignFilters.user}
-                  onChange={(event, value) => {
-                    setCampaignFilters({ ...campaignFilters, user: value as ByUserType });
-                  }}>
-                  <FormControlLabel value={'all' as ByUserType} control={<Radio />} label="All" />
-                  <FormControlLabel
-                    value={'createdByMe' as ByUserType}
-                    control={<Radio />}
-                    label="Created by me"
-                  />
-                  <FormControlLabel
-                    value={'assignedToMe' as ByUserType}
-                    control={<Radio />}
-                    label="Assigned to me"
-                  />
-                </RadioGroup>
-              </FormControl>
-            )}
+      <CampaignFiltersDialog
+        open={openCampaignFilters}
+        onClose={() => setOpenCampaignFilters(false)}
+      />
+      <CampaignViewDialog
+        open={openCampaignView}
+        onClose={() => setOpenCampaignView(false)}
+        campaignid={campaignId}
+      />
 
-            {isWalletConnected && (
-              <Divider
-                orientation="horizontal"
-                variant="middle"
-                sx={{ border: 1, borderColor: 'divider', borderStyle: 'dashed' }}
-              />
-            )}
-
-            <FormControl>
-              <FormLabel>Status</FormLabel>
-              <RadioGroup
-                value={campaignFilters.status}
-                onChange={(event, value) => {
-                  setCampaignFilters({ ...campaignFilters, status: value as CampaignStatus });
-                }}>
-                <FormControlLabel value={'all' as CampaignStatus} control={<Radio />} label="All" />
-                <FormControlLabel
-                  value={'pending' as CampaignStatus}
-                  control={<Radio />}
-                  label="Pending"
-                />
-                <FormControlLabel
-                  value={'live' as CampaignStatus}
-                  control={<Radio />}
-                  label="Live"
-                />
-                <FormControlLabel
-                  value={'funded' as CampaignStatus}
-                  control={<Radio />}
-                  label="Funded"
-                />
-                <FormControlLabel
-                  value={'rejected' as CampaignStatus}
-                  control={<Radio />}
-                  label="Rejected"
-                />
-              </RadioGroup>
-            </FormControl>
-
-            <Divider
-              orientation="horizontal"
-              variant="middle"
-              sx={{ border: 1, borderColor: 'divider', borderStyle: 'dashed' }}
-            />
-            <FormControl>
-              <FormLabel>Region</FormLabel>
-              <Select
-                variant="standard"
-                disableUnderline
-                value={campaignFilters.region}
-                onChange={(event) => {
-                  setCampaignFilters({ ...campaignFilters, region: event.target.value as Region });
-                }}
-                sx={{
-                  'label + &': {
-                    marginTop: 1
-                  }
-                }}>
-                <MenuItem value={'all' as Region}>All</MenuItem>
-
-                {regions.map((region) => {
-                  return (
-                    <MenuItem key={`filter_region_item_${region}`} value={region}>
-                      {region}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          </Stack>
-        </DialogContent>
-      </Dialog>
-      <Dialog open={openDonation} onClose={() => setOpenDonation(false)}>
+      <Dialog open={openCampaignDonation} onClose={() => setOpenCampaignDonation(false)}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <DialogTitle>Donation</DialogTitle>
           {loading && LoadingProgress}
