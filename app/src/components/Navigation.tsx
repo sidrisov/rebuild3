@@ -14,15 +14,20 @@ import { Link, useLocation } from 'react-router-dom';
 
 import HomeLogo from './Logo';
 
-const paths = ['/app/dashboard', '/app/fundraisers', '/app/validators'];
-
-import { QueryStats, VolunteerActivism, VerifiedUser, ContentCopy } from '@mui/icons-material';
+import {
+  QueryStats,
+  VolunteerActivism,
+  VerifiedUser,
+  ContentCopy,
+  Settings
+} from '@mui/icons-material';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { UserContext } from '../contexts/UserContext';
 import { ethers } from 'ethers';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { useSnackbar } from 'notistack';
 import AddressAvatar from './AddressAvatar';
+import { routes } from '../router';
 
 export default function Navigation() {
   const { pathname } = useLocation();
@@ -34,7 +39,7 @@ export default function Navigation() {
   const { enqueueSnackbar } = useSnackbar();
 
   useMemo(() => {
-    setTabValue(paths.indexOf(pathname));
+    setTabValue(routes.indexOf(pathname));
   }, [pathname]);
 
   useMemo(async () => {
@@ -108,21 +113,28 @@ export default function Navigation() {
           label="Dashboard"
           tabIndex={0}
           component={Link}
-          to={paths[0]}
+          to={routes[0]}
           icon={<QueryStats />}
         />
         <AlignedLinkTab
           label="Fundraisers"
           tabIndex={1}
-          to={paths[1]}
+          to={routes[1]}
           icon={<VolunteerActivism />}
         />
         <AlignedLinkTab
           label="Validators"
           tabIndex={2}
           component={Link}
-          to={paths[2]}
+          to={routes[2]}
           icon={<VerifiedUser />}
+        />
+        <AlignedLinkTab
+          label="Settings"
+          tabIndex={3}
+          component={Link}
+          to={routes[3]}
+          icon={<Settings />}
         />
       </Tabs>
       <MuiLink

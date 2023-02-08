@@ -33,24 +33,23 @@ import { ethers } from 'ethers';
 import {
   Add,
   AttachFile,
-  AttachMoney,
   CheckCircle,
   ContentCopy,
-  Done,
-  DoneAll,
-  FilterList
+  FilterList,
+  VolunteerActivism
 } from '@mui/icons-material';
 
 import { UserContext } from '../contexts/UserContext';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { ReBuild3 } from '../../../solidity/typechain-types';
-import { green } from '@mui/material/colors';
+import { green, red } from '@mui/material/colors';
 
 import { uploadToIpfs } from '../utils/ipfs';
 import { useSnackbar } from 'notistack';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { ByUserType, CampaignStatus, Region } from '../types/CampaignFiltersType';
 import AddressAvatar from '../components/AddressAvatar';
+import { CampaignStatusIcon } from '../components/CampaignStatusIcon';
 
 const LoadingProgress = <CircularProgress size={30} thickness={5} color="warning" sx={{ m: 2 }} />;
 const SuccessIndicator = <CheckCircle fontSize="large" color="success" sx={{ m: 2 }} />;
@@ -180,14 +179,6 @@ export default function Fundraisers() {
     } else {
       return 'live';
     }
-  }
-
-  function CampaignStatusIcon(props: any) {
-    return !props.released ? (
-      <Done color={props.active ? 'success' : 'warning'} />
-    ) : (
-      <DoneAll color="success" />
-    );
   }
 
   return (
@@ -387,13 +378,14 @@ export default function Fundraisers() {
                     <Button
                       variant="text"
                       size="small"
+                      sx={{ color: red[400] }}
                       onClick={() => {
                         setCampaingId(campaignId);
                         setOpenDonation(true);
                         setLoading(false);
                         setShowSuccess(false);
                       }}
-                      endIcon={<AttachMoney />}>
+                      endIcon={<VolunteerActivism />}>
                       Donate
                     </Button>
                   )}

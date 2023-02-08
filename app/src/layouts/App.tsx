@@ -42,30 +42,34 @@ import { CampaignFilters } from '../types/CampaignFiltersType';
 import HideOnScroll from '../components/HideOnScroll';
 
 import { WalletTypeAvatar, WalletTypeName } from '../components/WalletType';
+import { AppSettings } from '../types/AppSettingsType';
 
-const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
+const MAGIC_SUPPORTED = import.meta.env.VITE_MAGIC_SUPPORTED === 'true';
+const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true' && MAGIC_SUPPORTED;
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
 
 var magic: InstanceWithExtensions<SDKBase, ConnectExtension[]>;
-var signerProvider: ethers.providers.Web3Provider | undefined;
+var magicSignerProvider: ethers.providers.Web3Provider | undefined;
+var embeddedSignerProvider: ethers.providers.Web3Provider | undefined;
 
 // if magic enabled
-if (MAGIC_ENABLED) {
+if (MAGIC_SUPPORTED) {
   magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
     network: import.meta.env.VITE_DEFAULT_NETWORK as EthNetworkName,
     extensions: [new ConnectExtension()]
   });
   magic.preload();
-  signerProvider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
-} else if (window.ethereum) {
-  // otherwise try to use metamask provider
-  signerProvider = new ethers.providers.Web3Provider(window.ethereum as any);
+  magicSignerProvider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
+}
+
+if (window.ethereum) {
+  embeddedSignerProvider = new ethers.providers.Web3Provider(window.ethereum as any);
 }
 
 // use alchemy as default provider, fallback to wallet provider if network wasn't set up, e.g. local hardhat
 const defaultProvider =
   import.meta.env.VITE_DEFAULT_NETWORK === ''
-    ? signerProvider
+    ? embeddedSignerProvider
     : new ethers.providers.AlchemyProvider(
         import.meta.env.VITE_DEFAULT_NETWORK,
         import.meta.env.VITE_ALCHEMY_API_KEY
@@ -94,12 +98,14 @@ export default function AppLayout() {
   });
 
   const [walletType, setWalletType] = useState<WalletInfo['walletType']>();
-
   const [isSubscribedToEvents, setSubscribedToEvents] = useState(false);
-
   const { enqueueSnackbar } = useSnackbar();
-
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [signerProvider, setSignerProvider] = useState<ethers.providers.Web3Provider | undefined>();
+  const [appSettings, setAppSettings] = useState<AppSettings>({
+    magicEnabled: MAGIC_ENABLED,
+    connectOnDemand: INIT_CONNECT
+  });
 
   useMemo(async () => {
     // reset filters whenever user changes the connection state
@@ -114,18 +120,26 @@ export default function AppLayout() {
 
       setRB3Contract(contract);
     }
-
-    if (isWalletConnected) {
-      enqueueSnackbar(WalletTypeName(walletType) + ' Connected!', { variant: 'success' });
-    }
   }, [isWalletConnected]);
 
   useMemo(async () => {
-    if (INIT_CONNECT) {
+    if (appSettings.magicEnabled) {
+      setSignerProvider(magicSignerProvider);
+    } else if (window.ethereum) {
+      // otherwise try to use metamask provider
+      setSignerProvider(embeddedSignerProvider);
+    }
+  }, [appSettings.magicEnabled]);
+
+  useMemo(async () => {
+    if (isWalletConnected) {
+      await disconnectWallet();
+    }
+    if (signerProvider && appSettings.connectOnDemand) {
       console.log('Initializing wallet connect on start up!');
       connectWallet();
     }
-  }, []);
+  }, [signerProvider, appSettings.connectOnDemand]);
 
   async function connectWallet() {
     if (!signerProvider) {
@@ -133,7 +147,7 @@ export default function AppLayout() {
       return;
     }
 
-    if (!MAGIC_ENABLED) {
+    if (!appSettings.magicEnabled) {
       await signerProvider.send('eth_requestAccounts', []);
     }
 
@@ -146,14 +160,15 @@ export default function AppLayout() {
       defaultProvider
     ) as ReBuild3;
 
-    if (MAGIC_ENABLED) {
-      setWalletType((await magic.connect.getWalletInfo()).walletType);
-    } else {
-      setWalletType('metamask');
-    }
+    const connectedWalletType = appSettings.magicEnabled
+      ? (await magic.connect.getWalletInfo()).walletType
+      : 'metamask'; // TODO: for now consider it as metamask, however in future we might support other embedded wallets
+
+    enqueueSnackbar(WalletTypeName(connectedWalletType) + ' Connected!', { variant: 'success' });
 
     setRB3Contract(contract.connect(signer));
     setUserAddress(address);
+    setWalletType(connectedWalletType);
     setWalletConnected(true);
   }
 
@@ -275,8 +290,8 @@ export default function AppLayout() {
     }
   }, [isSubscribedToEvents, rb3Contract]);
 
-  async function disconnectWallet(): Promise<void> {
-    if (MAGIC_ENABLED) {
+  async function disconnectWallet() {
+    if (MAGIC_SUPPORTED) {
       await magic.connect.disconnect();
     }
 
@@ -298,7 +313,9 @@ export default function AppLayout() {
           campaigns,
           threshold,
           campaignFilters,
-          setCampaignFilters
+          setCampaignFilters,
+          appSettings,
+          setAppSettings
         }}>
         <Box
           sx={{
