@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   return (
     <Box mt={3} display="flex" flexDirection="column">
-      <Typography color="primary" alignSelf="center" variant="h6" m={1}>
+      <Typography color="primary" align="center" variant="h6" m={1}>
         Welcome back, let's ReBuild3!
       </Typography>
       <Box

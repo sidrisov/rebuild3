@@ -41,7 +41,7 @@ import Moralis from 'moralis';
 import { CampaignFilters } from '../types/CampaignFiltersType';
 import HideOnScroll from '../components/HideOnScroll';
 
-import { WalletTypeAvatar } from '../components/WalletTypeAvatar';
+import { WalletTypeAvatar, WalletTypeName } from '../components/WalletType';
 
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true';
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
@@ -114,6 +114,10 @@ export default function AppLayout() {
 
       setRB3Contract(contract);
     }
+
+    if (isWalletConnected) {
+      enqueueSnackbar(WalletTypeName(walletType) + ' Connected!', { variant: 'success' });
+    }
   }, [isWalletConnected]);
 
   useMemo(async () => {
@@ -151,8 +155,6 @@ export default function AppLayout() {
     setRB3Contract(contract.connect(signer));
     setUserAddress(address);
     setWalletConnected(true);
-
-    enqueueSnackbar((MAGIC_ENABLED ? 'Magic ' : '') + 'Wallet Connected!', { variant: 'success' });
   }
 
   const handleDrawerToggle = () => {
