@@ -5,7 +5,7 @@ import { ReactComponent as Coinbase } from '../assets/coinbase.svg';
 import AddressAvatar from './AddressAvatar';
 
 export function WalletTypeAvatar(props: any) {
-  switch (props.walletType) {
+  switch (props.wallettype) {
     case 'magic':
       return <MagicLink {...props} />;
     case 'metamask':

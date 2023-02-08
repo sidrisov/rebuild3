@@ -13,17 +13,17 @@ export default function Validators() {
   const { enqueueSnackbar } = useSnackbar();
 
   return (
-    <Box mt={4} display="flex" flexDirection="column">
-      <Typography variant="h5" m={1}>
+    <Box mt={3} display="flex" flexDirection="column">
+      <Typography align="center" color="primary" variant="h6" m={1}>
         Validators
       </Typography>
       <Box
         sx={{
           display: 'flex',
           flexWrap: 'wrap',
-          justifyContent: 'flex-start',
+          justifyContent: 'space-evenly',
           p: 1,
-          mt: 1
+          mt: 3
         }}>
         {organizations.map((organization, i) => (
           <Card
@@ -41,8 +41,7 @@ export default function Validators() {
             }}
             onClick={() => {
               alert('Description: ' + organization.description);
-            }}
-            variant="elevation">
+            }}>
             <CardActionArea>
               <Box
                 sx={{

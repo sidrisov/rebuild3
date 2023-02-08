@@ -22,32 +22,31 @@ export default function Dashboard() {
         .map((campaign) => campaign.donated.toNumber())
         .reduce((previousValue, currentValue) => {
           return previousValue + currentValue;
-        }),
+        }, 0),
       donationsAmount: ethers.utils.formatEther(
         campaigns
           .map((campaign) => campaign.raised)
           .reduce((previousValue, currentValue) => {
             return previousValue.add(currentValue);
-          })
+          }, ethers.BigNumber.from(0))
       ),
       threshold
     });
   }, [regions, organizations, campaigns]);
 
   return (
-    <Box mt={4} display="flex" flexDirection="column">
-      <Typography alignSelf="center" variant="h5" m={1}>
-        Welcome, let's ReBuild3!
+    <Box mt={3} display="flex" flexDirection="column">
+      <Typography color="primary" alignSelf="center" variant="h6" m={1}>
+        Welcome back, let's ReBuild3!
       </Typography>
       <Box
         sx={{
           display: 'flex',
           flexWrap: 'wrap',
-          overflowWrap: 'break-word',
           alignContent: 'center',
           justifyContent: 'space-evenly',
           p: 1,
-          mt: 1
+          mt: 3
         }}>
         <StatsCard>
           <Typography variant="overline" color="grey">

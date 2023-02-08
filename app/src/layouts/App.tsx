@@ -198,7 +198,6 @@ export default function AppLayout() {
   }
 
   async function subscribeToAllEvents(contract: ReBuild3) {
-    console.log('subscribeToAllEvents');
     if (contract !== undefined) {
       // subscribe from the next block
       defaultProvider?.once('block', async () => {
@@ -269,7 +268,6 @@ export default function AppLayout() {
 
   useMemo(async () => {
     if (!isSubscribedToEvents && rb3Contract) {
-      console.log('subscribing');
       subscribeToAllEvents(rb3Contract);
       setSubscribedToEvents(true);
     }
@@ -375,7 +373,7 @@ export default function AppLayout() {
                             await magic.connect.showWallet();
                           }
                         }}
-                        avatar={<WalletTypeAvatar walletType={walletType} address={userAddress} />}
+                        avatar={<WalletTypeAvatar wallettype={walletType} address={userAddress} />}
                         sx={{
                           height: 40,
                           width: 155,

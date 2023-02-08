@@ -159,24 +159,25 @@ export default function HomeLayout() {
           </Stack>
         </Box>
 
+        <Typography mt={10} align="center" variant="h4">
+          Decentralized Governance
+        </Typography>
+
         <Box
           sx={{
-            mt: 10,
+            m: 5,
             display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
             justifyContent: 'center'
           }}>
-          <Typography variant="h4">Decentralized Governance</Typography>
           <Card
             component={MuiLink}
             href="https://www.tally.xyz/gov/rebuild3-pre-alpha-001"
             sx={{
-              m: 5,
               p: 2,
-              textDecoration: 'none',
               border: 2,
               borderRadius: 5,
+              flexGrow: 0.5,
+              textDecoration: 'none',
               '&:hover': {
                 borderStyle: 'dashed'
               }
@@ -186,7 +187,8 @@ export default function HomeLayout() {
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                alignSelf: 'center'
               }}>
               <SvgIcon>
                 <Logo />

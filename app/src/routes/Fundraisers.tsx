@@ -188,7 +188,7 @@ export default function Fundraisers() {
   }
 
   return (
-    <Box mt={4} display="flex" flexDirection="column">
+    <Box mt={3} display="flex" flexDirection="column">
       <Stack
         sx={{ m: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Button
@@ -216,11 +216,10 @@ export default function Fundraisers() {
         sx={{
           display: 'flex',
           flexWrap: 'wrap',
-          overflowWrap: 'break-word',
           alignContent: 'center',
           justifyContent: 'space-evenly',
-          p: 1,
-          mt: 1
+          mt: 3,
+          p: 1
         }}>
         {campaigns
           .filter((campaign) => {
@@ -285,7 +284,6 @@ export default function Fundraisers() {
               key={`campaigns_${campaignId}`}
               elevation={1}
               sx={{
-                maxWidth: '0.8',
                 minWidth: '0.3',
                 flexGrow: 1,
                 m: 1,
