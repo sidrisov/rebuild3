@@ -1,6 +1,9 @@
 export interface DashboardStatsType {
   activeRegions: number | undefined;
-  organizations: number | undefined;
-  campaigns: number | undefined;
+  validators: number | undefined;
+  totalCampaigns: number | undefined;
+  successCampaigns: number | undefined;
+  donationsCount: number | undefined;
+  donationsAmount: string | undefined;
   threshold: string | undefined;
 }

@@ -188,13 +188,9 @@ export default function Fundraisers() {
   }
 
   return (
-    <>
+    <Box mt={4} display="flex" flexDirection="column">
       <Stack
-        sx={{ m: 3, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        {/*         <Typography variant="h4" gutterBottom>
-          Campaigns
-        </Typography> */}
-
+        sx={{ m: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Button
           variant="text"
           size="small"
@@ -224,7 +220,7 @@ export default function Fundraisers() {
           alignContent: 'center',
           justifyContent: 'space-evenly',
           p: 1,
-          mt: 5
+          mt: 1
         }}>
         {campaigns
           .filter((campaign) => {
@@ -287,17 +283,19 @@ export default function Fundraisers() {
           .map((campaign, campaignId) => (
             <Card
               key={`campaigns_${campaignId}`}
+              elevation={1}
               sx={{
                 maxWidth: '0.8',
                 minWidth: '0.3',
                 flexGrow: 1,
                 m: 1,
                 p: 2,
-                border: 1,
-                borderColor: 'divider',
+                border: 2,
                 borderRadius: 3,
+                borderStyle: 'double',
+                borderColor: 'divider',
                 '&:hover': {
-                  borderColor: 'text.secondary'
+                  borderStyle: 'dashed'
                 }
               }}>
               <Stack spacing={1}>
@@ -313,7 +311,7 @@ export default function Fundraisers() {
                       alignItems: 'center'
                     }}>
                     <AddressAvatar address={campaign.owner} />
-                    <Box sx={{ ml: 1 }}>
+                    <Box sx={{ ml: 0.5 }}>
                       <Stack direction="row" alignItems="center">
                         <Typography variant="body1">
                           {shortenWalletAddressLabel(campaign.owner)}
@@ -680,6 +678,6 @@ export default function Fundraisers() {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
 }

@@ -166,6 +166,14 @@ export default function AppLayout() {
     }
   }
 
+  // TODO: make donations public or introduce a new API in contract
+  /*   async function fetchDonationData(contract: ReBuild3) {
+    if (contract !== undefined) {
+      const regions = await contract.donations();
+      setDonations(regions);
+    }
+  } */
+
   async function fetchConfig(contract: ReBuild3) {
     if (contract !== undefined) {
       const thresholdWei = await rb3Contract?.goalThreshold();

@@ -10,8 +10,6 @@ export function WalletTypeAvatar(props: any) {
       return <MagicLink {...props} />;
     case 'metamask':
       return <MetamaskFox {...props} />;
-    case 'metamask':
-      return <MetamaskFox {...props} />;
     case 'coinbase_wallet':
       return <Coinbase {...props} />;
     case 'wallet_connect':

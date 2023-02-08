@@ -13,8 +13,8 @@ export default function Validators() {
   const { enqueueSnackbar } = useSnackbar();
 
   return (
-    <Box>
-      <Typography variant="h4" m={3}>
+    <Box mt={4} display="flex" flexDirection="column">
+      <Typography variant="h5" m={1}>
         Validators
       </Typography>
       <Box
@@ -23,15 +23,18 @@ export default function Validators() {
           flexWrap: 'wrap',
           justifyContent: 'flex-start',
           p: 1,
-          mt: 6
+          mt: 1
         }}>
         {organizations.map((organization, i) => (
           <Card
             key={`validators_${i}`}
+            elevation={1}
             sx={{
               m: 1,
-              border: 1,
+              border: 2,
               borderRadius: 5,
+              borderStyle: 'double',
+              borderColor: 'divider',
               '&:hover': {
                 borderStyle: 'dashed'
               }

@@ -11,19 +11,33 @@ export default function Dashboard() {
   const { regions, organizations, campaigns, threshold } = useContext(UserContext);
   const [stats, setStats] = useState<DashboardStatsType>({} as DashboardStatsType);
 
+  // TODO: ideally, we would like to keep track of stats directly in Smart Contract, instead of doing it here
   useMemo(async () => {
     setStats({
       activeRegions: regions.length,
-      organizations: organizations.length,
-      campaigns: campaigns.length,
+      validators: organizations.length,
+      totalCampaigns: campaigns.length,
+      successCampaigns: campaigns.filter((campaign) => campaign.released).length,
+      donationsCount: campaigns
+        .map((campaign) => campaign.donated.toNumber())
+        .reduce((previousValue, currentValue) => {
+          return previousValue + currentValue;
+        }),
+      donationsAmount: ethers.utils.formatEther(
+        campaigns
+          .map((campaign) => campaign.raised)
+          .reduce((previousValue, currentValue) => {
+            return previousValue.add(currentValue);
+          })
+      ),
       threshold
     });
   }, [regions, organizations, campaigns]);
 
   return (
-    <Box>
-      <Typography variant="h4" m={3}>
-        Welcome to ReBuild3
+    <Box mt={4} display="flex" flexDirection="column">
+      <Typography alignSelf="center" variant="h5" m={1}>
+        Welcome, let's ReBuild3!
       </Typography>
       <Box
         sx={{
@@ -33,29 +47,47 @@ export default function Dashboard() {
           alignContent: 'center',
           justifyContent: 'space-evenly',
           p: 1,
-          mt: 5
+          mt: 1
         }}>
         <StatsCard>
           <Typography variant="overline" color="grey">
-            Active Regions:
+            Active Regions
           </Typography>
           <Typography variant="h6">{stats.activeRegions}</Typography>
         </StatsCard>
         <StatsCard>
           <Typography variant="overline" color="grey">
-            Organizations:
+            Validators
           </Typography>
-          <Typography variant="h6">{stats.organizations}</Typography>
+          <Typography variant="h6">{stats.validators}</Typography>
         </StatsCard>
         <StatsCard>
           <Typography variant="overline" color="grey">
-            Campaigns:
+            Total Campaigns
           </Typography>
-          <Typography variant="h6">{stats.campaigns}</Typography>
+          <Typography variant="h6">{stats.totalCampaigns}</Typography>
         </StatsCard>
         <StatsCard>
           <Typography variant="overline" color="grey">
-            Goal Threashold:
+            Success Campaigns
+          </Typography>
+          <Typography variant="h6">{stats.successCampaigns}</Typography>
+        </StatsCard>
+        <StatsCard>
+          <Typography variant="overline" color="grey">
+            Donations
+          </Typography>
+          <Typography variant="h6">{stats.donationsCount}</Typography>
+        </StatsCard>
+        <StatsCard>
+          <Typography variant="overline" color="grey">
+            Amount Donated
+          </Typography>
+          <Typography variant="h6">{stats.donationsAmount?.toString()} ETH</Typography>
+        </StatsCard>
+        <StatsCard>
+          <Typography variant="overline" color="grey">
+            Goal Threashold
           </Typography>
           <Typography variant="h6">{stats.threshold} ETH</Typography>
         </StatsCard>

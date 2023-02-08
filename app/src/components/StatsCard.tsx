@@ -8,11 +8,15 @@ export function StatsCard(props: CardProps) {
         maxWidth: '0.8',
         minWidth: '0.2',
         flexGrow: 1,
-        m: 2,
+        m: 1,
         p: 2,
-        border: 1,
-        borderColor: 'gray',
-        borderRadius: 1
+        border: 2,
+        borderRadius: 3,
+        borderStyle: 'double',
+        borderColor: 'divider',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
       }}
     />
   );
