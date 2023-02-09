@@ -10,8 +10,11 @@ import {
   DialogProps,
   DialogTitle,
   IconButton,
+  LinearProgress,
+  linearProgressClasses,
   Paper,
   Stack,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -64,6 +67,8 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
   const [openCampaignDonation, setOpenCampaignDonation] = useState(false);
   const [donations, setDonations] = useState<ReBuild3.DonationStructOutput[] | undefined>([]);
 
+  const [campaignProgress, setCampaignProgress] = useState(0);
+
   const campaignId = props.campaignid;
 
   async function handleApproveCampaign(campaignId: number) {
@@ -73,6 +78,18 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
   useMemo(async () => {
     if (campaignId !== -1) {
       setDonations(await contract?.getCampaignDonations(campaignId));
+
+      const currentCampaign = campaigns[campaignId];
+
+      const raised = ethers.utils.formatEther(currentCampaign.raised.toString());
+      const goal = ethers.utils.formatEther(currentCampaign.goal.toString());
+
+      const currentProgress = (Number(raised) / Number(goal)) * 100;
+
+      console.log(currentProgress);
+
+      setCampaignProgress(Number(currentProgress));
+      console.log('current progress', Number(currentProgress));
       setCampaign(campaigns[campaignId]);
     }
   }, [campaignId, campaigns]);
@@ -81,6 +98,18 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
     // TODO: rename => releaseCampaign or releaseFunds
     await (await contract?.release(campaignId))?.wait();
   }
+
+  const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+    height: 10,
+    borderRadius: 5,
+    [`&.${linearProgressClasses.colorPrimary}`]: {
+      backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800]
+    },
+    [`& .${linearProgressClasses.bar}`]: {
+      borderRadius: 5,
+      backgroundColor: theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8'
+    }
+  }));
 
   if (campaign) {
     return (
@@ -106,9 +135,13 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
             <Card
               elevation={1}
               sx={{
-                minWidth: '0.3',
-                m: 1,
-                p: 2,
+                flexGrow: 1,
+                minWidth: 'sm',
+                minHeight: 'sm',
+                maxWidth: 'lg',
+                maxHeight: 'lg',
+                my: 1,
+                p: 1.5,
                 border: 2,
                 borderRadius: 3,
                 borderStyle: 'double',
@@ -120,53 +153,50 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}>
+                <Stack spacing={0.5} direction="row" alignItems="center">
                   <AddressAvatar address={campaign.owner} />
-                  <Box sx={{ ml: 0.5 }}>
-                    <Stack direction="row" alignItems="center">
-                      <Typography variant="body1">
-                        {shortenWalletAddressLabel(campaign.owner)}
-                      </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          copyToClipboard(campaign.owner);
-                          enqueueSnackbar('Wallet address is copied to clipboard!');
-                        }}>
-                        <ContentCopy fontSize="small" />
-                      </IconButton>
-                    </Stack>
-                    <Typography
-                      variant="subtitle2"
-                      color={
-                        campaign.raised.toBigInt() >= campaign.goal.toBigInt() ? green[400] : 'gray'
-                      }>
-                      {ethers.utils.formatEther(campaign.raised.toString()) +
-                        '/' +
-                        ethers.utils.formatEther(campaign.goal.toString()) +
-                        ' ETH'}
-                    </Typography>
-                  </Box>
-                </Box>
-                <Typography variant="body2" color="grey">{`${campaign.region}`}</Typography>
+                  <Typography variant="subtitle1">
+                    {smallScreen ? shortenWalletAddressLabel(campaign.owner) : campaign.owner}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      copyToClipboard(campaign.owner);
+                      enqueueSnackbar('Wallet address is copied to clipboard!');
+                    }}>
+                    <ContentCopy fontSize="small" />
+                  </IconButton>
+                </Stack>
+                <Typography variant="body1" color="grey">{`${campaign.region}`}</Typography>
               </Box>
+              <Stack p={0.5} spacing={0.5} direction="row" alignItems="center">
+                <BorderLinearProgress
+                  variant="determinate"
+                  value={campaignProgress}
+                  sx={{ flexGrow: 1 }}
+                />
+                <Typography variant="subtitle2">
+                  {ethers.utils.formatEther(campaign.raised.toString())}/
+                  {ethers.utils.formatEther(campaign.goal.toString())} ETH
+                </Typography>
+              </Stack>
               <CardMedia
                 component="img"
-                width="300"
-                height="300"
                 image={campaign.cid}
                 loading="lazy"
+                sx={{
+                  border: 1,
+                  borderRadius: 3,
+                  borderColor: 'divider'
+                }}
               />
             </Card>
+
             <Paper
               elevation={1}
               sx={{
-                m: 1,
-                p: 2,
+                my: 1,
+                p: 1.5,
                 border: 2,
                 borderRadius: 3,
                 borderStyle: 'double',

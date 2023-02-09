@@ -238,7 +238,10 @@ export default function Fundraisers() {
               key={`campaigns_${campaignId}`}
               elevation={1}
               sx={{
-                minWidth: '0.3',
+                minWidth: 'xs',
+                minHeight: 'xs',
+                maxWidth: 'sm',
+                maxHeight: 'sm',
                 flexGrow: 1,
                 m: 1,
                 p: 2,
@@ -317,10 +320,13 @@ export default function Fundraisers() {
                 </Box>
                 <CardMedia
                   component="img"
-                  width="200"
-                  height="200"
                   image={campaign.cid}
                   loading="lazy"
+                  sx={{
+                    border: 1,
+                    borderRadius: 3,
+                    borderColor: 'divider'
+                  }}
                 />
                 <Box
                   sx={{
