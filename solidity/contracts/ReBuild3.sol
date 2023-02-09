@@ -277,4 +277,25 @@ contract ReBuild3 is Ownable {
   function getAllCampaigns() external view returns (Campaign[] memory) {
     return campaigns;
   }
+
+  // get donations for campaign
+  function getCampaignDonations(uint _campaignId) external view returns (Donation[] memory) {
+    require(_campaignId < campaigns.length, "Campaign doesn't exist!");
+    Donation[] memory campaignDonations = new Donation[](donatedTo[_campaignId].length);
+    for (uint i = 0; i < donatedTo[_campaignId].length; i++) {
+      uint donationId = donatedTo[_campaignId][i];
+      campaignDonations[i] = donations[donationId];
+    }
+    return campaignDonations;
+  }
+
+  // get donations for address
+  function getAddressDonations(address _donor) external view returns (Donation[] memory) {
+    Donation[] memory addressDonations = new Donation[](donatedBy[_donor].length);
+    for (uint i = 0; i < donatedBy[_donor].length; i++) {
+      uint donationId = donatedBy[_donor][i];
+      addressDonations[i] = donations[donationId];
+    }
+    return addressDonations;
+  }
 }

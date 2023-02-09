@@ -10,7 +10,7 @@ contract ReBuild3Token is ERC20, ERC20Permit, ERC20Votes {
 
   constructor(address _governor) ERC20('ReBuild3Token', 'RB3') ERC20Permit('ReBuild3Token') {
     governor = _governor;
-    _mint(msg.sender, 10000e18);
+    _mint(msg.sender, 100000e18);
   }
 
   function mint(address to, uint256 amount) external {

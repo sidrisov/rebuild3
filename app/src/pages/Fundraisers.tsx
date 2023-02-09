@@ -6,9 +6,7 @@ import {
   Box,
   Button,
   Card,
-  CardActionArea,
   CardMedia,
-  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -18,41 +16,36 @@ import {
   InputAdornment,
   Stack,
   TextField,
-  Typography
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 
 import { ethers } from 'ethers';
 
-import {
-  Add,
-  AttachFile,
-  CheckCircle,
-  ContentCopy,
-  FilterList,
-  OpenInFull,
-  VolunteerActivism
-} from '@mui/icons-material';
+import { Add, AttachFile, ContentCopy, FilterList, OpenInFull } from '@mui/icons-material';
 
 import { UserContext } from '../contexts/UserContext';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { ReBuild3 } from '../../../solidity/typechain-types';
-import { green, red } from '@mui/material/colors';
+import { green } from '@mui/material/colors';
 
 import { uploadToIpfs } from '../utils/ipfs';
 import { useSnackbar } from 'notistack';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { Region } from '../types/CampaignFiltersType';
 import AddressAvatar from '../components/AddressAvatar';
-import { CampaignStatusIcon } from '../components/CampaignStatusIcon';
+import { CampaignStatusIndicator } from '../components/CampaignStatusIcon';
 import CampaignFiltersDialog from '../modals/CampaignFiltersDialog';
 import CampaignViewDialog from '../modals/CampaignViewDialog';
-
-const LoadingProgress = <CircularProgress size={30} thickness={5} color="warning" sx={{ m: 2 }} />;
-const SuccessIndicator = <CheckCircle fontSize="large" color="success" sx={{ m: 2 }} />;
-
-const showSuccessTimeMs = 1000;
+import DonateButton from '../buttons/DonateButton';
+import { LoadingProgress, SuccessIndicator, showSuccessTimeMs } from './ProgressIndicators';
+import CampaignDonationDialog from '../modals/CampaignDonationDialog';
 
 export default function Fundraisers() {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [openCampaignFilters, setOpenCampaignFilters] = useState(false);
   const [openCampaignDonation, setOpenCampaignDonation] = useState(false);
   const [openCampaignCreate, setOpenCampaignCreate] = useState(false);
@@ -84,10 +77,6 @@ export default function Fundraisers() {
     setSelectedValidator('');
   }
 
-  function handleCloseDonationDialog() {
-    setOpenCampaignDonation(false);
-  }
-
   function handleOnRegionSelected(event: any, value: string | null) {
     if (value !== null) {
       setSelectedRegion(value);
@@ -103,28 +92,6 @@ export default function Fundraisers() {
   function handleFileChange(event: any) {
     if (event.target.files && event.target.files[0]) {
       setSelectedImage(event.target.files[0]);
-    }
-  }
-
-  async function handleApproveCampaign(campaignId: number) {
-    await (await contract?.approveCampaign(campaignId))?.wait();
-  }
-
-  async function handleReleaseCampaign(campaignId: number) {
-    // TODO: rename => releaseCampaign or releaseFunds
-    await (await contract?.release(campaignId))?.wait();
-  }
-
-  async function handleDonateToCampaign(campaignId: number | undefined) {
-    if (campaignId) {
-      const donation = ethers.utils.parseEther(
-        (document.getElementById('eth-donation-amount') as HTMLInputElement).value
-      );
-      await (
-        await contract?.donate(campaignId, {
-          value: donation
-        })
-      )?.wait();
     }
   }
 
@@ -325,15 +292,17 @@ export default function Fundraisers() {
                       </Typography>
                     </Box>
                   </Box>
-                  <IconButton
-                    size="medium"
-                    onClick={() => {
-                      setCampaignId(campaignId);
-                      setOpenCampaignView(true);
-                    }}
-                    sx={{ mt: -1, mr: -1 }}>
-                    <OpenInFull fontSize="small" />
-                  </IconButton>
+                  <Tooltip title="Expand in fullsreen">
+                    <IconButton
+                      size="medium"
+                      onClick={() => {
+                        setCampaignId(campaignId);
+                        setOpenCampaignView(true);
+                      }}
+                      sx={{ mt: -1, mr: -1 }}>
+                      <OpenInFull fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 </Box>
                 <Box
                   display="flex"
@@ -344,7 +313,7 @@ export default function Fundraisers() {
                     <Typography variant="h6">{campaign.title}</Typography>
                     <Typography variant="body2" color="grey">{`${campaign.region}`}</Typography>
                   </Box>
-                  <CampaignStatusIcon active={campaign.active} released={campaign.released} />
+                  <CampaignStatusIndicator active={campaign.active} released={campaign.released} />
                 </Box>
                 <CardMedia
                   component="img"
@@ -384,26 +353,19 @@ export default function Fundraisers() {
                     )}
                   </Box>
                   {isWalletConnected && campaign.active && !campaign.released && (
-                    <Button
-                      variant="text"
-                      size="small"
-                      sx={{ color: red[400] }}
+                    <DonateButton
                       onClick={() => {
                         setCampaignId(campaignId);
                         setOpenCampaignDonation(true);
-                        setLoading(false);
-                        setShowSuccess(false);
                       }}
-                      endIcon={<VolunteerActivism />}>
-                      Donate
-                    </Button>
+                    />
                   )}
                 </Box>
               </Stack>
             </Card>
           ))}
       </Box>
-      <Dialog fullScreen open={openCampaignCreate} onClose={handleCloseCampaignDialog}>
+      <Dialog fullScreen={fullScreen} open={openCampaignCreate} onClose={handleCloseCampaignDialog}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <DialogTitle>New Campaign</DialogTitle>
           {loading && LoadingProgress}
@@ -546,63 +508,11 @@ export default function Fundraisers() {
         onClose={() => setOpenCampaignView(false)}
         campaignid={campaignId}
       />
-
-      <Dialog open={openCampaignDonation} onClose={() => setOpenCampaignDonation(false)}>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <DialogTitle>Donation</DialogTitle>
-          {loading && LoadingProgress}
-          {showSuccess && SuccessIndicator}
-        </Box>
-        <DialogContent>
-          <DialogContentText>Choose amount to donate:</DialogContentText>
-          <TextField
-            variant="outlined"
-            label="Amount"
-            id="eth-donation-amount"
-            type="number"
-            sx={{ m: 1 }}
-            InputProps={{
-              endAdornment: <InputAdornment position="end">ETH</InputAdornment>,
-              inputMode: 'numeric'
-              //pattern: '[0-9]*'
-            }}
-          />
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            color="primary"
-            onClick={() => {
-              setLoading(false);
-              handleCloseDonationDialog();
-            }}>
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            color="primary"
-            onClick={() => {
-              setLoading(true);
-              handleDonateToCampaign(campaignId)
-                .then(() => {
-                  setLoading(false);
-                  setShowSuccess(true);
-                  setTimeout(() => {
-                    setShowSuccess(false);
-                    handleCloseDonationDialog();
-                  }, showSuccessTimeMs);
-                })
-                .catch((reason) => {
-                  handleCloseDonationDialog();
-                  enqueueSnackbar(`Failed to donate!\n${reason}`, { variant: 'error' });
-                });
-            }}>
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <CampaignDonationDialog
+        open={openCampaignDonation}
+        onClose={() => setOpenCampaignDonation(false)}
+        campaignid={campaignId}
+      />
     </Box>
   );
 }

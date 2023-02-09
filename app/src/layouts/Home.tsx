@@ -171,7 +171,7 @@ export default function HomeLayout() {
           }}>
           <Card
             component={MuiLink}
-            href="https://www.tally.xyz/gov/rebuild3-pre-alpha-001"
+            href={import.meta.env.VITE_TALLY_DAO_URL}
             sx={{
               p: 2,
               border: 2,

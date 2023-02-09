@@ -1,17 +1,46 @@
 import { DoneAll, GppBad, GppGood, PendingActions } from '@mui/icons-material';
+import { Icon, IconProps, Tooltip } from '@mui/material';
 
-export function CampaignStatusIcon(props: { active: boolean; released: boolean }) {
+export function CampaignStatusIndicator(props: {
+  active: boolean;
+  released: boolean;
+  fontSize?: IconProps['fontSize'];
+}) {
   if (props.active && props.released) {
-    return <DoneAll color="success" />;
+    return (
+      <Tooltip title="Successful campaign">
+        <Icon fontSize={props.fontSize}>
+          <DoneAll fontSize="inherit" color="success" />;
+        </Icon>
+      </Tooltip>
+    );
   }
 
   if (props.active) {
-    return <GppGood color="primary" />;
+    return (
+      <Tooltip title="Validated campaign, open for donations">
+        <Icon fontSize={props.fontSize}>
+          <GppGood fontSize="inherit" color="primary" />;
+        </Icon>
+      </Tooltip>
+    );
   }
 
   if (!props.active) {
-    return <PendingActions color="warning" />;
+    return (
+      <Tooltip title="Pending campaign">
+        <Icon fontSize={props.fontSize}>
+          <PendingActions fontSize="inherit" color="warning" />;
+        </Icon>
+      </Tooltip>
+    );
   }
 
-  return <GppBad color="error" />;
+  return (
+    <Tooltip title="Rejected campaign">
+      <Icon fontSize={props.fontSize}>
+        <GppBad fontSize="inherit" color="error" />;
+      </Icon>
+    </Tooltip>
+  );
 }

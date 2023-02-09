@@ -14,12 +14,12 @@ contract ReBuild3Governor is
   GovernorVotes,
   GovernorVotesQuorumFraction
 {
-  // ~5 mins period
+  // ~10 mins voting period
   constructor(
     IVotes _token
   )
     Governor('ReBuild3Governor')
-    GovernorSettings(1, 25, 0)
+    GovernorSettings(1, 50, 0)
     GovernorVotes(_token)
     GovernorVotesQuorumFraction(4)
   {}
