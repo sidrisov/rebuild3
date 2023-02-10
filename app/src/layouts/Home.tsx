@@ -111,7 +111,7 @@ export default function HomeLayout() {
               </Typography>
               <Typography m="10" color="grey" variant="h6">
                 enforced by smart contracts to bring transperancy into the fundraising process,
-                safeguard donations, and validate the expenditure.
+                safeguard donations, community based decision making.
               </Typography>
             </Stack>
             {darkMode ? <LoveInverted width={350} /> : <Love width={350} />}
@@ -145,7 +145,7 @@ export default function HomeLayout() {
               Approve
             </Typography>
             <Typography color="grey" variant="body1">
-              Validator opens it for donation
+              Validator approves fundraising
             </Typography>
           </Stack>
           <Stack m={3} width={300} spacing={1} alignItems="center">
