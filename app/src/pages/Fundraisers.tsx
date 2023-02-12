@@ -46,6 +46,7 @@ import CampaignDonationDialog from '../modals/CampaignDonationDialog';
 export default function Fundraisers() {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [openCampaignFilters, setOpenCampaignFilters] = useState(false);
   const [openCampaignDonation, setOpenCampaignDonation] = useState(false);
   const [openCampaignCreate, setOpenCampaignCreate] = useState(false);
@@ -238,11 +239,7 @@ export default function Fundraisers() {
               key={`campaigns_${campaignId}`}
               elevation={1}
               sx={{
-                minWidth: 'xs',
-                minHeight: 'xs',
-                maxWidth: 'sm',
-                maxHeight: 'sm',
-                flexGrow: 1,
+                maxWidth: smallScreen ? 1 : 500,
                 m: 1,
                 p: 2,
                 border: 2,
@@ -335,7 +332,7 @@ export default function Fundraisers() {
                     justifyContent: 'space-between',
                     alignItems: 'center'
                   }}>
-                  <Box display="flex" flexDirection="row">
+                  <Box p={0.5} display="flex" flexDirection="row">
                     {campaign.active && (
                       <>
                         <AvatarGroup

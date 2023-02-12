@@ -8,7 +8,7 @@ export default function DonateButton(props: ButtonProps) {
       {...props}
       variant="text"
       size="small"
-      sx={{ p: 1, color: red[400] }}
+      sx={{ p: 0.5, color: red[400] }}
       endIcon={<VolunteerActivism />}>
       Donate
     </Button>

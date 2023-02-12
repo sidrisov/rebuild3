@@ -85,9 +85,9 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
       const goal = ethers.utils.formatEther(currentCampaign.goal.toString());
 
       const currentProgress = (Number(raised) / Number(goal)) * 100;
-      
+
       // linear progress value is of range [0, 100], normalize
-      setCampaignProgress(currentProgress > 100 ? 100: currentProgress);
+      setCampaignProgress(currentProgress > 100 ? 100 : currentProgress);
       setCampaign(campaigns[campaignId]);
     }
   }, [campaignId, campaigns]);
@@ -133,11 +133,6 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
             <Card
               elevation={1}
               sx={{
-                flexGrow: 1,
-                minWidth: 'sm',
-                minHeight: 'sm',
-                maxWidth: 'lg',
-                maxHeight: 'lg',
                 my: 1,
                 p: 1.5,
                 border: 2,
