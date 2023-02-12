@@ -235,137 +235,145 @@ export default function Fundraisers() {
             return result;
           })
           .map((campaign, campaignId) => (
-            <Card
-              key={`campaigns_${campaignId}`}
-              elevation={1}
-              sx={{
-                maxWidth: smallScreen ? 1 : 500,
-                m: 1,
-                p: 2,
-                border: 2,
-                borderRadius: 3,
-                borderStyle: 'double',
-                borderColor: 'divider',
-                '&:hover': {
-                  borderStyle: 'dashed',
-                  boxShadow: 10
-                }
-              }}>
-              <Stack spacing={1}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start'
-                  }}>
+            <Tooltip
+              key={`campaign_tooltip_${campaignId}`}
+              title={campaign.description}
+              followCursor={true}>
+              <Card
+                key={`campaigns_${campaignId}`}
+                elevation={1}
+                sx={{
+                  maxWidth: smallScreen ? 1 : 500,
+                  m: 1,
+                  p: 2,
+                  border: 2,
+                  borderRadius: 3,
+                  borderStyle: 'double',
+                  borderColor: 'divider',
+                  '&:hover': {
+                    borderStyle: 'dashed',
+                    boxShadow: 10
+                  }
+                }}>
+                <Stack spacing={1}>
                   <Box
                     sx={{
                       display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start'
+                    }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}>
+                      <AddressAvatar address={campaign.owner} />
+                      <Box sx={{ ml: 0.5 }}>
+                        <Stack direction="row" alignItems="center">
+                          <Typography variant="body1">
+                            {shortenWalletAddressLabel(campaign.owner)}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              copyToClipboard(campaign.owner);
+                              enqueueSnackbar('Wallet address is copied to clipboard!');
+                            }}>
+                            <ContentCopy fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                        <Typography
+                          variant="subtitle2"
+                          color={
+                            campaign.raised.toBigInt() >= campaign.goal.toBigInt()
+                              ? green[400]
+                              : 'gray'
+                          }>
+                          {ethers.utils.formatEther(campaign.raised.toString()) +
+                            '/' +
+                            ethers.utils.formatEther(campaign.goal.toString()) +
+                            ' ETH'}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Tooltip title="Expand in fullsreen">
+                      <IconButton
+                        size="medium"
+                        onClick={() => {
+                          setCampaignId(campaignId);
+                          setOpenCampaignView(true);
+                        }}
+                        sx={{ mt: -1, mr: -1 }}>
+                        <OpenInFull fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="space-between"
+                    alignItems="center">
+                    <Box>
+                      <Typography variant="h6">{campaign.title}</Typography>
+                      <Typography variant="body2" color="grey">{`${campaign.region}`}</Typography>
+                    </Box>
+                    <CampaignStatusIndicator
+                      active={campaign.active}
+                      released={campaign.released}
+                    />
+                  </Box>
+                  <CardMedia
+                    component="img"
+                    image={campaign.cid}
+                    loading="lazy"
+                    sx={{
+                      border: 1,
+                      borderRadius: 3,
+                      borderColor: 'divider'
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
                       alignItems: 'center'
                     }}>
-                    <AddressAvatar address={campaign.owner} />
-                    <Box sx={{ ml: 0.5 }}>
-                      <Stack direction="row" alignItems="center">
-                        <Typography variant="body1">
-                          {shortenWalletAddressLabel(campaign.owner)}
-                        </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            copyToClipboard(campaign.owner);
-                            enqueueSnackbar('Wallet address is copied to clipboard!');
-                          }}>
-                          <ContentCopy fontSize="small" />
-                        </IconButton>
-                      </Stack>
-                      <Typography
-                        variant="subtitle2"
-                        color={
-                          campaign.raised.toBigInt() >= campaign.goal.toBigInt()
-                            ? green[400]
-                            : 'gray'
-                        }>
-                        {ethers.utils.formatEther(campaign.raised.toString()) +
-                          '/' +
-                          ethers.utils.formatEther(campaign.goal.toString()) +
-                          ' ETH'}
-                      </Typography>
+                    <Box p={0.5} display="flex" flexDirection="row">
+                      {campaign.active && (
+                        <>
+                          <AvatarGroup
+                            max={3}
+                            total={campaign.donated.toNumber()}
+                            sx={{
+                              '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
+                            }}>
+                            {[...Array(Math.min(2, campaign.donated.toNumber()))].map((item, i) => (
+                              <AddressAvatar
+                                key={`${campaignId}_${i}`}
+                                // TODO: fetch real address
+                                address={`${campaignId}_${i}`}
+                              />
+                            ))}
+                          </AvatarGroup>
+                          <Typography variant="body2" color="grey">
+                            donated by
+                          </Typography>
+                        </>
+                      )}
                     </Box>
-                  </Box>
-                  <Tooltip title="Expand in fullsreen">
-                    <IconButton
-                      size="medium"
-                      onClick={() => {
-                        setCampaignId(campaignId);
-                        setOpenCampaignView(true);
-                      }}
-                      sx={{ mt: -1, mr: -1 }}>
-                      <OpenInFull fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-                <Box
-                  display="flex"
-                  flexDirection="row"
-                  justifyContent="space-between"
-                  alignItems="center">
-                  <Box>
-                    <Typography variant="h6">{campaign.title}</Typography>
-                    <Typography variant="body2" color="grey">{`${campaign.region}`}</Typography>
-                  </Box>
-                  <CampaignStatusIndicator active={campaign.active} released={campaign.released} />
-                </Box>
-                <CardMedia
-                  component="img"
-                  image={campaign.cid}
-                  loading="lazy"
-                  sx={{
-                    border: 1,
-                    borderRadius: 3,
-                    borderColor: 'divider'
-                  }}
-                />
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}>
-                  <Box p={0.5} display="flex" flexDirection="row">
-                    {campaign.active && (
-                      <>
-                        <AvatarGroup
-                          max={3}
-                          total={campaign.donated.toNumber()}
-                          sx={{
-                            '& .MuiAvatar-root': { width: 15, height: 15, fontSize: 10 }
-                          }}>
-                          {[...Array(Math.min(2, campaign.donated.toNumber()))].map((item, i) => (
-                            <AddressAvatar
-                              key={`${campaignId}_${i}`}
-                              // TODO: fetch real address
-                              address={`${campaignId}_${i}`}
-                            />
-                          ))}
-                        </AvatarGroup>
-                        <Typography variant="body2" color="grey">
-                          donated by
-                        </Typography>
-                      </>
+                    {isWalletConnected && campaign.active && !campaign.released && (
+                      <DonateButton
+                        onClick={() => {
+                          setCampaignId(campaignId);
+                          setOpenCampaignDonation(true);
+                        }}
+                      />
                     )}
                   </Box>
-                  {isWalletConnected && campaign.active && !campaign.released && (
-                    <DonateButton
-                      onClick={() => {
-                        setCampaignId(campaignId);
-                        setOpenCampaignDonation(true);
-                      }}
-                    />
-                  )}
-                </Box>
-              </Stack>
-            </Card>
+                </Stack>
+              </Card>
+            </Tooltip>
           ))}
       </Box>
       <Dialog fullScreen={fullScreen} open={openCampaignCreate} onClose={handleCloseCampaignDialog}>
