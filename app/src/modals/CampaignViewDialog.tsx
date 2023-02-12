@@ -85,11 +85,9 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
       const goal = ethers.utils.formatEther(currentCampaign.goal.toString());
 
       const currentProgress = (Number(raised) / Number(goal)) * 100;
-
-      console.log(currentProgress);
-
-      setCampaignProgress(Number(currentProgress));
-      console.log('current progress', Number(currentProgress));
+      
+      // linear progress value is of range [0, 100], normalize
+      setCampaignProgress(currentProgress > 100 ? 100: currentProgress);
       setCampaign(campaigns[campaignId]);
     }
   }, [campaignId, campaigns]);
