@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { shortenWalletAddressLabel } from '../utils/address';
 
-import { Badge, Box, Card, Chip, Typography, Tooltip } from '@mui/material';
+import { Badge, Box, Card, Chip, Typography, Tooltip, Stack } from '@mui/material';
 import { ContentCopy } from '@mui/icons-material';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { useSnackbar } from 'notistack';
@@ -21,7 +21,7 @@ export default function Validators() {
         sx={{
           display: 'flex',
           flexWrap: 'wrap',
-          justifyContent: 'space-evenly',
+          justifyContent: 'center',
           p: 1,
           mt: 3
         }}>
@@ -34,6 +34,7 @@ export default function Validators() {
               key={`validators_${i}`}
               elevation={1}
               sx={{
+                width: 300,
                 m: 1,
                 border: 2,
                 borderRadius: 5,
@@ -44,34 +45,7 @@ export default function Validators() {
                   boxShadow: 10
                 }
               }}>
-              <Box
-                sx={{
-                  m: 2,
-                  p: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center'
-                }}>
-                <Chip
-                  label={shortenWalletAddressLabel(organization.account)}
-                  avatar={<AddressAvatar address={organization.account} />}
-                  deleteIcon={<ContentCopy fontSize="inherit" />}
-                  onDelete={() => {
-                    copyToClipboard(organization.account);
-                    enqueueSnackbar('Wallet address is copied to clipboard!');
-                  }}
-                  sx={{
-                    height: 40,
-                    width: 140,
-                    fontSize: 12,
-                    fontWeight: 'bold'
-                  }}
-                />
-
-                <Typography variant="h6">{organization.name}</Typography>
-                <Typography variant="body1" color="grey">
-                  {organization.region}
-                </Typography>
+              <Stack spacing={1} direction="column" m={1} p={1}>
                 <Badge
                   variant="dot"
                   color={organization.active ? 'success' : 'error'}
@@ -79,11 +53,36 @@ export default function Validators() {
                     alignSelf: 'flex-end'
                   }}
                   anchorOrigin={{
-                    vertical: 'bottom',
+                    vertical: 'top',
                     horizontal: 'right'
                   }}
                 />
-              </Box>
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  alignItems="center">
+                  <Chip
+                    label={shortenWalletAddressLabel(organization.account)}
+                    avatar={<AddressAvatar address={organization.account} />}
+                    deleteIcon={<ContentCopy fontSize="inherit" />}
+                    onDelete={() => {
+                      copyToClipboard(organization.account);
+                      enqueueSnackbar('Wallet address is copied to clipboard!');
+                    }}
+                    sx={{
+                      height: 40,
+                      width: 150,
+                      fontSize: 12,
+                      fontWeight: 'bold'
+                    }}
+                  />
+                  <Typography fontSize={12} color="grey">
+                    {organization.region}
+                  </Typography>
+                </Box>
+                <Typography fontSize={16}>{organization.name}</Typography>
+              </Stack>
             </Card>
           </Tooltip>
         ))}
