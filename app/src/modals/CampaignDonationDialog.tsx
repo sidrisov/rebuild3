@@ -12,9 +12,13 @@ import {
 } from '@mui/material';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useState } from 'react';
 import { UserContext } from '../contexts/UserContext';
-import { LoadingProgress, showSuccessTimeMs, SuccessIndicator } from '../pages/ProgressIndicators';
+import {
+  LoadingProgress,
+  showSuccessTimeMs,
+  SuccessIndicator
+} from '../components/ProgressIndicators';
 
 export type CampaignDonationDialogProps = DialogProps & {
   campaignid: number;
