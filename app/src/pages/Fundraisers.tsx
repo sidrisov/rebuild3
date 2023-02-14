@@ -24,7 +24,6 @@ import { green } from '@mui/material/colors';
 
 import { useSnackbar } from 'notistack';
 import { copyToClipboard } from '../utils/copyToClipboard';
-import { CampaignFilters, Region } from '../types/CampaignFiltersType';
 import AddressAvatar from '../components/AddressAvatar';
 import { CampaignStatusIndicator } from '../components/CampaignStatusIcon';
 import CampaignFiltersDialog from '../modals/CampaignFiltersDialog';
@@ -32,7 +31,6 @@ import CampaignViewDialog from '../modals/CampaignViewDialog';
 import DonateButton from '../buttons/DonateButton';
 import CampaignDonationDialog from '../modals/CampaignDonationDialog';
 import CampaignNewDialog from '../modals/CampaignNewDialog';
-import { ReBuild3 } from '../../../solidity/typechain-types';
 import filterCampaigns from '../utils/filterCampaigns';
 
 export default function Fundraisers() {

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import {
   AppBar,
@@ -13,7 +12,7 @@ import {
   Stack,
   useMediaQuery,
   Avatar,
-  Link as MuiLink,
+  Link,
   SvgIcon
 } from '@mui/material';
 
@@ -26,7 +25,7 @@ import { ReactComponent as Love } from '../assets/loving.svg';
 import { ReactComponent as LoveInverted } from '../assets/loving_inverted.svg';
 import CustomThemeProvider from '../theme/CustomThemeProvider';
 import { TECH_STACK } from './techStack';
-import Logo from '../components/Logo';
+import { ReactComponent as Logo } from '../assets/cubes.svg';
 
 function randomCardBgcolor() {
   const number = Math.floor(Math.random() * 3) + 1;
@@ -43,7 +42,7 @@ function randomCardBgcolor() {
 function TechUsedCard(props: any) {
   return (
     <Card
-      component={MuiLink}
+      component={Link}
       href={props.href}
       underline="none"
       sx={{
@@ -67,6 +66,8 @@ export default function HomeLayout() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [darkMode, setDarkMode] = useState(prefersDarkMode);
 
+  const appURL = `${window.location.protocol}//app.${window.location.host}`;
+
   return (
     <CustomThemeProvider darkMode={darkMode}>
       <HideOnScroll>
@@ -80,12 +81,7 @@ export default function HomeLayout() {
             <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
               {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
             </IconButton>
-            <Button
-              variant="contained"
-              component={Link}
-              to={'/app'}
-              endIcon={<ExitToApp />}
-              sx={{ width: 155 }}>
+            <Button variant="contained" href={appURL} endIcon={<ExitToApp />} sx={{ width: 155 }}>
               Go To App
             </Button>
           </Toolbar>
@@ -170,7 +166,7 @@ export default function HomeLayout() {
             justifyContent: 'center'
           }}>
           <Card
-            component={MuiLink}
+            component={Link}
             href={import.meta.env.VITE_TALLY_DAO_URL}
             sx={{
               p: 2,
@@ -220,7 +216,7 @@ export default function HomeLayout() {
           ))}
         </Box>
 
-        <MuiLink
+        <Link
           my={2}
           display="flex"
           justifyContent="center"
@@ -229,7 +225,7 @@ export default function HomeLayout() {
           color="grey"
           href="https://github.com/sidrisov">
           Made by Sinaver
-        </MuiLink>
+        </Link>
       </Container>
     </CustomThemeProvider>
   );

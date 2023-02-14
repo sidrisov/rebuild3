@@ -27,7 +27,7 @@ import { ethers } from 'ethers';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { useSnackbar } from 'notistack';
 import AddressAvatar from './AddressAvatar';
-import { routes } from '../router';
+import { appRoutes } from '../appRouter';
 
 export default function Navigation() {
   const { pathname } = useLocation();
@@ -39,7 +39,10 @@ export default function Navigation() {
   const { enqueueSnackbar } = useSnackbar();
 
   useMemo(() => {
-    setTabValue(routes.indexOf(pathname));
+    const index = appRoutes.indexOf(pathname);
+    if (index !== -1) {
+      setTabValue(appRoutes.indexOf(pathname));
+    }
   }, [pathname]);
 
   useMemo(async () => {
@@ -113,27 +116,27 @@ export default function Navigation() {
           label="Dashboard"
           tabIndex={0}
           component={Link}
-          to={routes[0]}
+          to={appRoutes[0]}
           icon={<QueryStats />}
         />
         <AlignedLinkTab
           label="Fundraisers"
           tabIndex={1}
-          to={routes[1]}
+          to={appRoutes[1]}
           icon={<VolunteerActivism />}
         />
         <AlignedLinkTab
           label="Validators"
           tabIndex={2}
           component={Link}
-          to={routes[2]}
+          to={appRoutes[2]}
           icon={<VerifiedUser />}
         />
         <AlignedLinkTab
           label="Settings"
           tabIndex={3}
           component={Link}
-          to={routes[3]}
+          to={appRoutes[3]}
           icon={<Settings />}
         />
       </Tabs>
