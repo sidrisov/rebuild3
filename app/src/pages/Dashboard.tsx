@@ -6,6 +6,7 @@ import { Box, Typography } from '@mui/material';
 import { UserContext } from '../contexts/UserContext';
 import { DashboardStatsType } from '../types/DashboardStatsType';
 import { StatsCard } from '../components/StatsCard';
+import { Helmet } from 'react-helmet-async';
 
 export default function Dashboard() {
   const { regions, organizations, campaigns, threshold } = useContext(UserContext);
@@ -35,62 +36,67 @@ export default function Dashboard() {
   }, [regions, organizations, campaigns]);
 
   return (
-    <Box mt={3} display="flex" flexDirection="column">
-      <Typography color="primary" align="center" variant="h6" m={1}>
-        Welcome back, let's ReBuild3!
-      </Typography>
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignContent: 'center',
-          justifyContent: 'space-evenly',
-          p: 1,
-          mt: 3
-        }}>
-        <StatsCard>
-          <Typography variant="overline" color="grey">
-            Active Regions
-          </Typography>
-          <Typography variant="h6">{stats.activeRegions}</Typography>
-        </StatsCard>
-        <StatsCard>
-          <Typography variant="overline" color="grey">
-            Validators
-          </Typography>
-          <Typography variant="h6">{stats.validators}</Typography>
-        </StatsCard>
-        <StatsCard>
-          <Typography variant="overline" color="grey">
-            Total Campaigns
-          </Typography>
-          <Typography variant="h6">{stats.totalCampaigns}</Typography>
-        </StatsCard>
-        <StatsCard>
-          <Typography variant="overline" color="grey">
-            Success Campaigns
-          </Typography>
-          <Typography variant="h6">{stats.successCampaigns}</Typography>
-        </StatsCard>
-        <StatsCard>
-          <Typography variant="overline" color="grey">
-            Donations
-          </Typography>
-          <Typography variant="h6">{stats.donationsCount}</Typography>
-        </StatsCard>
-        <StatsCard>
-          <Typography variant="overline" color="grey">
-            Amount Donated
-          </Typography>
-          <Typography variant="h6">{stats.donationsAmount?.toString()} ETH</Typography>
-        </StatsCard>
-        <StatsCard>
-          <Typography variant="overline" color="grey">
-            Goal Threashold
-          </Typography>
-          <Typography variant="h6">{stats.threshold} ETH</Typography>
-        </StatsCard>
+    <>
+      <Helmet>
+        <title> ReBuild3 | Dashboard </title>
+      </Helmet>
+      <Box mt={3} display="flex" flexDirection="column">
+        <Typography color="primary" align="center" variant="h6" m={1}>
+          Welcome back, let's ReBuild3!
+        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignContent: 'center',
+            justifyContent: 'space-evenly',
+            p: 1,
+            mt: 3
+          }}>
+          <StatsCard>
+            <Typography variant="overline" color="grey">
+              Active Regions
+            </Typography>
+            <Typography variant="h6">{stats.activeRegions}</Typography>
+          </StatsCard>
+          <StatsCard>
+            <Typography variant="overline" color="grey">
+              Validators
+            </Typography>
+            <Typography variant="h6">{stats.validators}</Typography>
+          </StatsCard>
+          <StatsCard>
+            <Typography variant="overline" color="grey">
+              Total Campaigns
+            </Typography>
+            <Typography variant="h6">{stats.totalCampaigns}</Typography>
+          </StatsCard>
+          <StatsCard>
+            <Typography variant="overline" color="grey">
+              Success Campaigns
+            </Typography>
+            <Typography variant="h6">{stats.successCampaigns}</Typography>
+          </StatsCard>
+          <StatsCard>
+            <Typography variant="overline" color="grey">
+              Donations
+            </Typography>
+            <Typography variant="h6">{stats.donationsCount}</Typography>
+          </StatsCard>
+          <StatsCard>
+            <Typography variant="overline" color="grey">
+              Amount Donated
+            </Typography>
+            <Typography variant="h6">{stats.donationsAmount?.toString()} ETH</Typography>
+          </StatsCard>
+          <StatsCard>
+            <Typography variant="overline" color="grey">
+              Goal Threashold
+            </Typography>
+            <Typography variant="h6">{stats.threshold} ETH</Typography>
+          </StatsCard>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 }
