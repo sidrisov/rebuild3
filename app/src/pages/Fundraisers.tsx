@@ -92,10 +92,7 @@ export default function Fundraisers() {
           {campaigns
             .filter((campaign) => filterCampaigns(campaign, campaignFilters, userAddress))
             .map((campaign, campaignId) => (
-              <Tooltip
-                key={`campaign_tooltip_${campaignId}`}
-                title={campaign.description}
-                followCursor={true}>
+              <Tooltip key={`campaign_tooltip_${campaignId}`} title={campaign.description}>
                 <Card
                   key={`campaigns_${campaignId}`}
                   elevation={1}

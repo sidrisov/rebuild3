@@ -31,10 +31,7 @@ export default function Validators() {
             mt: 3
           }}>
           {organizations.map((organization, i) => (
-            <Tooltip
-              key={`validators_tooltip_${i}`}
-              title={organization.description}
-              followCursor={true}>
+            <Tooltip key={`validators_tooltip_${i}`} title={organization.description}>
               <Card
                 key={`validators_${i}`}
                 elevation={1}
