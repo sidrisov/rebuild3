@@ -13,7 +13,8 @@ import {
   Typography,
   DialogActions,
   useMediaQuery,
-  useTheme
+  useTheme,
+  DialogProps
 } from '@mui/material';
 import { ethers } from 'ethers';
 
@@ -29,14 +30,15 @@ import {
 } from '../components/ProgressIndicators';
 
 import { UserContext } from '../contexts/UserContext';
+import { CloseCallbackType } from '../types/CloseCallbackType';
 import { uploadToIpfs } from '../utils/ipfs';
 
-export type CampaignNewDialogProps = {
-  open: boolean;
-  close: React.Dispatch<React.SetStateAction<boolean>>;
-};
+export type CampaignNewDialogProps = DialogProps & CloseCallbackType;
 
-export default function CampaignNewDialog(props: CampaignNewDialogProps) {
+export default function CampaignNewDialog({
+  closeStateCallback,
+  ...props
+}: CampaignNewDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const { enqueueSnackbar } = useSnackbar();
@@ -49,7 +51,7 @@ export default function CampaignNewDialog(props: CampaignNewDialogProps) {
   const { regions, organizations, contract } = useContext(UserContext);
 
   function handleCloseCampaignDialog() {
-    props.close(false);
+    closeStateCallback();
     setSelectedImage(null);
     setSelectedRegion('');
     setSelectedValidator('');
@@ -113,7 +115,7 @@ export default function CampaignNewDialog(props: CampaignNewDialogProps) {
   }
 
   return (
-    <Dialog fullScreen={fullScreen} open={props.open} onClose={handleCloseCampaignDialog}>
+    <Dialog fullScreen={fullScreen} onClose={handleCloseCampaignDialog} {...props}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <DialogTitle>New Campaign</DialogTitle>
         {loading && LoadingProgress}

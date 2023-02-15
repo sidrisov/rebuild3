@@ -239,16 +239,25 @@ export default function Fundraisers() {
           open={openCampaignFilters}
           onClose={() => setOpenCampaignFilters(false)}
         />
-        <CampaignNewDialog open={openCampaignCreate} close={setOpenCampaignCreate} />
+        <CampaignNewDialog
+          open={openCampaignCreate}
+          closeStateCallback={() => setOpenCampaignCreate(false)}
+        />
         <CampaignViewDialog
+          campaignId={campaignId}
           open={openCampaignView}
-          onClose={() => setOpenCampaignView(false)}
-          campaignid={campaignId}
+          closeStateCallback={() => {
+            setOpenCampaignView(false);
+            setCampaignId(-1);
+          }}
         />
         <CampaignDonationDialog
           open={openCampaignDonation}
-          onClose={() => setOpenCampaignDonation(false)}
-          campaignid={campaignId}
+          closeStateCallback={() => {
+            setOpenCampaignDonation(false);
+            setCampaignId(-1);
+          }}
+          campaignId={campaignId}
         />
       </Box>
     </>

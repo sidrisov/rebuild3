@@ -27,7 +27,7 @@ import {
   useTheme,
   Zoom
 } from '@mui/material';
-import { blue, green } from '@mui/material/colors';
+import { blue } from '@mui/material/colors';
 import { TransitionProps } from '@mui/material/transitions';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
@@ -43,10 +43,7 @@ import ReleaseButton from '../buttons/ReleaseButton';
 import CampaignDonationDialog from './CampaignDonationDialog';
 import { ReBuild3 } from '../../../solidity/typechain-types';
 import { Utils } from 'alchemy-sdk';
-
-export type CampaignDialogProps = DialogProps & {
-  campaignid: number;
-};
+import { CloseCallbackType } from '../types/CloseCallbackType';
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -57,7 +54,16 @@ const Transition = forwardRef(function Transition(
   return <Zoom ref={ref} {...props} style={{ transitionDelay: '100ms' }} />;
 });
 
-export default function CampaignViewDialog(props: CampaignDialogProps) {
+export type CampaignDialogProps = DialogProps &
+  CloseCallbackType & {
+    campaignId: number;
+  };
+
+export default function CampaignViewDialog({
+  campaignId,
+  closeStateCallback,
+  ...props
+}: CampaignDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
   const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -69,25 +75,29 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
 
   const [campaignProgress, setCampaignProgress] = useState(0);
 
-  const campaignId = props.campaignid;
-
   async function handleApproveCampaign(campaignId: number) {
     await (await contract?.approveCampaign(campaignId))?.wait();
   }
 
   useMemo(async () => {
-    if (campaignId !== -1) {
+    if (campaign) {
       setDonations(await contract?.getCampaignDonations(campaignId));
-
-      const currentCampaign = campaigns[campaignId];
-
-      const raised = ethers.utils.formatEther(currentCampaign.raised.toString());
-      const goal = ethers.utils.formatEther(currentCampaign.goal.toString());
-
+      const raised = ethers.utils.formatEther(campaign.raised.toString());
+      const goal = ethers.utils.formatEther(campaign.goal.toString());
       const currentProgress = (Number(raised) / Number(goal)) * 100;
-
       // linear progress value is of range [0, 100], normalize
       setCampaignProgress(currentProgress > 100 ? 100 : currentProgress);
+    } else {
+      setDonations([]);
+      setCampaignProgress(0);
+    }
+  }, [campaign]);
+
+  useMemo(async () => {
+    console.log(campaignId);
+    if (campaignId === -1) {
+      setCampaign(undefined);
+    } else {
       setCampaign(campaigns[campaignId]);
     }
   }, [campaignId, campaigns]);
@@ -95,6 +105,10 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
   async function handleReleaseCampaign(campaignId: number) {
     // TODO: rename => releaseCampaign or releaseFunds
     await (await contract?.release(campaignId))?.wait();
+  }
+
+  function handleCloseCampaignDialog() {
+    closeStateCallback();
   }
 
   const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -113,6 +127,7 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
     return (
       <>
         <Dialog
+          onClose={handleCloseCampaignDialog}
           fullWidth
           maxWidth="md"
           fullScreen={fullScreen}
@@ -281,8 +296,8 @@ export default function CampaignViewDialog(props: CampaignDialogProps) {
         </Dialog>
         <CampaignDonationDialog
           open={openCampaignDonation}
-          onClose={() => setOpenCampaignDonation(false)}
-          campaignid={campaignId}
+          closeStateCallback={() => setOpenCampaignDonation(false)}
+          campaignId={campaignId}
         />
       </>
     );
