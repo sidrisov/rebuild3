@@ -74,7 +74,7 @@ In solidity all smart-contract (EVM) related work is done, where in app - all fr
 
 ### Smart-Contracts
 
-Hardhat is used as development framework for smart-contracts.
+**HardHat** is used as development framework for smart-contract, **OpenZeppelin**  - smart-contract library, mainly for token/governance related functionality.
 
 Firstly, go to the solidity project and install dependencies:
 
@@ -89,4 +89,91 @@ npx hardhat compile
 npx hardhat test 
 ```
 
+1. Running locally
+Uncoment this section in hardhat.configt.ts:
+
+```
+defaultNetwork: 'localhost',
+...
+    hardhat: {
+        mining: {
+            interval: 5000
+        }
+    }
+```
+
+This way we make sure that your transactions actually take time to become part of next block; as your front-end should expect to have those confirmations delay in **goerli** or **mainnet**.
+
+Run local node:
+
+```
+npx hardhat node 
+```
+
+To deploy our ReBuild3 and pre-initiate with regions and organizations run following script:
+
+```
+./scripts/app/init_local_env.sh
+```
+
+You will see some output:
+
+```
+ReBuild3 deployed to 0x5FbDB2315678afecb367f032d93F642f64180aa3
+...
+```
+
+The address of deployed smart-contract will be required for front-end later on.
+
+### Front-End
+
+Technical stack: **Vite + React + TypeScript + MUI**; **Vercel** for dev/preview/production deployments under *.rebuild3.xyz.
+
+Web3 SDK Tools:
+
+1. Alchemy SDK - used mainly as default provider for all read-only communication with our deployed smart-contract, even if you don't connect any wallet, front-end will still be able to fetch all required metadata from contract.
+2. MagicLink Connect - used as instant Web3 wallet (email/google sign-in), for those users who are still novice with crypto wallets.
+3. Moralis SDK - used for uploading images to IPFS
+
+**Vite** supports env segregation by specifying **mode**:
+
+```
+// used for development with contracts deployed to local network
+// vite will load all env variables from *.env file
+npm run dev or npx vite   
+
+// used for staging with contracts deployed to goerli network
+// vite will load all env variables from *.env.staging or *env.staging.local files
+npx vite --mode staging
+```
+
+In our front-end application we need to specify following env variables (defined in **app/src/vite-env.d.ts**):
+
+```
+// deployed smart-contract address
+VITE_REBUILD3_CONTRACT_ADDR=  
+
+VITE_ALCHEMY_API_KEY=
+
+// if not specified, assumed localhost is used
+VITE_DEFAULT_NETWORK=
+
+// whether magic is integrated
+VITE_MAGIC_SUPPORTED=
+VITE_MAGIC_API_KEY=
+// whether enable magic wallet connection by default
+VITE_MAGIC_ENABLED=
+
+// whether to auto initiate wallet connection
+VITE_INIT_CONNECT=
+
+VITE_MORALIS_API_KEY=
+
+// tally DAO URL for our ReBuild3 Governer specified in home page
+VITE_TALLY_DAO_URL=
+```
+
+### Governance Interaction ([Tally](https://tally.xyz/))
+
+**Tally** is used as User Inteface for interaction with deployed on-chain ReBuild3 Governer, this simplifies **proposal -> voting -> execution** process.
 * * *
