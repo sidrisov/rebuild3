@@ -8,13 +8,18 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
+import { Buffer } from 'buffer';
+
 import { appRouter } from './appRouter';
 import { homeRouter } from './homeRouter';
+
+// undefined buffer fix
+window.Buffer = window.Buffer || Buffer;
 
 const isApp = window.location.host.split('.')[0] === 'app';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <RouterProvider router={!isApp ? homeRouter : appRouter} />
-  </React.StrictMode>
+  //<React.StrictMode>
+  <RouterProvider router={!isApp ? homeRouter : appRouter} />
+  //</React.StrictMode>
 );

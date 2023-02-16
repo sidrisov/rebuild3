@@ -43,6 +43,7 @@ import HideOnScroll from '../components/HideOnScroll';
 
 import { WalletTypeAvatar, WalletTypeName } from '../components/WalletType';
 import { AppSettings } from '../types/AppSettingsType';
+import { Client } from '@xmtp/xmtp-js';
 
 const MAGIC_SUPPORTED = import.meta.env.VITE_MAGIC_SUPPORTED === 'true';
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true' && MAGIC_SUPPORTED;
@@ -107,6 +108,8 @@ export default function AppLayout() {
     darkMode: prefersDarkMode
   });
 
+  const [xmtpClient, setXmtpClient] = useState<Client>();
+
   useMemo(async () => {
     // reset filters whenever user changes the connection state
     setCampaignFilters({ user: 'all', status: 'all', region: 'all' });
@@ -140,6 +143,26 @@ export default function AppLayout() {
       connectWallet();
     }
   }, [signerProvider, appSettings.connectOnDemand]);
+
+  useMemo(async () => {
+    if (isWalletConnected && signerProvider) {
+      const xmtp = await Client.create(signerProvider.getSigner(), { env: 'dev' });
+      setXmtpClient(xmtp);
+    }
+  }, [isWalletConnected]);
+
+  useMemo(async () => {
+    // TODO: make it configurable setting in Settings tab
+    if (isWalletConnected && xmtpClient) {
+      const allConversations = await xmtpClient.conversations.list();
+      for (const conversation of allConversations) {
+        console.log(
+          `Messages from : ${conversation.peerAddress}:
+          ${await conversation.messages()}`
+        );
+      }
+    }
+  }, [xmtpClient]);
 
   async function connectWallet() {
     if (!signerProvider) {
