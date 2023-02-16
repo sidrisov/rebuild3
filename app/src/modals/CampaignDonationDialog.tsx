@@ -19,26 +19,28 @@ import {
   showSuccessTimeMs,
   SuccessIndicator
 } from '../components/ProgressIndicators';
+import { CloseCallbackType } from '../types/CloseCallbackType';
 
-export type CampaignDonationDialogProps = DialogProps & {
-  campaignid: number;
-};
+export type CampaignDonationDialogProps = DialogProps &
+  CloseCallbackType & {
+    campaignId: number;
+  };
 
-export default function CampaignDonationDialog(props: CampaignDonationDialogProps) {
+export default function CampaignDonationDialog({
+  campaignId,
+  closeStateCallback,
+  ...props
+}: CampaignDonationDialogProps) {
   const { contract } = useContext(UserContext);
   const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // TODO: little hack, any better way to close itsef within dialog?
-  async function closeDialog() {
-    if (props.onClose) {
-      props.onClose({}, 'escapeKeyDown');
-    }
+  async function onCloseDialog() {
+    closeStateCallback();
   }
   async function handleDonation(campaignId: number) {
     if (campaignId !== -1) {
-      console.log('Im here');
       const donation = ethers.utils.parseEther(
         (document.getElementById('eth-donation-amount') as HTMLInputElement).value
       );
@@ -51,7 +53,7 @@ export default function CampaignDonationDialog(props: CampaignDonationDialogProp
   }
 
   return (
-    <Dialog {...props}>
+    <Dialog {...props} onClose={onCloseDialog}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <DialogTitle>Donation</DialogTitle>
         {loading && LoadingProgress}
@@ -79,7 +81,7 @@ export default function CampaignDonationDialog(props: CampaignDonationDialogProp
           color="primary"
           onClick={() => {
             setLoading(false);
-            closeDialog();
+            onCloseDialog();
           }}>
           Cancel
         </Button>
@@ -89,17 +91,17 @@ export default function CampaignDonationDialog(props: CampaignDonationDialogProp
           color="primary"
           onClick={() => {
             setLoading(true);
-            handleDonation(props.campaignid)
+            handleDonation(campaignId)
               .then(() => {
                 setLoading(false);
                 setShowSuccess(true);
                 setTimeout(() => {
                   setShowSuccess(false);
-                  closeDialog();
+                  onCloseDialog();
                 }, showSuccessTimeMs);
               })
               .catch((reason) => {
-                closeDialog();
+                onCloseDialog();
                 enqueueSnackbar(`Failed to donate!\n${reason}`, { variant: 'error' });
               });
           }}>

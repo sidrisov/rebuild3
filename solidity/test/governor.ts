@@ -32,7 +32,7 @@ describe('ReBuild3Governor', function () {
     const { token, owner } = await loadFixture(deployFixture);
 
     const balance = await token.balanceOf(owner.address);
-    assert.equal(balance.toString(), parseEther('10000').toString());
+    assert.equal(balance.toString(), parseEther('100000').toString());
   });
 
   describe('after proposing', () => {
@@ -43,7 +43,7 @@ describe('ReBuild3Governor', function () {
       const tx = await governor.propose(
         [token.address],
         [0],
-        [token.interface.encodeFunctionData('mint', [owner.address, parseEther('25000')])],
+        [token.interface.encodeFunctionData('mint', [owner.address, parseEther('10000')])],
         'Give the owner more tokens!'
       );
       const receipt = await tx.wait();
@@ -84,25 +84,25 @@ describe('ReBuild3Governor', function () {
         assert.equal((voteCastEvent as VoteCastEvent).args.voter, owner.address);
         assert.equal(
           (voteCastEvent as VoteCastEvent).args.weight.toString(),
-          parseEther('10000').toString()
+          parseEther('100000').toString()
         );
       });
 
       it('should allow executing the proposal', async () => {
         const { governor, token, owner } = await loadFixture(afterVotingFixture);
 
-        // wait for 25 blocks, so that proposal period ends and it can be executed
-        await mine(25);
+        // wait for 50 blocks, so that proposal period ends and it can be executed
+        await mine(50);
 
         await governor.execute(
           [token.address],
           [0],
-          [token.interface.encodeFunctionData('mint', [owner.address, parseEther('25000')])],
+          [token.interface.encodeFunctionData('mint', [owner.address, parseEther('10000')])],
           keccak256(toUtf8Bytes('Give the owner more tokens!'))
         );
 
         const balance = await token.balanceOf(owner.address);
-        assert.equal(balance.toString(), parseEther('35000').toString());
+        assert.equal(balance.toString(), parseEther('110000').toString());
       });
     });
   });
