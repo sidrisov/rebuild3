@@ -56,6 +56,7 @@ Using web3 smart-contract technologies, by default, we achieve accessebility, tr
 
 ## Next Steps 🚀:  
 
+* Secure Web3 messaging(@xmtp protocol)
 * Decentralized Identity (gitcoin passport integration)
 * On-chain reputation
 * Expenditure validation (user submits restoration results)
@@ -65,4 +66,27 @@ Using web3 smart-contract technologies, by default, we achieve accessebility, tr
 * * *
 
 ## Technical details 🛠️:
+
+In this monorepo there are 2 projects: **solidity** and **app**.
+In solidity all smart-contract (EVM) related work is done, where in app - all front-end.
+
+**app** project depends on artifacts published in **solidity**, make sure to compile smart-contracts before running/bulding front-end.
+
+### Smart-Contracts
+
+Hardhat is used as development framework for smart-contracts.
+
+Firstly, go to the solidity project and install dependencies:
+
+```
+cd solidity; npm install
+```
+
+Compile project to generate contract artifacts and run tests:
+
+```
+npx hardhat compile
+npx hardhat test 
+```
+
 * * *

@@ -94,7 +94,6 @@ export default function CampaignViewDialog({
   }, [campaign]);
 
   useMemo(async () => {
-    console.log(campaignId);
     if (campaignId === -1) {
       setCampaign(undefined);
     } else {
