@@ -59,6 +59,7 @@ export default function Validators() {
                       horizontal: 'right'
                     }}
                   />
+                  <Typography fontSize={16}>{organization.name}</Typography>
                   <Box
                     display="flex"
                     flexDirection="row"
@@ -66,7 +67,7 @@ export default function Validators() {
                     alignItems="center">
                     <Chip
                       label={shortenWalletAddressLabel(organization.account)}
-                      avatar={<AddressAvatar address={organization.account} />}
+                      avatar={<AddressAvatar address={organization.account} scale={3} />}
                       deleteIcon={<ContentCopy fontSize="inherit" />}
                       onDelete={() => {
                         copyToClipboard(organization.account);
@@ -83,7 +84,6 @@ export default function Validators() {
                       {organization.region}
                     </Typography>
                   </Box>
-                  <Typography fontSize={16}>{organization.name}</Typography>
                 </Stack>
               </Card>
             </Tooltip>

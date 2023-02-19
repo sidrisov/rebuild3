@@ -269,13 +269,6 @@ export default function AppLayout() {
   useMemo(async () => {
     // load all countries
     if (rb3Contract) {
-      const thresholdWei = await rb3Contract?.goalThreshold();
-
-      let threshold;
-      if (thresholdWei) {
-        threshold = ethers.utils.formatEther(thresholdWei);
-      }
-
       fetchConfig(rb3Contract);
       fetchRegionData(rb3Contract);
       fetchOrganizationData(rb3Contract);

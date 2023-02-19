@@ -233,6 +233,7 @@ export default function CampaignViewDialog({
                               <AddressAvatar
                                 sx={{ width: smallScreen ? 24 : 36, height: smallScreen ? 24 : 36 }}
                                 address={donations[i].donor}
+                                scale={smallScreen ? 3 : 4.5}
                               />
                               <Typography>
                                 {smallScreen
