@@ -85,6 +85,7 @@ export default function AppLayout() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [isWalletConnected, setWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState('');
+  const [userAdressENS, setUserAddressENS] = useState<string | null>();
   const [rb3Contract, setRB3Contract] = useState<ReBuild3>();
   const [regions, setRegions] = useState<string[]>([]);
   const [organizations, setOrganizations] = useState<ReBuild3.OrganizationStructOutput[]>([]);
@@ -119,6 +120,10 @@ export default function AppLayout() {
       ) as ReBuild3;
 
       setRB3Contract(contract);
+    }
+
+    if (isWalletConnected) {
+      setUserAddressENS(await defaultProvider?.lookupAddress(userAddress));
     }
   }, [isWalletConnected]);
 
@@ -289,6 +294,8 @@ export default function AppLayout() {
     }
 
     setWalletConnected(false);
+    setUserAddress('');
+    setUserAddressENS(null);
   }
 
   const drawer = <Nav />;
@@ -380,7 +387,9 @@ export default function AppLayout() {
                       </Button>
                     ) : (
                       <Chip
-                        label={shortenWalletAddressLabel(userAddress)}
+                        label={
+                          userAdressENS ? userAdressENS : shortenWalletAddressLabel(userAddress)
+                        }
                         clickable={walletType === 'magic'}
                         onClick={async () => {
                           if (walletType === 'magic') {
@@ -392,7 +401,8 @@ export default function AppLayout() {
                           height: 40,
                           width: 155,
                           fontSize: 15,
-                          fontWeight: 'bold'
+                          fontWeight: 'bold',
+                          justifyContent: 'space-around'
                         }}
                         deleteIcon={<PowerSettingsNew />}
                         onDelete={() => {

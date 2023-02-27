@@ -6,7 +6,8 @@ import {
   Box,
   Typography,
   IconButton,
-  Card
+  Card,
+  Avatar
 } from '@mui/material';
 
 import { useContext, useMemo, useState } from 'react';
@@ -33,6 +34,7 @@ export default function Navigation() {
   const { pathname } = useLocation();
   const [tabValue, setTabValue] = useState(0);
   const [balance, setBalance] = useState('');
+  const [avatar, setAvatar] = useState<string | null>();
 
   const { isWalletConnected, userAddress, provider } = useContext(UserContext);
 
@@ -49,6 +51,8 @@ export default function Navigation() {
     if (isWalletConnected && provider) {
       const weiBalance = await provider.getBalance(userAddress);
       setBalance(parseFloat(ethers.utils.formatEther(weiBalance)).toPrecision(8));
+      const avatar = await provider.getAvatar(userAddress);
+      setAvatar(avatar);
     }
   }, [isWalletConnected, userAddress, provider]);
 
@@ -81,7 +85,12 @@ export default function Navigation() {
             display: 'flex',
             alignItems: 'center'
           }}>
-          <AddressAvatar address={userAddress} />
+          {avatar ? (
+            <Avatar src={avatar} sx={{ width: 40, height: 40 }} />
+          ) : (
+            <AddressAvatar address={userAddress} />
+          )}
+
           <Box sx={{ ml: 0.5 }}>
             <Stack direction="row" alignItems="center">
               <Typography variant="h6" color="primary">
