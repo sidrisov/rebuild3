@@ -2,15 +2,7 @@ import { useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
-import {
-  AppBar,
-  IconButton,
-  Toolbar,
-  Box,
-  Container,
-  Drawer,
-  Stack
-} from '@mui/material';
+import { AppBar, IconButton, Toolbar, Box, Container, Drawer, Stack } from '@mui/material';
 
 import { useSnackbar } from 'notistack';
 
@@ -29,8 +21,6 @@ import { CampaignFilters } from '../types/CampaignFiltersType';
 import HideOnScroll from '../components/HideOnScroll';
 
 import { useAccount, useContract, useNetwork, useProvider, useSigner } from 'wagmi';
-
-const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
 
 // TODO: enable magic link once there is a working wagmi connector available
 /* const MAGIC_SUPPORTED = import.meta.env.VITE_MAGIC_SUPPORTED === 'true';
@@ -289,9 +279,8 @@ export default function AppLayout({ appSettings, setAppSettings }: any) {
                     </IconButton>
 
                     <ConnectButton
-                      accountStatus={'full'}
-                      showBalance={false}
-                      chainStatus={'icon'}
+                      showBalance={{ smallScreen: false, largeScreen: true }}
+                      chainStatus={{ smallScreen: 'icon', largeScreen: 'full' }}
                     />
 
                     {/* {!isWalletConnected ? (

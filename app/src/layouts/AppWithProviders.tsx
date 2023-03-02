@@ -19,7 +19,7 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
 import AddressAvatar from '../components/AddressAvatar';
 import { useMediaQuery } from '@mui/material';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { AppSettings } from '../types/AppSettingsType';
 
 const { chains, provider, webSocketProvider } = configureChains(
@@ -52,13 +52,26 @@ const customDarkTheme = merge(darkTheme({ overlayBlur: 'small' }), {
   }
 } as Theme);
 
+const appSettingsStorageItem = localStorage.getItem('appSettings');
+const appSettingsStored = appSettingsStorageItem
+  ? (JSON.parse(appSettingsStorageItem) as AppSettings)
+  : null;
+
 export default function AppWithProviders() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [appSettings, setAppSettings] = useState<AppSettings>({
-    magicEnabled: false,
-    autoConnect: import.meta.env.VITE_INIT_CONNECT === 'true',
-    darkMode: prefersDarkMode
-  });
+  const [appSettings, setAppSettings] = useState<AppSettings>(
+    appSettingsStored
+      ? appSettingsStored
+      : {
+          magicEnabled: false,
+          autoConnect: import.meta.env.VITE_INIT_CONNECT === 'true',
+          darkMode: prefersDarkMode
+        }
+  );
+
+  useMemo(() => {
+    localStorage.setItem('appSettings', JSON.stringify(appSettings));
+  }, [appSettings]);
 
   const wagmiClient = createClient({
     autoConnect: appSettings.autoConnect,
