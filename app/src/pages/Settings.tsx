@@ -76,16 +76,16 @@ export default function Settings() {
               <FormControlLabel
                 control={
                   <Switch
-                    checked={appSettings.connectOnDemand}
+                    checked={appSettings.autoConnect}
                     onChange={() => {
                       setAppSettings({
                         ...appSettings,
-                        connectOnDemand: !appSettings.connectOnDemand
+                        autoConnect: !appSettings.autoConnect
                       });
                     }}
                   />
                 }
-                label="On demand"
+                label="Auto connect"
               />
             </FormGroup>
           </FormControl>

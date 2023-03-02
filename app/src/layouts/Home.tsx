@@ -81,7 +81,11 @@ export default function HomeLayout() {
             <IconButton onClick={() => setDarkMode((darkMode) => !darkMode)}>
               {darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
             </IconButton>
-            <Button variant="contained" href={appURL} endIcon={<ExitToApp />} sx={{ width: 155 }}>
+            <Button
+              variant="contained"
+              href={appURL}
+              endIcon={<ExitToApp />}
+              sx={{ width: 155, height: 40, borderRadius: 3 }}>
               Go To App
             </Button>
           </Toolbar>

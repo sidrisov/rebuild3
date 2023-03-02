@@ -32,18 +32,18 @@ import { TransitionProps } from '@mui/material/transitions';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import { forwardRef, useContext, useMemo, useState } from 'react';
-import AddressAvatar from '../components/AddressAvatar';
-import { CampaignStatusIndicator } from '../components/CampaignStatusIcon';
-import { UserContext } from '../contexts/UserContext';
-import { shortenWalletAddressLabel } from '../utils/address';
-import { copyToClipboard } from '../utils/copyToClipboard';
+import AddressAvatar from '../AddressAvatar';
+import { CampaignStatusIndicator } from '../CampaignStatusIcon';
+import { UserContext } from '../../contexts/UserContext';
+import { shortenWalletAddressLabel } from '../../utils/address';
+import { copyToClipboard } from '../../utils/copyToClipboard';
 import ApproveButton from '../buttons/ApproveButton';
 import DonateButton from '../buttons/DonateButton';
 import ReleaseButton from '../buttons/ReleaseButton';
 import CampaignDonationDialog from './CampaignDonationDialog';
-import { ReBuild3 } from '../../../solidity/typechain-types';
+import { ReBuild3 } from '../../../../solidity/typechain-types';
 import { Utils } from 'alchemy-sdk';
-import { CloseCallbackType } from '../types/CloseCallbackType';
+import { CloseCallbackType } from '../../types/CloseCallbackType';
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {

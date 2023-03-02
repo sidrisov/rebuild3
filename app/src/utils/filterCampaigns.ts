@@ -4,7 +4,7 @@ import { CampaignFilters, Region } from '../types/CampaignFiltersType';
 export default function filterCampaigns(
   campaign: ReBuild3.CampaignStructOutput,
   campaignFilters: CampaignFilters,
-  userAddress: string
+  userAddress: string | undefined
 ) {
   let result = false;
   if (campaignFilters.region === ('all' as Region)) {

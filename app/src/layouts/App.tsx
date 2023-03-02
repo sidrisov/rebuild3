@@ -1,38 +1,25 @@
 import { useMemo, useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 import {
   AppBar,
-  Button,
   IconButton,
   Toolbar,
   Box,
   Container,
-  Chip,
-  useMediaQuery,
-  Drawer
+  Drawer,
+  Stack
 } from '@mui/material';
 
 import { useSnackbar } from 'notistack';
 
 import CustomThemeProvider from '../theme/CustomThemeProvider';
-import {
-  PowerSettingsNew,
-  LightModeOutlined,
-  DarkModeOutlined,
-  Menu,
-  Wallet
-} from '@mui/icons-material';
+import { LightModeOutlined, DarkModeOutlined, Menu } from '@mui/icons-material';
 
 import Nav from '../components/Navigation';
 
-import { Magic } from 'magic-sdk';
-import { EthNetworkName } from '@magic-sdk/types';
 import { ethers } from 'ethers';
-
-import { ConnectExtension, WalletInfo } from '@magic-ext/connect';
-import { shortenWalletAddressLabel } from '../utils/address';
-import { InstanceWithExtensions, SDKBase } from '@magic-sdk/provider';
 
 import Rebuild3ContractArtifact from '../../../solidity/artifacts/contracts/ReBuild3.sol/ReBuild3.json';
 import { ReBuild3 } from '../../../solidity/typechain-types';
@@ -41,16 +28,16 @@ import Moralis from 'moralis';
 import { CampaignFilters } from '../types/CampaignFiltersType';
 import HideOnScroll from '../components/HideOnScroll';
 
-import { WalletTypeAvatar, WalletTypeName } from '../components/WalletType';
-import { AppSettings } from '../types/AppSettingsType';
+import { useAccount, useContract, useNetwork, useProvider, useSigner } from 'wagmi';
 
-const MAGIC_SUPPORTED = import.meta.env.VITE_MAGIC_SUPPORTED === 'true';
-const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true' && MAGIC_SUPPORTED;
 const INIT_CONNECT = import.meta.env.VITE_INIT_CONNECT === 'true';
+
+// TODO: enable magic link once there is a working wagmi connector available
+/* const MAGIC_SUPPORTED = import.meta.env.VITE_MAGIC_SUPPORTED === 'true';
+const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true' && MAGIC_SUPPORTED;
 
 var magic: InstanceWithExtensions<SDKBase, ConnectExtension[]>;
 var magicSignerProvider: ethers.providers.Web3Provider | undefined;
-var embeddedSignerProvider: ethers.providers.Web3Provider | undefined;
 
 // if magic enabled
 if (MAGIC_SUPPORTED) {
@@ -60,20 +47,7 @@ if (MAGIC_SUPPORTED) {
   });
   magic.preload();
   magicSignerProvider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
-}
-
-if (window.ethereum) {
-  embeddedSignerProvider = new ethers.providers.Web3Provider(window.ethereum as any);
-}
-
-// use alchemy as default provider, fallback to wallet provider if network wasn't set up, e.g. local hardhat
-const defaultProvider =
-  import.meta.env.VITE_DEFAULT_NETWORK === ''
-    ? embeddedSignerProvider
-    : new ethers.providers.AlchemyProvider(
-        import.meta.env.VITE_DEFAULT_NETWORK,
-        import.meta.env.VITE_ALCHEMY_API_KEY
-      );
+} */
 
 Moralis.start({
   apiKey: import.meta.env.VITE_MORALIS_API_KEY
@@ -81,12 +55,28 @@ Moralis.start({
 
 const drawerWidth = 220;
 
-export default function AppLayout() {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [isWalletConnected, setWalletConnected] = useState(false);
-  const [userAddress, setUserAddress] = useState('');
-  const [userAdressENS, setUserAddressENS] = useState<string | null>();
-  const [rb3Contract, setRB3Contract] = useState<ReBuild3>();
+interface ContractAddressPerNetwork {
+  network: string;
+  address: string;
+}
+
+const contracts = JSON.parse(
+  import.meta.env.VITE_CONTRACTS_PER_NETWORK
+) as ContractAddressPerNetwork[];
+
+export default function AppLayout({ appSettings, setAppSettings }: any) {
+  //const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const defaultProvider = useProvider();
+  const signer = useSigner();
+  const { isConnected: isWalletConnected, address: userAddress } = useAccount();
+  const { chain } = useNetwork();
+  const rb3Contract = useContract({
+    address: contracts.find((contract) => (chain ? contract.network === chain?.network : true))
+      ?.address,
+    abi: Rebuild3ContractArtifact.abi,
+    signerOrProvider: signer.data || defaultProvider
+  }) as ReBuild3;
+
   const [regions, setRegions] = useState<string[]>([]);
   const [organizations, setOrganizations] = useState<ReBuild3.OrganizationStructOutput[]>([]);
   const [threshold, setThreshold] = useState('N/A');
@@ -97,85 +87,14 @@ export default function AppLayout() {
     region: 'all'
   });
 
-  const [walletType, setWalletType] = useState<WalletInfo['walletType']>();
   const [isSubscribedToEvents, setSubscribedToEvents] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [signerProvider, setSignerProvider] = useState<ethers.providers.Web3Provider | undefined>();
-  const [appSettings, setAppSettings] = useState<AppSettings>({
-    magicEnabled: MAGIC_ENABLED,
-    connectOnDemand: INIT_CONNECT,
-    darkMode: prefersDarkMode
-  });
 
   useMemo(async () => {
     // reset filters whenever user changes the connection state
     setCampaignFilters({ user: 'all', status: 'all', region: 'all' });
-
-    if (!isWalletConnected && defaultProvider) {
-      const contract = new ethers.Contract(
-        import.meta.env.VITE_REBUILD3_CONTRACT_ADDR,
-        Rebuild3ContractArtifact.abi,
-        defaultProvider
-      ) as ReBuild3;
-
-      setRB3Contract(contract);
-    }
-
-    if (isWalletConnected) {
-      setUserAddressENS(await defaultProvider?.lookupAddress(userAddress));
-    }
   }, [isWalletConnected]);
-
-  useMemo(async () => {
-    if (appSettings.magicEnabled) {
-      setSignerProvider(magicSignerProvider);
-    } else if (window.ethereum) {
-      // otherwise try to use metamask provider
-      setSignerProvider(embeddedSignerProvider);
-    }
-  }, [appSettings.magicEnabled]);
-
-  useMemo(async () => {
-    if (isWalletConnected) {
-      await disconnectWallet();
-    }
-    if (signerProvider && appSettings.connectOnDemand) {
-      console.log('Initializing wallet connect on start up!');
-      connectWallet();
-    }
-  }, [signerProvider, appSettings.connectOnDemand]);
-
-  async function connectWallet() {
-    if (!signerProvider) {
-      enqueueSnackbar('Wallet Provider is not available!', { variant: 'warning' });
-      return;
-    }
-
-    if (!appSettings.magicEnabled) {
-      await signerProvider.send('eth_requestAccounts', []);
-    }
-
-    const signer = signerProvider.getSigner();
-    const address = await signer.getAddress();
-
-    const contract = new ethers.Contract(
-      import.meta.env.VITE_REBUILD3_CONTRACT_ADDR,
-      Rebuild3ContractArtifact.abi,
-      defaultProvider
-    ) as ReBuild3;
-
-    const connectedWalletType = appSettings.magicEnabled
-      ? (await magic.connect.getWalletInfo()).walletType
-      : 'metamask'; // TODO: for now consider it as metamask, however in future we might support other embedded wallets
-
-    enqueueSnackbar(WalletTypeName(connectedWalletType) + ' Connected!', { variant: 'success' });
-
-    setRB3Contract(contract.connect(signer));
-    setUserAddress(address);
-    setWalletType(connectedWalletType);
-    setWalletConnected(true);
-  }
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -278,6 +197,11 @@ export default function AppLayout() {
       fetchRegionData(rb3Contract);
       fetchOrganizationData(rb3Contract);
       fetchCampaignData(rb3Contract);
+    } else {
+      setRegions([]);
+      setOrganizations([]);
+      setCampaigns([]);
+      setThreshold('N/A');
     }
   }, [rb3Contract]);
 
@@ -288,24 +212,13 @@ export default function AppLayout() {
     }
   }, [isSubscribedToEvents, rb3Contract]);
 
-  async function disconnectWallet() {
-    if (MAGIC_SUPPORTED) {
-      await magic.connect.disconnect();
-    }
-
-    setWalletConnected(false);
-    setUserAddress('');
-    setUserAddressENS(null);
-  }
-
   const drawer = <Nav />;
   return (
     <CustomThemeProvider darkMode={appSettings.darkMode}>
       <UserContext.Provider
         value={{
           isWalletConnected,
-          userAddress,
-          provider: defaultProvider,
+          userAddress: userAddress,
           regions,
           organizations,
           contract: rb3Contract,
@@ -367,7 +280,7 @@ export default function AppLayout() {
                       <Menu />
                     </IconButton>
                   </Box>
-                  <Box>
+                  <Stack direction="row" spacing={1}>
                     <IconButton
                       onClick={() =>
                         setAppSettings({ ...appSettings, darkMode: !appSettings.darkMode })
@@ -375,12 +288,18 @@ export default function AppLayout() {
                       {appSettings.darkMode ? <DarkModeOutlined /> : <LightModeOutlined />}
                     </IconButton>
 
-                    {!isWalletConnected ? (
+                    <ConnectButton
+                      accountStatus={'full'}
+                      showBalance={false}
+                      chainStatus={'icon'}
+                    />
+
+                    {/* {!isWalletConnected ? (
                       <Button
                         variant="contained"
                         endIcon={<Wallet />}
                         onClick={() => {
-                          connectWallet();
+                          //connectWallet();
                         }}
                         sx={{ width: 155 }}>
                         Connect
@@ -409,8 +328,8 @@ export default function AppLayout() {
                           disconnectWallet();
                         }}
                       />
-                    )}
-                  </Box>
+                    )} */}
+                  </Stack>
                 </Toolbar>
               </AppBar>
             </HideOnScroll>
