@@ -1,15 +1,21 @@
+import './polyfills';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import './index.css';
+
+import { RouterProvider } from 'react-router-dom';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
+import { appRouter } from './appRouter';
+import { homeRouter } from './homeRouter';
+
+const isApp = window.location.host.split('.')[0] === 'app';
+
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <RouterProvider router={!isApp ? homeRouter : appRouter} />
   </React.StrictMode>
 );
