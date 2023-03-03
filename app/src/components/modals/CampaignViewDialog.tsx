@@ -27,7 +27,7 @@ import {
   useTheme,
   Zoom
 } from '@mui/material';
-import { blue } from '@mui/material/colors';
+import { blue, green } from '@mui/material/colors';
 import { TransitionProps } from '@mui/material/transitions';
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
@@ -118,7 +118,7 @@ export default function CampaignViewDialog({
     },
     [`& .${linearProgressClasses.bar}`]: {
       borderRadius: 5,
-      backgroundColor: theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8'
+      backgroundColor: theme.palette.mode === 'light' ? green[600] : green[500]
     }
   }));
 

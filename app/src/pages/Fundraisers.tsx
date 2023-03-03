@@ -43,7 +43,8 @@ export default function Fundraisers() {
   const [openCampaignView, setOpenCampaignView] = useState(false);
   const [campaignId, setCampaignId] = useState<number>(-1);
 
-  const { isWalletConnected, userAddress, campaigns, campaignFilters } = useContext(UserContext);
+  const { isWalletConnected, userAddress, campaigns, campaignFilters, appSettings } =
+    useContext(UserContext);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -140,7 +141,9 @@ export default function Fundraisers() {
                             variant="subtitle2"
                             color={
                               campaign.raised.toBigInt() >= campaign.goal.toBigInt()
-                                ? green[400]
+                                ? appSettings.darkMode
+                                  ? green[500]
+                                  : green[600]
                                 : 'gray'
                             }>
                             {ethers.utils.formatEther(campaign.raised.toString()) +
