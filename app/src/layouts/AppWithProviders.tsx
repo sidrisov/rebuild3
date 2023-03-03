@@ -23,7 +23,7 @@ import { useMemo, useState } from 'react';
 import { AppSettings } from '../types/AppSettingsType';
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [optimismGoerli, goerli, baseGoerli, mainnet, zkSyncTestnet],
+  [optimismGoerli, goerli, baseGoerli, mainnet],
   [alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }), publicProvider()]
 );
 
