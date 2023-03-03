@@ -13,13 +13,9 @@ import {
 import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import { useContext, useState } from 'react';
-import { UserContext } from '../contexts/UserContext';
-import {
-  LoadingProgress,
-  showSuccessTimeMs,
-  SuccessIndicator
-} from '../components/ProgressIndicators';
-import { CloseCallbackType } from '../types/CloseCallbackType';
+import { UserContext } from '../../contexts/UserContext';
+import { LoadingProgress, showSuccessTimeMs, SuccessIndicator } from '../ProgressIndicators';
+import { CloseCallbackType } from '../../types/CloseCallbackType';
 
 export type CampaignDonationDialogProps = DialogProps &
   CloseCallbackType & {

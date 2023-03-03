@@ -6,10 +6,11 @@ import {
   Box,
   Typography,
   IconButton,
-  Card
+  Card,
+  Avatar
 } from '@mui/material';
 
-import { useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import HomeLogo from './Logo';
@@ -22,35 +23,29 @@ import {
   Settings
 } from '@mui/icons-material';
 import { shortenWalletAddressLabel } from '../utils/address';
-import { UserContext } from '../contexts/UserContext';
-import { ethers } from 'ethers';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import { useSnackbar } from 'notistack';
 import AddressAvatar from './AddressAvatar';
 import { appRoutes } from '../appRouter';
 
+import { useAccount, useBalance, useEnsAvatar } from 'wagmi';
+
 export default function Navigation() {
   const { pathname } = useLocation();
   const [tabValue, setTabValue] = useState(0);
-  const [balance, setBalance] = useState('');
-
-  const { isWalletConnected, userAddress, provider } = useContext(UserContext);
-
   const { enqueueSnackbar } = useSnackbar();
 
-  useMemo(() => {
+  const account = useAccount();
+  const balance = useBalance(account);
+  // always load ens avatar from mainnet, as that's where people typically set up avatar
+  const { data: avatar, isSuccess } = useEnsAvatar({ ...account, chainId: 1 });
+
+  useMemo(async () => {
     const index = appRoutes.indexOf(pathname);
     if (index !== -1) {
       setTabValue(appRoutes.indexOf(pathname));
     }
   }, [pathname]);
-
-  useMemo(async () => {
-    if (isWalletConnected && provider) {
-      const weiBalance = await provider.getBalance(userAddress);
-      setBalance(parseFloat(ethers.utils.formatEther(weiBalance)).toPrecision(8));
-    }
-  }, [isWalletConnected, userAddress, provider]);
 
   function AlignedLinkTab(props: any) {
     return (
@@ -65,7 +60,7 @@ export default function Navigation() {
         height: '100vh'
       }}>
       <HomeLogo m={2} />
-      {isWalletConnected && (
+      {account.isConnected && account.address && (
         <Card
           elevation={10}
           sx={{
@@ -81,23 +76,30 @@ export default function Navigation() {
             display: 'flex',
             alignItems: 'center'
           }}>
-          <AddressAvatar address={userAddress} />
+          {isSuccess && avatar ? (
+            <Avatar src={avatar as string} sx={{ width: 40, height: 40 }} />
+          ) : (
+            <AddressAvatar address={account.address?.toString()} />
+          )}
+
           <Box sx={{ ml: 0.5 }}>
             <Stack direction="row" alignItems="center">
               <Typography variant="h6" color="primary">
-                {shortenWalletAddressLabel(userAddress)}
+                {shortenWalletAddressLabel(account.address?.toString() as string)}
               </Typography>
               <IconButton
                 color="primary"
                 size="small"
                 onClick={() => {
-                  copyToClipboard(userAddress);
+                  copyToClipboard(account.address?.toString() as string);
                   enqueueSnackbar('Wallet address is copied to clipboard!');
                 }}>
                 <ContentCopy fontSize="small" />
               </IconButton>
             </Stack>
-            <Typography variant="subtitle2">{balance} ETH</Typography>
+            <Typography variant="subtitle2">
+              {balance.data?.formatted.substring(0, 7)} ETH
+            </Typography>
           </Box>
         </Card>
       )}

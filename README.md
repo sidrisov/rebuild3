@@ -125,6 +125,12 @@ ReBuild3 deployed to 0x5FbDB2315678afecb367f032d93F642f64180aa3
 
 The address of deployed smart-contract will be required for front-end later on.
 
+2. Pre-Alpha Contracts (Goerli):
+
+REBUILD3_CONTRACT_ADDR=0xD7bb9678D7821b9835cBF141ec1427C635E3046e  
+GOV_CONTRACT_ADDR=0x16449fC3C87b5f4d50BDECB389777C3968Bd70eC   
+TOKEN_CONTRACT_ADDR=0xe33b259ECAAe232d7fB5DceCA5ea721c5df272F7
+
 ### Front-End
 
 Technical stack: **Vite + React + TypeScript + MUI**; **Vercel** for dev/preview/production deployments under *.rebuild3.xyz.
@@ -147,7 +153,7 @@ npm run dev or npx vite
 npx vite --mode staging
 ```
 
-In our front-end application we need to specify following env variables (defined in **app/src/vite-env.d.ts**):
+In our front-end application we need to specify following env variables (declared in **app/src/vite-env.d.ts**):
 
 ```
 // deployed smart-contract address

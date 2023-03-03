@@ -13,8 +13,8 @@ import {
   Stack
 } from '@mui/material';
 import { useContext } from 'react';
-import { UserContext } from '../contexts/UserContext';
-import { ByUserType, CampaignStatus, Region } from '../types/CampaignFiltersType';
+import { UserContext } from '../../contexts/UserContext';
+import { ByUserType, CampaignStatus, Region } from '../../types/CampaignFiltersType';
 
 export default function CampaignFiltersDialog(props: DialogProps) {
   const { isWalletConnected, campaignFilters, setCampaignFilters, regions } =

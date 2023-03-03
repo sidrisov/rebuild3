@@ -26,11 +26,11 @@ import { useSnackbar } from 'notistack';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import AddressAvatar from '../components/AddressAvatar';
 import { CampaignStatusIndicator } from '../components/CampaignStatusIcon';
-import CampaignFiltersDialog from '../modals/CampaignFiltersDialog';
-import CampaignViewDialog from '../modals/CampaignViewDialog';
-import DonateButton from '../buttons/DonateButton';
-import CampaignDonationDialog from '../modals/CampaignDonationDialog';
-import CampaignNewDialog from '../modals/CampaignNewDialog';
+import CampaignFiltersDialog from '../components/modals/CampaignFiltersDialog';
+import CampaignViewDialog from '../components/modals/CampaignViewDialog';
+import DonateButton from '../components/buttons/DonateButton';
+import CampaignDonationDialog from '../components/modals/CampaignDonationDialog';
+import CampaignNewDialog from '../components/modals/CampaignNewDialog';
 import filterCampaigns from '../utils/filterCampaigns';
 import { Helmet } from 'react-helmet-async';
 

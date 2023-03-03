@@ -21,17 +21,13 @@ import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import { useContext, useState } from 'react';
 
-import { ReBuild3 } from '../../../solidity/typechain-types';
+import { ReBuild3 } from '../../../../solidity/typechain-types';
 
-import {
-  LoadingProgress,
-  SuccessIndicator,
-  showSuccessTimeMs
-} from '../components/ProgressIndicators';
+import { LoadingProgress, SuccessIndicator, showSuccessTimeMs } from '../ProgressIndicators';
 
-import { UserContext } from '../contexts/UserContext';
-import { CloseCallbackType } from '../types/CloseCallbackType';
-import { uploadToIpfs } from '../utils/ipfs';
+import { UserContext } from '../../contexts/UserContext';
+import { CloseCallbackType } from '../../types/CloseCallbackType';
+import { uploadToIpfs } from '../../utils/ipfs';
 
 export type CampaignNewDialogProps = DialogProps & CloseCallbackType;
 

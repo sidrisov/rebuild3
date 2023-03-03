@@ -5,8 +5,7 @@ import { CampaignFilters } from './CampaignFiltersType';
 
 export interface UserContextType {
   isWalletConnected: boolean;
-  userAddress: string;
-  provider: ethers.providers.Web3Provider | ethers.providers.AlchemyProvider | undefined;
+  userAddress: string | undefined;
   regions: string[];
   organizations: ReBuild3.OrganizationStructOutput[];
   campaigns: ReBuild3.CampaignStructOutput[];

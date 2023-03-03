@@ -5,14 +5,14 @@ import Fundraisers from './pages/Fundraisers';
 import Validators from './pages/Validators';
 import Settings from './pages/Settings';
 
-import AppWithSnackBarAndHelmet from './layouts/AppWithSnackBar';
+import AppWithProviders from './layouts/AppWithProviders';
 
 export const appRoutes = ['/dashboard', '/fundraisers', '/validators', '/settings'];
 
 export const appRouter = createBrowserRouter([
   {
     path: '/',
-    element: <AppWithSnackBarAndHelmet />,
+    element: <AppWithProviders />,
     errorElement: <Page404 />,
     children: [
       { element: <Navigate to="/dashboard" />, index: true },
