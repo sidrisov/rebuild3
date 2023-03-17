@@ -3,7 +3,7 @@ import { ReactComponent as MagicLink } from '../assets/magiclink.svg';
 import { ReactComponent as WalletConnect } from '../assets/walletconnect.svg';
 import { ReactComponent as Coinbase } from '../assets/coinbase.svg';
 import AddressAvatar from './AddressAvatar';
-import { WalletInfo } from '@magic-ext/connect';
+import { WalletInfo } from 'magic-sdk';
 
 export function WalletTypeAvatar(props: any) {
   switch (props.wallettype) {
