@@ -1,8 +1,9 @@
-import { SnackbarProvider } from 'notistack';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
 
 import '@rainbow-me/rainbowkit/styles.css';
+import 'react-toastify/dist/ReactToastify.css';
+
 import merge from 'lodash.merge';
 
 import {
@@ -14,13 +15,14 @@ import {
   Theme
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
-import { goerli, optimismGoerli, baseGoerli, mainnet, zkSyncTestnet } from 'wagmi/chains';
+import { goerli, optimismGoerli, baseGoerli, mainnet } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
 import AddressAvatar from '../components/AddressAvatar';
 import { useMediaQuery } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { AppSettings } from '../types/AppSettingsType';
+import { ToastContainer } from 'react-toastify';
 
 const { chains, provider, webSocketProvider } = configureChains(
   [optimismGoerli, goerli, baseGoerli, mainnet],
@@ -92,9 +94,20 @@ export default function AppWithProviders() {
             (chain) => chain.network === import.meta.env.VITE_DEFAULT_NETWORK
           )}
           showRecentTransactions={true}>
-          <SnackbarProvider maxSnack={3}>
-            <App appSettings={appSettings} setAppSettings={setAppSettings} />
-          </SnackbarProvider>
+          <App appSettings={appSettings} setAppSettings={setAppSettings} />
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            limit={5}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
         </RainbowKitProvider>
       </WagmiConfig>
     </HelmetProvider>

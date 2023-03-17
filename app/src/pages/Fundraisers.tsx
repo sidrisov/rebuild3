@@ -22,7 +22,6 @@ import { UserContext } from '../contexts/UserContext';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { green } from '@mui/material/colors';
 
-import { useSnackbar } from 'notistack';
 import { copyToClipboard } from '../utils/copyToClipboard';
 import AddressAvatar from '../components/AddressAvatar';
 import { CampaignStatusIndicator } from '../components/CampaignStatusIcon';
@@ -33,6 +32,7 @@ import CampaignDonationDialog from '../components/modals/CampaignDonationDialog'
 import CampaignNewDialog from '../components/modals/CampaignNewDialog';
 import filterCampaigns from '../utils/filterCampaigns';
 import { Helmet } from 'react-helmet-async';
+import { toast } from 'react-toastify';
 
 export default function Fundraisers() {
   const theme = useTheme();
@@ -45,8 +45,6 @@ export default function Fundraisers() {
 
   const { isWalletConnected, userAddress, campaigns, campaignFilters, appSettings } =
     useContext(UserContext);
-
-  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <>
@@ -132,7 +130,7 @@ export default function Fundraisers() {
                               size="small"
                               onClick={() => {
                                 copyToClipboard(campaign.owner);
-                                enqueueSnackbar('Wallet address is copied to clipboard!');
+                                toast.info('Wallet address is copied to clipboard!');
                               }}>
                               <ContentCopy fontSize="small" />
                             </IconButton>

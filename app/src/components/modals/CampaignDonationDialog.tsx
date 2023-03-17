@@ -11,11 +11,11 @@ import {
   TextField
 } from '@mui/material';
 import { ethers } from 'ethers';
-import { useSnackbar } from 'notistack';
 import { useContext, useState } from 'react';
 import { UserContext } from '../../contexts/UserContext';
 import { LoadingProgress, showSuccessTimeMs, SuccessIndicator } from '../ProgressIndicators';
 import { CloseCallbackType } from '../../types/CloseCallbackType';
+import { toast } from 'react-toastify';
 
 export type CampaignDonationDialogProps = DialogProps &
   CloseCallbackType & {
@@ -28,7 +28,6 @@ export default function CampaignDonationDialog({
   ...props
 }: CampaignDonationDialogProps) {
   const { contract } = useContext(UserContext);
-  const { enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -98,7 +97,7 @@ export default function CampaignDonationDialog({
               })
               .catch((reason) => {
                 onCloseDialog();
-                enqueueSnackbar(`Failed to donate!\n${reason}`, { variant: 'error' });
+                toast.error(`Failed to donate!\n${reason}`);
               });
           }}>
           Confirm

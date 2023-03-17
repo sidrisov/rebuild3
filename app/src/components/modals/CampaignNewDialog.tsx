@@ -18,7 +18,6 @@ import {
 } from '@mui/material';
 import { ethers } from 'ethers';
 
-import { useSnackbar } from 'notistack';
 import { useContext, useState } from 'react';
 
 import { ReBuild3 } from '../../../../solidity/typechain-types';
@@ -28,6 +27,7 @@ import { LoadingProgress, SuccessIndicator, showSuccessTimeMs } from '../Progres
 import { UserContext } from '../../contexts/UserContext';
 import { CloseCallbackType } from '../../types/CloseCallbackType';
 import { uploadToIpfs } from '../../utils/ipfs';
+import { toast } from 'react-toastify';
 
 export type CampaignNewDialogProps = DialogProps & CloseCallbackType;
 
@@ -37,7 +37,6 @@ export default function CampaignNewDialog({
 }: CampaignNewDialogProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-  const { enqueueSnackbar } = useSnackbar();
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedValidator, setSelectedValidator] = useState('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -87,14 +86,10 @@ export default function CampaignNewDialog({
     }
 
     if (cid === '') {
-      enqueueSnackbar('Image upload to IPFS failed!', {
-        variant: 'error'
-      });
+      toast.error('Image upload to IPFS failed!');
       return;
     } else {
-      enqueueSnackbar('Successfully uploaded image to IPFS!', {
-        variant: 'success'
-      });
+      toast.success('Successfully uploaded image to IPFS!');
     }
 
     // TODO: for now save the whole path, ideally, we want to save only cid, and then load all files based on the metadata stored
@@ -236,9 +231,7 @@ export default function CampaignNewDialog({
               })
               .catch((reason) => {
                 handleCloseCampaignDialog();
-                enqueueSnackbar(`Failed to submit a campaign!\n${reason}`, {
-                  variant: 'error'
-                });
+                toast.error(`Failed to submit a campaign!\n${reason}`);
               });
           }}>
           Submit
