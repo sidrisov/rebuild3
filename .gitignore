@@ -17,6 +17,7 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+.deps/*
 *.suo
 *.ntvs*
 *.njsproj
@@ -26,6 +27,8 @@ dist-ssr
 # Hardhat files
 cache
 artifacts
+cache-zk
+artifacts-zk
 
 
 node_modules

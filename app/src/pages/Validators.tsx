@@ -5,13 +5,12 @@ import { shortenWalletAddressLabel } from '../utils/address';
 import { Badge, Box, Card, Chip, Typography, Tooltip, Stack } from '@mui/material';
 import { ContentCopy } from '@mui/icons-material';
 import { copyToClipboard } from '../utils/copyToClipboard';
-import { useSnackbar } from 'notistack';
 import AddressAvatar from '../components/AddressAvatar';
 import { Helmet } from 'react-helmet-async';
+import { toast } from 'react-toastify';
 
 export default function Validators() {
   const { organizations } = useContext(UserContext);
-  const { enqueueSnackbar } = useSnackbar();
 
   return (
     <>
@@ -71,7 +70,7 @@ export default function Validators() {
                       deleteIcon={<ContentCopy fontSize="inherit" />}
                       onDelete={() => {
                         copyToClipboard(organization.account);
-                        enqueueSnackbar('Wallet address is copied to clipboard!');
+                        toast.info('Wallet address is copied to clipboard!');
                       }}
                       sx={{
                         height: 40,

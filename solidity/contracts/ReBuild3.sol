@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 // import "hardhat/console.sol";
 
-import '@openzeppelin/contracts/access/Ownable.sol';
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ReBuild3 is Ownable {
   struct Region {
@@ -75,7 +75,7 @@ contract ReBuild3 is Ownable {
 
   // Activate region
   function activateRegion(string memory _region) public onlyOwner {
-    require(!isRegion(_region), 'Region already exists!');
+    require(!isRegion(_region), "Region already exists!");
     regions.push(Region(true, _region));
     regionIds[_region] = regions.length;
     activeRegionsCount++;
@@ -92,7 +92,7 @@ contract ReBuild3 is Ownable {
   function deactivateRegion(string memory _name) public onlyOwner {
     require(isRegion(_name), "Region doesn't exist!");
     uint id = regionIds[_name] - 1;
-    require(regions[id].active, 'Region is not active already!');
+    require(regions[id].active, "Region is not active already!");
     regions[id].active = false;
     activeRegionsCount--;
     emit RegionDeactivated(_name);
@@ -105,8 +105,8 @@ contract ReBuild3 is Ownable {
     string memory _description,
     string memory _region
   ) public onlyOwner {
-    require(!isOrganization(_organization), 'Organization already exists!');
-    require(isRegionActive(_region), 'Region is not active!');
+    require(!isOrganization(_organization), "Organization already exists!");
+    require(isRegionActive(_region), "Region is not active!");
     organizations.push(Organization(true, _organization, _name, _description, _region));
     organizationIds[_organization] = organizations.length;
     emit OrganizationRegistered(_organization);
@@ -116,7 +116,7 @@ contract ReBuild3 is Ownable {
   function deactivateOrganization(address _organization) public onlyOwner {
     require(isOrganization(_organization), "Organization doesn't exist!");
     uint id = organizationIds[_organization] - 1;
-    require(organizations[id].active, 'Organization is not active already!');
+    require(organizations[id].active, "Organization is not active already!");
     organizations[id].active = false;
     emit OrganizationDeactivated(_organization);
   }
@@ -160,7 +160,7 @@ contract ReBuild3 is Ownable {
   function getOrganizationsInRegion(
     string memory _region
   ) public view returns (Organization[] memory) {
-    require(isRegionActive(_region), 'Region is not active!');
+    require(isRegionActive(_region), "Region is not active!");
     Organization[] memory orgs = new Organization[](organizations.length);
     uint count = 0;
     for (uint i = 0; i < organizations.length; i++) {
@@ -185,8 +185,8 @@ contract ReBuild3 is Ownable {
     string memory _region,
     address _organization
   ) external {
-    require(isRegionActive(_region), 'Region is not active!');
-    require(isOrganizationActive(_organization), 'Organization is not active!');
+    require(isRegionActive(_region), "Region is not active!");
+    require(isOrganizationActive(_organization), "Organization is not active!");
     require(_goal <= goalThreshold, "You can't raise more than allowed threshold!");
     require(msg.sender != _organization, "Campaign creator and organization can't be same!");
 
@@ -213,8 +213,8 @@ contract ReBuild3 is Ownable {
   function approveCampaign(uint _campaignId) external {
     require(_campaignId < campaigns.length, "Campaign doesn't exist!");
 
-    require(!campaigns[_campaignId].active, 'Campaign is approved already!');
-    require(campaigns[_campaignId].organization == msg.sender, 'Not allowed to approve!');
+    require(!campaigns[_campaignId].active, "Campaign is approved already!");
+    require(campaigns[_campaignId].organization == msg.sender, "Not allowed to approve!");
 
     campaigns[_campaignId].active = true;
     emit CampaignActive(_campaignId);
@@ -224,7 +224,7 @@ contract ReBuild3 is Ownable {
     require(_campaignId < campaigns.length, "Campaign doesn't exist!");
     require(
       campaigns[_campaignId].active && !campaigns[_campaignId].released,
-      'Campaign is not open for donation!'
+      "Campaign is not open for donation!"
     );
 
     address donor = msg.sender;
@@ -246,12 +246,12 @@ contract ReBuild3 is Ownable {
     require(_campaignId < campaigns.length, "Campaign doesn't exist!");
     require(
       campaigns[_campaignId].active && !campaigns[_campaignId].released,
-      'Campaign is not open for donation!'
+      "Campaign is not open for donation!"
     );
 
     require(
       campaigns[_campaignId].raised >= campaigns[_campaignId].goal,
-      'The goal amount is not raised!'
+      "The goal amount is not raised!"
     );
 
     campaigns[_campaignId].released = true;
@@ -263,8 +263,8 @@ contract ReBuild3 is Ownable {
 
     (bool sent, ) = payable(campaigns[_campaignId].owner).call{
       value: campaigns[_campaignId].raised
-    }('');
-    require(sent, 'Failed to release funds!');
+    }("");
+    require(sent, "Failed to release funds!");
 
     emit CampaignSuccess(_campaignId, campaigns[_campaignId].owner, campaigns[_campaignId].raised);
   }

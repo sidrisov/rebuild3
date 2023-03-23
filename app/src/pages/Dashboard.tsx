@@ -5,7 +5,7 @@ import { Box, Typography } from '@mui/material';
 
 import { UserContext } from '../contexts/UserContext';
 import { DashboardStatsType } from '../types/DashboardStatsType';
-import { StatsCard } from '../components/StatsCard';
+import { StatsCard } from '../components/cards/StatsCard';
 import { Helmet } from 'react-helmet-async';
 
 export default function Dashboard() {

@@ -85,7 +85,19 @@ export default function HomeLayout() {
               variant="contained"
               href={appURL}
               endIcon={<ExitToApp />}
-              sx={{ width: 155, height: 40, borderRadius: 3 }}>
+              sx={{
+                width: 145,
+                height: 40,
+                borderRadius: 3,
+                color: 'white',
+                fontSize: 15,
+                fontWeight: 'bold',
+                backgroundColor: darkMode ? blue[500] : blue[700],
+                transition: 'transform 0.15s ease-in-out',
+                '&:hover': {
+                  transform: 'scale3d(1.03, 1.03, 1.03)'
+                }
+              }}>
               Go To App
             </Button>
           </Toolbar>
