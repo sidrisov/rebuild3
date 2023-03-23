@@ -27,10 +27,9 @@ import {
   useTheme,
   Zoom
 } from '@mui/material';
-import { blue } from '@mui/material/colors';
+import { blue, green } from '@mui/material/colors';
 import { TransitionProps } from '@mui/material/transitions';
 import { ethers } from 'ethers';
-import { useSnackbar } from 'notistack';
 import { forwardRef, useContext, useMemo, useState } from 'react';
 import AddressAvatar from '../AddressAvatar';
 import { CampaignStatusIndicator } from '../CampaignStatusIcon';
@@ -44,6 +43,7 @@ import CampaignDonationDialog from './CampaignDonationDialog';
 import { ReBuild3 } from '../../../../solidity/typechain-types';
 import { Utils } from 'alchemy-sdk';
 import { CloseCallbackType } from '../../types/CloseCallbackType';
+import { toast } from 'react-toastify';
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -69,7 +69,6 @@ export default function CampaignViewDialog({
   const smallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { isWalletConnected, userAddress, campaigns, contract } = useContext(UserContext);
   const [campaign, setCampaign] = useState<ReBuild3.CampaignStructOutput>();
-  const { enqueueSnackbar } = useSnackbar();
   const [openCampaignDonation, setOpenCampaignDonation] = useState(false);
   const [donations, setDonations] = useState<ReBuild3.DonationStructOutput[] | undefined>([]);
 
@@ -118,7 +117,7 @@ export default function CampaignViewDialog({
     },
     [`& .${linearProgressClasses.bar}`]: {
       borderRadius: 5,
-      backgroundColor: theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8'
+      backgroundColor: theme.palette.mode === 'light' ? green[600] : green[500]
     }
   }));
 
@@ -169,7 +168,7 @@ export default function CampaignViewDialog({
                     size="small"
                     onClick={() => {
                       copyToClipboard(campaign.owner);
-                      enqueueSnackbar('Wallet address is copied to clipboard!');
+                      toast.info('Wallet address is copied to clipboard!');
                     }}>
                     <ContentCopy fontSize="small" />
                   </IconButton>
@@ -244,7 +243,7 @@ export default function CampaignViewDialog({
                                 size="small"
                                 onClick={() => {
                                   copyToClipboard(donations[i].donor);
-                                  enqueueSnackbar('Wallet address is copied to clipboard!');
+                                  toast.info('Wallet address is copied to clipboard!');
                                 }}>
                                 <ContentCopy fontSize="small" />
                               </IconButton>

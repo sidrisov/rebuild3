@@ -4,8 +4,6 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 import { AppBar, IconButton, Toolbar, Box, Container, Drawer, Stack } from '@mui/material';
 
-import { useSnackbar } from 'notistack';
-
 import CustomThemeProvider from '../theme/CustomThemeProvider';
 import { LightModeOutlined, DarkModeOutlined, Menu } from '@mui/icons-material';
 
@@ -21,19 +19,20 @@ import { CampaignFilters } from '../types/CampaignFiltersType';
 import HideOnScroll from '../components/HideOnScroll';
 
 import { useAccount, useContract, useNetwork, useProvider, useSigner } from 'wagmi';
+import { toast } from 'react-toastify';
 
 // TODO: enable magic link once there is a working wagmi connector available
-/* const MAGIC_SUPPORTED = import.meta.env.VITE_MAGIC_SUPPORTED === 'true';
+/*
+const MAGIC_SUPPORTED = import.meta.env.VITE_MAGIC_SUPPORTED === 'true';
 const MAGIC_ENABLED = import.meta.env.VITE_MAGIC_ENABLED === 'true' && MAGIC_SUPPORTED;
 
-var magic: InstanceWithExtensions<SDKBase, ConnectExtension[]>;
+var magic;
 var magicSignerProvider: ethers.providers.Web3Provider | undefined;
 
 // if magic enabled
 if (MAGIC_SUPPORTED) {
   magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
-    network: import.meta.env.VITE_DEFAULT_NETWORK as EthNetworkName,
-    extensions: [new ConnectExtension()]
+    network: import.meta.env.VITE_DEFAULT_NETWORK as EthNetworkName
   });
   magic.preload();
   magicSignerProvider = new ethers.providers.Web3Provider(magic.rpcProvider as any);
@@ -78,7 +77,6 @@ export default function AppLayout({ appSettings, setAppSettings }: any) {
   });
 
   const [isSubscribedToEvents, setSubscribedToEvents] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useMemo(async () => {
@@ -134,46 +132,46 @@ export default function AppLayout({ appSettings, setAppSettings }: any) {
       defaultProvider?.once('block', async () => {
         contract.once(contract.filters.RegionActivated(), () => {
           fetchRegionData(contract);
-          enqueueSnackbar('New region registered!', { variant: 'success' });
+          toast.success('New region registered!');
           setSubscribedToEvents(false);
         });
 
         contract.once(contract.filters.RegionDeactivated(), () => {
           fetchRegionData(contract);
-          enqueueSnackbar('Region deactivated!', { variant: 'warning' });
+          toast.warn('Region deactivated!');
           setSubscribedToEvents(false);
         });
 
         contract.once(contract.filters.OrganizationRegistered(), () => {
           fetchOrganizationData(contract);
-          enqueueSnackbar('New organization registered!', { variant: 'success' });
+          toast.success('New organization registered!');
           setSubscribedToEvents(false);
         });
         contract.once(contract.filters.OrganizationDeactivated(), () => {
           fetchOrganizationData(contract);
-          enqueueSnackbar('Organiation deactivated!', { variant: 'warning' });
+          toast.warn('Organiation deactivated!');
           setSubscribedToEvents(false);
         });
 
         contract.once(contract.filters.CampaignCreated(), () => {
           fetchCampaignData(contract);
-          enqueueSnackbar('New campaign created!', { variant: 'success' });
+          toast.success('New campaign created!');
           setSubscribedToEvents(false);
         });
 
         contract.once(contract.filters.CampaignActive(), () => {
           fetchCampaignData(contract);
-          enqueueSnackbar('Campaing is available for donations!', { variant: 'info' });
+          toast.info('Campaing is available for donations!');
           setSubscribedToEvents(false);
         });
         contract.once(contract.filters.CampaignSuccess(), () => {
           fetchCampaignData(contract);
-          enqueueSnackbar('Campaign was successful!', { variant: 'success' });
+          toast.success('Campaign was successful!');
           setSubscribedToEvents(false);
         });
         contract.once(contract.filters.DonationMade(), () => {
           fetchCampaignData(contract);
-          enqueueSnackbar('New donation was made!', { variant: 'info' });
+          toast.info('New donation was made!');
           setSubscribedToEvents(false);
         });
       });

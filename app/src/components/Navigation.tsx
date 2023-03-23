@@ -24,16 +24,15 @@ import {
 } from '@mui/icons-material';
 import { shortenWalletAddressLabel } from '../utils/address';
 import { copyToClipboard } from '../utils/copyToClipboard';
-import { useSnackbar } from 'notistack';
 import AddressAvatar from './AddressAvatar';
 import { appRoutes } from '../appRouter';
 
 import { useAccount, useBalance, useEnsAvatar } from 'wagmi';
+import { toast } from 'react-toastify';
 
 export default function Navigation() {
   const { pathname } = useLocation();
   const [tabValue, setTabValue] = useState(0);
-  const { enqueueSnackbar } = useSnackbar();
 
   const account = useAccount();
   const balance = useBalance(account);
@@ -92,7 +91,7 @@ export default function Navigation() {
                 size="small"
                 onClick={() => {
                   copyToClipboard(account.address?.toString() as string);
-                  enqueueSnackbar('Wallet address is copied to clipboard!');
+                  toast.info('Wallet address is copied to clipboard!');
                 }}>
                 <ContentCopy fontSize="small" />
               </IconButton>

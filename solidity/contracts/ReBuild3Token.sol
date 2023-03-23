@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import '@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol';
-import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol';
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
 contract ReBuild3Token is ERC20, ERC20Permit, ERC20Votes {
   address governor;
 
-  constructor(address _governor) ERC20('ReBuild3Token', 'RB3') ERC20Permit('ReBuild3Token') {
+  constructor(address _governor) ERC20("ReBuild3Token", "RB3") ERC20Permit("ReBuild3Token") {
     governor = _governor;
     _mint(msg.sender, 100000e18);
   }
