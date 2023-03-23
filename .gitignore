@@ -27,6 +27,8 @@ dist-ssr
 # Hardhat files
 cache
 artifacts
+cache-zk
+artifacts-zk
 
 
 node_modules
