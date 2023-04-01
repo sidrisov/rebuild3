@@ -4,6 +4,7 @@ import '@nomicfoundation/hardhat-toolbox';
 import '@matterlabs/hardhat-zksync-deploy';
 import '@matterlabs/hardhat-zksync-solc';
 import '@matterlabs/hardhat-zksync-verify';
+import '@truffle/dashboard-hardhat-plugin';
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -19,7 +20,7 @@ const config: HardhatUserConfig = {
     }
   },
   zksolc: {
-    version: '1.3.1',
+    version: '1.3.7',
     compilerSource: 'binary',
     settings: {}
   }
@@ -60,6 +61,9 @@ const config: HardhatUserConfig = {
         process.env.GOERLI_PRIVATE_KEY_2,
         process.env.GOERLI_PRIVATE_KEY_3
       ]
+    },
+    dashboard: {
+      url: 'http://localhost:24012/rpc'
     },
     zkSyncTestnet: {
       url: 'https://zksync2-testnet.zksync.dev',
