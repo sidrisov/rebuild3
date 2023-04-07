@@ -10,6 +10,9 @@ describe('ReBuild3', function () {
     const ReBuild3 = await ethers.getContractFactory('ReBuild3');
     const contract = await ReBuild3.deploy();
 
+    // TODO: little hack to make it work as we moved to using UUPSProxy
+    await contract.initialize();
+
     await contract.setGoalThreshold(ethers.utils.parseEther('1'));
 
     return { contract, owner, addr1, addr2 };
@@ -21,6 +24,9 @@ describe('ReBuild3', function () {
 
     const ReBuild3 = await ethers.getContractFactory('ReBuild3');
     const contract = await ReBuild3.deploy();
+
+    // TODO: little hack to make it work as we moved to using UUPSProxy
+    await contract.initialize();
 
     await contract.activateRegion('Ukraine');
 
@@ -35,6 +41,9 @@ describe('ReBuild3', function () {
 
     const ReBuild3 = await ethers.getContractFactory('ReBuild3');
     const contract = await ReBuild3.deploy();
+
+    // TODO: little hack to make it work as we moved to using UUPSProxy
+    await contract.initialize();
 
     await contract.setGoalThreshold(ethers.utils.parseEther('1'));
 

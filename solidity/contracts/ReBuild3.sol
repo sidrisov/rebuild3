@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.18;
 
 // import "hardhat/console.sol";
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract ReBuild3 is Ownable {
+contract ReBuild3 is UUPSUpgradeable, OwnableUpgradeable {
   struct Region {
     bool active;
     string name;
@@ -43,7 +44,7 @@ contract ReBuild3 is Ownable {
     bool returned;
   }
 
-  uint256 public goalThreshold = 0;
+  uint256 public goalThreshold;
 
   Region[] regions;
   mapping(string => uint) regionIds;
@@ -72,6 +73,12 @@ contract ReBuild3 is Ownable {
   event CampaignActive(uint indexed campaignId);
   event DonationMade(uint indexed campaignId, address indexed donor, uint256 indexed amount);
   event CampaignSuccess(uint indexed campaignId, address indexed receiver, uint256 amount);
+
+  function initialize() public initializer {
+    __Ownable_init();
+  }
+
+  function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
   // Activate region
   function activateRegion(string memory _region) public onlyOwner {

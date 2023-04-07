@@ -12,14 +12,14 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@fontsource/roboto": "^4.5.8",
-    "@magic-sdk/types": "^11.6.0",
+    "@magic-sdk/types": "^14.0.0",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.13",
     "@rainbow-me/rainbowkit": "^0.12.2",
     "alchemy-sdk": "^2.6.1",
     "ethers": "^5.7.2",
     "lodash.merge": "^4.6.2",
-    "magic-sdk": "^13.6.0",
+    "magic-sdk": "^16.0.1",
     "moralis": "^2.16.1",
     "react": "^18.2.0",
     "react-blockies": "^1.4.1",
@@ -40,7 +40,7 @@
     "@vitejs/plugin-react-swc": "^3.2.0",
     "eslint": "^8.36.0",
     "eslint-plugin-react": "^7.32.2",
-    "typescript": "^4.9.5",
+    "typescript": "^5.0.2",
     "vite": "^4.2.1"
   }
 }
