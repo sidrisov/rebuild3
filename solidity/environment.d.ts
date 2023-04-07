@@ -6,6 +6,7 @@ declare global {
       TOKEN_CONTRACT_ADDR: string;
       ALCHEMY_API_KEY: string;
       GOERLI_ETHERSCAN_API_KEY: string;
+      OPT_GOERLI_ETHERSCAN_API_KEY: string;
       GOERLI_PRIVATE_KEY_1: string;
       GOERLI_PRIVATE_KEY_2: string;
       GOERLI_PRIVATE_KEY_3: string;

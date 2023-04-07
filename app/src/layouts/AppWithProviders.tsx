@@ -15,7 +15,7 @@ import {
   Theme
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
-import { goerli, optimismGoerli, baseGoerli, mainnet, zkSyncTestnet } from 'wagmi/chains';
+import { goerli, sepolia, optimismGoerli, baseGoerli, mainnet, zkSyncTestnet } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
 import AddressAvatar from '../components/AddressAvatar';
@@ -25,7 +25,7 @@ import { AppSettings } from '../types/AppSettingsType';
 import { ToastContainer } from 'react-toastify';
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [zkSyncTestnet, optimismGoerli, goerli, baseGoerli, mainnet],
+  [zkSyncTestnet, optimismGoerli, goerli, sepolia, baseGoerli, mainnet],
   [alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }), publicProvider()]
 );
 

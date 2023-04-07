@@ -1,17 +1,19 @@
 import { HardhatUserConfig } from 'hardhat/config';
 
 import '@nomicfoundation/hardhat-toolbox';
+import '@openzeppelin/hardhat-upgrades';
+import '@truffle/dashboard-hardhat-plugin';
+
 import '@matterlabs/hardhat-zksync-deploy';
 import '@matterlabs/hardhat-zksync-solc';
 import '@matterlabs/hardhat-zksync-verify';
-import '@truffle/dashboard-hardhat-plugin';
 
 import dotenv from 'dotenv';
 dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: '0.8.17',
+    version: '0.8.18',
     settings: {
       optimizer: {
         enabled: true,
@@ -20,14 +22,14 @@ const config: HardhatUserConfig = {
     }
   },
   zksolc: {
-    version: '1.3.7',
+    version: '1.3.8',
     compilerSource: 'binary',
     settings: {}
   }
 
   // uncomment it to work with local node or goerli,
   // for tests to work it should be commented out, otherwise it will be trying to connect to local node
-  /*defaultNetwork: 'zkSyncTestnet',
+  /*defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
       mining: {
@@ -44,7 +46,15 @@ const config: HardhatUserConfig = {
       gas: 2100000,
       gasPrice: 8000000000
     },
-    'opt-goerli': {
+    sepolia: {
+      url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+      accounts: [
+        process.env.GOERLI_PRIVATE_KEY_1,
+        process.env.GOERLI_PRIVATE_KEY_2,
+        process.env.GOERLI_PRIVATE_KEY_3
+      ]
+    },
+    optimisticGoerli: {
       url: `https://opt-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
       accounts: [
         process.env.GOERLI_PRIVATE_KEY_1,
@@ -73,7 +83,21 @@ const config: HardhatUserConfig = {
     }
   },
   etherscan: {
-    apiKey: process.env.GOERLI_ETHERSCAN_API_KEY
+    apiKey: {
+      goerli: process.env.GOERLI_ETHERSCAN_API_KEY,
+      optimisticGoerli: process.env.OPT_GOERLI_ETHERSCAN_API_KEY,
+      'base-goerli': process.env.GOERLI_ETHERSCAN_API_KEY
+    },
+    customChains: [
+      {
+        network: 'base-goerli',
+        chainId: 84531,
+        urls: {
+          apiURL: 'https://api-goerli.basescan.org/api',
+          browserURL: 'https://goerli.basescan.org'
+        }
+      }
+    ]
   }*/
 };
 

@@ -41,5 +41,5 @@ typechain-types
 # Hardhat files
 cache
 artifacts
-
-*.todo
+# OpenZeppelin
+*/*.openzeppelin/unknown-*.json
