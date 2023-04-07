@@ -60,8 +60,11 @@ export default function AppLayout({ appSettings, setAppSettings }: any) {
   const { isConnected: isWalletConnected, address: userAddress } = useAccount();
   const { chain } = useNetwork();
   const rb3Contract = useContract({
-    address: contracts.find((contract) => (chain ? contract.network === chain?.network : true))
-      ?.address,
+    address: contracts.find((contract) =>
+      chain
+        ? contract.network === chain?.network
+        : contract.network === import.meta.env.VITE_DEFAULT_NETWORK
+    )?.address,
     abi: Rebuild3ContractArtifact.abi,
     signerOrProvider: signer.data || defaultProvider
   }) as ReBuild3;
